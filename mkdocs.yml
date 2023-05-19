@@ -6,7 +6,7 @@ nav:
     - Event Storming: event-storming/index.md
   - AWS techno:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
-      - EventBridge: https://jbcodeforce.github.io/aws-studies/serverless/eventbridge
+      - EventBridge: aws/eventbridge.md
   - IBM assets: ibm-assets.md
   - Return to main: https://jbcodeforce.github.io
 theme: 

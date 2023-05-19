@@ -17,6 +17,8 @@ Data architecture is evolving from a set of dedicated databases or data warehous
 
 The consideration of Data as a core differentiator to run a business, and as a competitive advantages, it is important that the IT architecture supports the need to get visibility of the data as soon as it created, and be able to act on it in close to real-time.
 
+Recent studies demonstrate the quality of business decision on data are inversely proportional of the age of the data. The value of the data dismishes over time. They have a short shelf like of actionability. This is perfectly relevant in AI model and we will see how EDA helps in the data pipeline and feature engineering and storage for Machine Learning model.
+
 Early 2000s, the adoption of service oriented architecture help to think about business applications as a group of business services that can be ubiquitous and accessible using internet. SOAP and XML were the technologies of choice. But as early as 2004, Event-driven architecture was positioned as an evolution of SOA to scale the number of data producer or data consumer and improve inter-dependencies. The following diagram illustrates this evolution.
 
 ![](./images/soa-to-eda.png){ width=800 }
@@ -25,8 +27,120 @@ What is clear is that asynchronous communication helps in decoupling and scaling
 
 Decoupling event producers and consumers from one another, helps increasing the scalability, resilience but also the development effort.
 
-Cloud helps enterprises' software capabilities to scale dramatically, supporting rapid change, adopting agile and continuous deployment of new features, multiple times a week to production to million of users…
+Cloud helps enterprises' software capabilities to scale horizontally, when needed for supporting workload peaks. Cloud native practice is helping to support rapid code change, adopting agile and continuous deployment to production of new feature versions, multiple times a week to million of users…
 
- IT department should get of their 80% of time to maintain infrastructure…
+Budget allocated to run server, update operating system, apply security patch, is used for innovating on new features for end users.
 
-There are some major drivers to adopt EDA in modern solution implementations
+## Components of the architecture
+
+At first it is important to consider, without any technology bias, EDA in the term of high level building blocks which we will find in any architecture. The diagram below illustrates those high-level component.
+
+![](./diagrams/eda-hl.drawio.png){ width=800 }
+
+The main goals of this architecture are to support scaling, decoupling, and acting on data as early as created, while enabling data pipelines for future batch processing and AI/ML development.
+
+* **Event sources** are any applications we want to get data from. Most of those sources are not event oriented per design, but it is possible to get events from them by pulling/querying their APIs or the data storage (database), or by connecting change data capture agent to get continuous event feeds. 
+* **Event Backbone** is the core middleware that supports asynchronous communication and storage of events, with high availability and replayability capabilities.
+* **New event-driven applications**:  microservices or functions, producers and consumers of events. Event is part of their design on day one. Those services expose APIs to be used by web apps, mobile apps, or B2B apps. So they supports synchronous and asynchronous protocols.
+* **Events** are persisted for very long time persistence to target sinks like data lakes. But it can be dat a warehouse, SaaS partners...
+* The last piece of the architecture acts on those events, in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation – pipeline, and Complex Event Processing.
+
+### A zoom into the event backbone
+
+The Event Backbone is not supported by a unique technology as different needs bring different tools. We will go over a simple decision tree to facilitate when to use what in a section below. In asynchronous communication, the applications produce messages, consume them, or do both in the form of consume-process-produce processing.
+
+![](./diagrams/event-backbone.drawio.png){ width=800 }
+
+For **the producer** we can illustrate two behaviors: 
+
+1. applications want to ask another service to do something for themselves: this is the classical command pattern, there is one interested consumer, exchange request/reply messages, with exactly once delivery, message ordering, no data loss. **Queues** are the best technology to support that.
+1. applications want to broadcast their main business entity state change. This is the events production as immutable facts. Pub/sub model on topic is the technology approach. There are two technology, the older one based on the topic semantic, like in JMS and the streaming one. Records are immutable.
+
+For **consumers**, they subscribe to the queue or topic, and pull messages, or get messages as part of their subscription in a push model. With pulling the consumer needs to filter out the messages it is not interested of. With pushing the event bus can apply filtering and routing rules. It is important to note that in queueing system message read are deleted, and in classical topic implementation, messages are kept until all known subscribers received the message.
+
+The consume-process-produce is a processing that we find in Kafka streaming, and the 3 step of this mini processus are transactional and supports exactly once delivery. Other technology like Flink or Spark streaming may support such implementation, the most important pattern is that the new facts are created from the processing. This is valuable approach for data pipeline, stateful aggregation using time window, real-time analytics. 
+
+Talking about streaming, topic, can be ordered, and messages in the topic include timestamp. So complex-event processing logic can be implemented, with semantic to look at event sequencing, or not sequencing. 
+
+Topic or queues should support persistence, for resiliance, and even being able to replay history, or restart from a specific message. This is supported differently depending of the technology, Kafka having offset management, partition and files on disk of the broker.
+
+Event backbone should scale, and support clustering of brokers. 
+
+There is something already strange about this, is why we call it event backbone as it supports queue, and in the world of queueing, there is no concept of event, but messages. A better name should be messaging middleware or system. This is indeed confusing but at the end, looking at APIs (JMS, Kafka, Kinesis,...) the underlying data structure is a record or message. It is admitted in modern days that the message concept is used when records are persisted until consumed, message consumers are typically directly targeted and related to the producer who cares that the message has been delivered and processed. Events are persisted as a replayable stream. Event consumers are not tied to the producer, and can consume at any point of time.
+
+In most topic implementation, there is the concept of partition or shard to be able to scale the number of consumers in parellel. 
+
+Finally there are two services that are necessary in this middleware to support the minimum governance: 
+
+* the **schema registry** to control the contract between producer and consumer by defining the data model schema fo the message exchanged. The message includes metadata about the schema version, and may be the URL of the schema registry so the consumer can get, at run time, the schema definition of the message to consume. With this capability consumer can replay old messages and new ones from the same topic or queue.
+* **AsyncAPI** support, this is a quite new capability that needs to be addressed: as we have standard, via OpenAPI to define HTTP interface, the [AsyncAPI](https://www.asyncapi.com/) is the open standard for asynchronous communication and binding. So the component is an api manager which faciliate the governance and consumer boilerplace code generation.
+
+### Event sources
+
+As introduced before, we group in this category applications that were not designed to produce events. They can use queueing, and they most likely use database. To get visibility of the data update, tool like change data capture, or CDC, are used to inject updated record as message to queue or topic.
+
+There are design considerations to study like, how to avoid duplication of message, not loosing message, and how to pace the throughput.
+
+### Event-driven microservices
+
+A microservices are small application that exposes a set of operations on a single entity and communicate with each other via web API, most of the time using RESTful protocol. Microservices are implemented by a two-pizza size team using agile development, devops approaches and cloud native development most of the time.
+
+To find and design microservice, we apply the domain-driven design by addressing domain and sub-domain, searching of events, aggregates, commands and bounded contexts. All those DDD elements help building microservices.
+
+I like to apply the [reactive manifesto principles](https://www.reactivemanifesto.org/) while looking at the microservice implementation. They need to support the following characteristics:
+
+* **Responsive**: deliver a consistent quality of service to end users or systems, react quickly and consistently to events happening in the system.
+* **Elastic**: The system stays responsive under varying workload, it can scale up and down the resource utilization depending of the load to the system.
+* **Resilient**: stay responsive in the face of failure, this is a key characteristics. It implies distributed systems.
+* **Message driven**: the underlying behavior is to have an asynchronous message driven backbone, to enable loose coupling of the application components by exchanging asynchronous messages to minimize or isolate the negative effects of resource contention, coherency delays and inter-service communication network latency. It is the base to support the other reactive characteristics. It also helps for isolation and support location transparency.
+
+### Event sinks
+
+### Event streaming processing
+ 
+## From SOA to EDA
+
+I will take a fictuous business case of car ride on autonomous vehicle. The customer wants to go from one address or geographic location to another one, within a big city, using the Acme Autonomous Car Ride mobile app.
+
+The high-level component architecture may look like in the following figure:
+
+![](./diagrams/classical-sync-arch.drawio.png){ width=800 }
+
+* The **traveller** user is using a mobile app, connected to the classical **Backend For Frontend** service, which exposes RESTful API, with may be also a websocket connection to push notifications back to the mobile app to support traffic from backend to user.
+* The major component is the **order manager** service which exposes API for the user to request to go from a geolocation A to geolocation B, and may be an API for historical rides query.
+* The **address finder**, geolocation mapper, is an utility service to map address to geo-location and any other metadata to facilitate the search for the optimal itinerary and car. It is a very important service, and may be complex to implement. It exposes HTTP APIs and must respond in sub millisecond.
+* The Order service needs to integrate with other services ,like payment service once the ride is terminated, and car dispatcher to get an autonomous car.
+* A car dispatcher needs to find the closest car to support the pickup within the shortest time. The computation may take sometime, but the response to the end user will be something like your car will arrive in 3 minutes and the target arrival time will be 15 minutes, do you want to proceed?. Once commited the car will move to pickup address and sends travel metrics
+* The metrics are processed by the route monitoring service, which computes ETA, and other interesting real-time, time-windowing logic.
+* When the travel is completed, the payment service needs to trigger the payment and the reward program service may update the number of travel, and may be also rate the consumer. As there is no driver, there is no more driver rating. 
+
+This architecture is interesting, it embraces microservices architecture, mostly synchronous HTTP based traffic. 
+
+One of the major design decision is who is doing the orchestration of this business process. In the early 2010, a lot of business applications were considered as business process management solution. Even when the process did not involved human task, the process was doing SOA services orchestration and BPEL was the technology of choice. To have some fun, this is how 2010, BPM experts will model this application:
+
+![](./diagrams/classical-bpm.drawio.png){ width=1100 }
+
+We will not dig into the details of this process flow, but what is interesting still, is the sequencing of action over time and then a set of commands that may happen, helping to design the service interface. Also the failover and compensation is not highlighted. This example is just to illustrate that when you have a technology, you try to solve the problem with it: "With my hammer, everything is a nail". 
+
+Which leads to my next argument: there are a lot of people who are currently claiming that EDA will be the silver bullet to address service coupling, scaling, resilience and ... cooking meals. For example, some architects are claiming the following challenges of the above component view diagram:
+
+- order services is responsible to talk to multiple services, and orchestrate service calls. 
+- orchestration logic should be outside of the microservice. I want to immediatly react on this one, as service orchestration is done to follow a business process. As seen in process flow there is a business logic and needs to follow those steps, so it is part of the context of the order service to implement the process about an order. We are in the domain-driven design bounded context. The implementation of this orchestration flow can be in code, or in business process engine, in state machine, but at least owned by one team.
+-  strong coupling between the components. The order service needs to understand the semantic of the other services. Which is partially true, it needs to understand the interface characteristics of the services. Which includes One argument is that if one of the service is not responding quickly, then all the components in the calling chain are impacted. Another one, is if one component fails, this will propagate to all the callers. 
+There are patterns, like circuit braker,   in the synchronous to support slow components or 
+
+
+## Selecting event bus technologies
+
+As introduced in the event backbone component description above, there are different messaging capabilities. Consider queue system for:
+
+* Exactly once delivery, and to participate into two phase commit transaction.
+* Asynchronous request / reply communication: the semantic of the communication is for one component to ask a second to do something on its data. This is a command pattern with delay on the response.
+* Messages in queue are kept until consumer(s) got them.
+
+Consider streaming system, like Kafka, as pub/sub and persistence system for:
+
+* Publish events as immutable facts of what happened in an application.
+* Get continuous visibility of the data Streams.
+* Keep data once consumed, for future consumers, and for replay-ability.
+* Scale horizontally the message consumption.
