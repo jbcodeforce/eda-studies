@@ -97,7 +97,21 @@ I like to apply the [reactive manifesto principles](https://www.reactivemanifest
 ### Event sinks
 
 ### Event streaming processing
- 
+
+This is one of the major value of EDA as it helps addressing one of the major AI/ML requirements for modern data pipelines and act on data as early as possible after creation. 
+
+For streaming, we have events persisted for a long time period, ordered, with timestamps and immutable. With these characteristics, we can implement elements of the classical Transform operations done in classical batch ETL jobs, but this time in real-time and consumable by any interested parties. Black box ETL becomes transparent processing in the continuous data pipeline.
+
+In the classical data preparation process for ML model development, data scientist discover raw data than do feature engineering by applying transformation, mostly in python notebook, then trains the model. Once confident of the model scoring, a data engineer productionize the data pipeline, so data inject to the model, once the ML model is deployed are well prepare. The model is integrated as a service. If there is a data issue the model results will be impacted. The implementation of the data pipeline is traditionally done in ETL product. But most of modern pipeline needs to integrate with streaming data.
+
+The following diagram illustrates this concept of modern data pipeline to prepare events/ features for ML model and feature store.  
+
+![](./diagrams/modern-data-pipeline.drawio.png){ width=1000 }
+
+This is using the autonomous car system, where each car can send telemetries to a topic. The raw data is consumed, transformed, mapped according to the processing defined by the Data engineer, may compute some aggregate and produce, what we used to call in the CEP, a synthetic event. This event is in another topic, and may be relevant for other consumers. From a EDA this is an important value proposition to share events for multiple use cases. One of the consumer will be a sink adapter which write to a Feature store. The Feature store, which includes also data coming from warehouse or data lake, is used by the predictive service to prepare the data for the ML model. The car dispatcher service may be a user of the predictive service to get for example the Estimated travel time. 
+
+In a lot of EDA deployments, this logic of consuming - processing - and publishing events is very common and bring a lot of flexibility on the data processing. Data becoming real asset, in real-time, shareable as needed.
+
 ## From SOA to EDA
 
 I will take a fictuous business case of car ride on autonomous vehicle. The customer wants to go from one address or geographic location to another one, within a big city, using the Acme Autonomous Car Ride mobile app.
@@ -124,10 +138,20 @@ We will not dig into the details of this process flow, but what is interesting s
 
 Which leads to my next argument: there are a lot of people who are currently claiming that EDA will be the silver bullet to address service coupling, scaling, resilience and ... cooking meals. For example, some architects are claiming the following challenges of the above component view diagram:
 
-- order services is responsible to talk to multiple services, and orchestrate service calls. 
-- orchestration logic should be outside of the microservice. I want to immediatly react on this one, as service orchestration is done to follow a business process. As seen in process flow there is a business logic and needs to follow those steps, so it is part of the context of the order service to implement the process about an order. We are in the domain-driven design bounded context. The implementation of this orchestration flow can be in code, or in business process engine, in state machine, but at least owned by one team.
--  strong coupling between the components. The order service needs to understand the semantic of the other services. Which is partially true, it needs to understand the interface characteristics of the services. Which includes One argument is that if one of the service is not responding quickly, then all the components in the calling chain are impacted. Another one, is if one component fails, this will propagate to all the callers. 
-There are patterns, like circuit braker,   in the synchronous to support slow components or 
+* order service is responsible to talk to multiple services, and orchestrates service calls. 
+* orchestration logic should be outside of the microservice. I want to immediatly react on this one, as service orchestration is done to follow a business process. As seen in process flow there is a business logic and needs to follow those steps, so it is part of the context of the order service to implement the process about an order. We are in the domain-driven design bounded context. The implementation of this orchestration flow can be in code, or in business process engine, in state machine, but at least owned by one team.
+* strong coupling between the components. The order service needs to understand the semantic of the other services. Which is partially true, but it really needs to understand the interface characteristics of the services. Which includes data model, protocol, SLA, communication type, ... The data model is part of the interface contract and is the main argument for coupling. Any change to the API of the downstream services impact the order / orchestrator service. There are way to go over that by using contract testing, so each change to the contracts can be seen during CI/CD pipelines. Now it is true that when a service is used by a big number of other services then API versioning becomes a challenge. On the other side of the argument on most of simple business application the number of services stand to stay low and interface characteristics do not change that often. Data model coupling still exists in messaging system. Schema registry and the metadata exchange within the message helps to address that, but it means now consumers need to be aware of the producer. This is an inversion of control. 
+* Choreography of API is hard to do. I touched on this point before, but one thing important is to differentiate choreography from orchestration. Most of that example to illustrate the bad thing of synchronous processing is about compensation flow. The problem is not the way we interact with service, the problem comes from the fact that in RESTful there is no support, yet, for transaction as it was possible to do with SOAP WS-* protocol. Asynchronous messaging, event bus,... does not help that much on compensation flow. 
+
+??? "Choreography vs Orchestration"
+    This different models are used in the context of the Saga pattern, which helps to support a long running transaction between distributed systems that can be broken up to a collection of sub transactions that can be interleaved any way with other transactions:
+
+    * **Orchestration** is when one controller is responsible to drive each participant on what to do and when. 
+    * **Choreography** applies each service produces and listens to other service’s events and decides if an action should be taken or not.
+
+In the autonomous example choreography may be used, as it seems that some services are maintaining states of the overall travel transaction: the order, the car dispatching, the route...
+
+* Another argument is related to availability: if one of the service is not responding quickly, then all the components in the calling chain are impacted. And in case of outages, if one component fails, error will propagate back to caller chain. There are patterns to handle such issues, like circuit braker, throttling, or bulkhead. Now asynchronous processing helps to support failure and slower services. 
 
 
 ## Selecting event bus technologies
@@ -138,7 +162,7 @@ As introduced in the event backbone component description above, there are diffe
 * Asynchronous request / reply communication: the semantic of the communication is for one component to ask a second to do something on its data. This is a command pattern with delay on the response.
 * Messages in queue are kept until consumer(s) got them.
 
-Consider streaming system, like Kafka, as pub/sub and persistence system for:
+Consider streaming system, like Kafka, AWS Kinesis data stream, as pub/sub and persistence system for:
 
 * Publish events as immutable facts of what happened in an application.
 * Get continuous visibility of the data Streams.
