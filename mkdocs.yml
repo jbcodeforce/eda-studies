@@ -1,12 +1,15 @@
 site_name: EDA Studies
 repo_url: https://github.com/jbcodeforce/eda-studies.git
 nav:
-  - Introduction: index.md
+  - EDA concepts: index.md
   - Methodology:
     - Event Storming: event-storming/index.md
-  - AWS techno:
+    - Domain driven design: ddd/index.md
+  - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md
+  - AWS assets: 
+      - Autonomous Car Ride: solutions/autonomous-car/index.md
   - IBM assets: ibm-assets.md
   - Return to main: https://jbcodeforce.github.io
 theme: 

@@ -2,7 +2,7 @@
 
 The goal of this site is to keep references and notes on studies and best practices I have used to implement EDA customer's solutions and to address some common problems I encountered while trying new technologies. 
 
-All the content of this repository is visible as blog pages and website at [https://jbcodeforce.github.io/eda-studies](https://jbcodeforce.github.io). 
+All the content of this repository is visible as blog pages and website at [eda-studies](https://jbcodeforce.github.io/eda-studies). 
 
 
 
