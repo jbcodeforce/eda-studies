@@ -21,6 +21,15 @@ This architecture is interesting, it embraces microservices architecture, mostly
 
 ### Handle duplicate delivery with AWS EventBridge
 
+Producer to EventBridge may generate duplicate messages while retrying to send a message. The producer code needs to take into account, connection failure, retries, and may add an unique identifier in the message to be able to handle idempotency on the consumer side.
+
+The implementation of this solution leverages, [CloudEvents](https://cloudevents.io), a well not established event structure to share metadata among technology agnostic component.
+
+![](./diagrams/exactly-once-eb.drawio.png){ width=900 }
+
+The producer code needs to manage failure. 
+
+
 ## Domain-driven design applied
 
 ### Event Storming
