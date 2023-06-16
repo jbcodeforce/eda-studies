@@ -1,10 +1,13 @@
 site_name: EDA Studies
 repo_url: https://github.com/jbcodeforce/eda-studies.git
 nav:
-  - EDA concepts: index.md
+  - Introduction: index.md
+  - EDA concepts: eda.md
   - Methodology:
     - Event Storming: event-storming/index.md
     - Domain driven design: ddd/index.md
+  - Design patterns:
+    - CQRS: patterns/cqrs/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md
