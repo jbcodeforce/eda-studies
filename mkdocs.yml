@@ -1,4 +1,4 @@
-site_name: EDA Studies
+site_name: Event-Driven Architecture Studies
 repo_url: https://github.com/jbcodeforce/eda-studies.git
 nav:
   - Introduction: index.md
@@ -7,6 +7,7 @@ nav:
     - Event Storming: event-storming/index.md
     - Domain driven design: ddd/index.md
   - Design patterns:
+    - Common patterns: patterns/index.md
     - CQRS: patterns/cqrs/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis

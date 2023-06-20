@@ -39,7 +39,7 @@ The adoption of the pattern can be applied in phases, incrementally from existin
 
 Before even beginning to apply the pattern, let’s consider the typical app design for accessing data. This diagram shows an app with a domain model for accessing data persisted in a database of record, i.e. a single source of truth for that data. The domain model has an API that at a minimum enables clients to perform CRUD tasks on domain objects within the model.
 
-![1](./images/fig-1.png)
+![1](./images/first-rw-model.drawio.png){ width=200 }
 
 The [domain model](https://www.martinfowler.com/eaaCatalog/domainModel.html) is an object representation of the database documents or records. It is comprised of domain objects that represent individual documents or records and the business logic for managing and using them. [Domain-Driven Design](https://dddcommunity.org/learning-ddd/what_is_ddd/) (DDD) models these domain objects as [entities](https://martinfowler.com/bliki/EvansClassification.html)—“objects that have a distinct identity that runs through time and different representations”—and [aggregates](https://martinfowler.com/bliki/DDD_Aggregate.html)—“a cluster of domain objects that can be treated as a single unit”; the aggregate root maintains the integrity of the aggregate as a whole.
 
@@ -49,16 +49,16 @@ Ideally, the domain model’s API should be more domain-specific than simply CRU
 
 The first and most visible step in applying the CQRS pattern is splitting the CRUD API into separate read and write APIs. This diagram shows the same domain model as before, but its single CRUD API is split into retrieve and modify APIs.
 
-![2](./images/fig-2.png)
+![2](./images/separate-rw-model.drawio.png){ width=400 }
 
 The two APIs share the existing domain model but split the behavior:
 
 * **Read**: The retrieve API is used to read the existing state of the objects in the domain model without changing that state. The API treats the domain state as read only.
-* **Write**: The modify API is used to change the objects in the domain model. Changes are made using CUD tasks: create new domain objects, update the state in existing ones, and delete ones that are no longer needed. The operations in this API do not return result values, they return success (ack or void) or failure (nak or throw an exception). The create operation might return the primary of key of the entity, which can be generated either by the domain model or in the data source.
+* **Write**: The modify API is used to change the objects in the domain model. Changes are made using CUD tasks: create new domain objects, update the state in existing ones, and delete ones that are no longer needed. The operations in this API do not return result values, they return success (ack or void) or failure (nak or throw an exception). The create operation might return the primary of key of the entity, which can be generated either by the domain model or in the data store.
 
 This separation of APIs is an application of the [Command Query Separation](https://martinfowler.com/bliki/CommandQuerySeparation.html) (CQS) pattern, which says to clearly separate methods that change state from those that don’t. To do so, each of an object’s methods can be in one of two categories (but not both):
 
-* **Query**: Returns a result. Does not change the system’s state nor cause any side effects that change the state.
+* **Query**: Returns a result, a view of the domain model. Does not change the system’s state nor cause any side effects that change the state.
 * **Command** (a.k.a. modifiers or mutators): Changes the state of a system. Does not return a value, just an indication of success or failure.
 
 With this approach, the domain model works the same and provides access to the data the same as before. What has changed is the API for using the domain model. Whereas a higher-level operation might previously have both changed the state of the application and returned a part of that state, now each such operation is redesigned to only do one or the other.
@@ -69,15 +69,15 @@ This stage depends on the domain model being able to implement both the retrieve
 
 ### Separate read and write models
 
-The second step in applying the CQRS pattern is to split the domain model into separate read and write models. This doesn’t just change the API for accessing domain functionality, it also changes the design of how that functionality is structured and implemented. This diagram shows that the domain model becomes the basis for a write model that handles changes to the domain objects, along with a separate read model used to access the state of the app.
+The second step, in applying the CQRS pattern, is to split the domain model into separate read and write models. This doesn’t just change the API for accessing domain functionality, it also changes the design of how that functionality is structured and implemented. This diagram shows that the domain model becomes the basis for a write model that handles changes to the domain objects, along with a separate read model used to access the state of the application.
 
-![3](./images/fig-3.png)
+![3](./images/separate-rw-model-2.drawio.png){ width=400 }
 
 Naturally, the read model implements the retrieve API and the write model implements the modify API. Now, the application consists not only of separate APIs for querying and updating the domain objects, there’s also separate business functionality for doing so. Both the read business functionality and the write business functionality share the same database.
 
 The write model is implemented by specializing the domain model to focus solely on maintaining the valid structure of domain objects when changing their state and by applying any business rules.
 
-Meanwhile, responsibility for returning domain objects is shifted to a separate read model. The read model defines [data transfer objects](https://martinfowler.com/eaaCatalog/dataTransferObject.html) (DTOs) designed specifically for the model to return just the data the client wants in a structure the client finds convenient. The read model knows how to gather the data used to populate the DTOs. DTOs encapsulate little if any domain functionality, they just bundle data into a convenient package that can easily be transmitted using a single method call, especially between processes.
+Meanwhile, responsibility for returning domain objects is shifted to a separate read model. The read model defines [Data Transfer Objects](https://martinfowler.com/eaaCatalog/dataTransferObject.html) (DTOs) designed specifically for the model to return just the data the client wants in a structure the client finds convenient. The read model knows how to gather the data used to populate the DTOs. DTOs encapsulate little if any domain functionality, they just bundle data into a convenient package that can easily be transmitted using a single method call, especially between processes.
 
 The read model should be able to implement the retrieve API by implementing the necessary queries and executing them. If the retrieve API is already built to return domain objects as results, the read model can continue to do so, or better yet, implements DTO types that are compatible with the domain objects and returns those. Likewise, the modify API was already implemented using the domain model, so the write model should preserve that. The write model may enhance the implementation to more explicitly implement a command interface or use command objects.
 
@@ -87,7 +87,7 @@ This phase assumes that the read and write models can both be implemented using 
 
 The third step in applying the CQRS pattern—-which implements the complete CQRS pattern solution—-is splitting the database of record into separate read and write databases. This diagram shows the write model and read model, each supported by its own database. The overall solution consists of two main parts: the write solution that supports updating the data and the read solution that supports querying the data. The two parts are connected by the event bus.
 
-![4](./images/fig-4.png)
+![4](./images/separate-rw-model-full.drawio.png){ width=600 }
 
 The write model has its own read/write database and the read model has its own read-only database. The read/write database still serves as the database of record (the single source of truth for the data) but is mostly used write-only: mostly written to and rarely read. Reading is offloaded onto a separate read database that contains the same data but is used read-only.
 
@@ -135,17 +135,15 @@ The CQRS application pattern is frequently associated with event sourcing: when 
 
 As introduced in previous section, creations and updates are done as state notification events (change of state), and are persisted in the event log/store. The following figure, presents two separate microservices, one supporting the write model, and multiple other supporting the queries:
 
-![5](./images/cqrs-es-api.png)
+![5](./images/cqrs-es-api.drawio.png){ width=600 }
 
 The query part is separate processes that consume change log events and build a projection for future queries. The "write" part may persist in SQL while the read may use document oriented database with strong indexing and query capabilities. Or use in-memory database, or distributed cache... They do not need to be in the same language. With CQRS and ES the projections are retroactives. New query equals implementing new projection and read the events from the beginning of time or the recent committed state and snapshot. Read and write models are strongly decoupled and can evolve independently. It is important to note that the 'Command' part can still handle simple queries, primary-key based, like get order by id, or queries that do not involve joins.
 
-The event backbone, use a pub/sub model, and Kafka is a good candidate as an implementation technology.
+The event backbone, uses a pub/sub model, to share events to different consumers interested in them.
 
-With this structure, the `Read model` microservice will most likely consume events from multiple topics to build the data projection based on joining those data streams. A query, to assess if the cold-chain was respected on the fresh food order shipment, will go to the voyage, container metrics, and order to be able to answer this question. This is where CQRS shines.
+With this structure, the `Read model` microservice will most likely consume events from multiple topics to build the data projection based on joining those data streams. A query, to assess if the cold-chain was respected on the fresh food order shipment, will go to the `voyage`, container `metrics`, and `order` topics to be able to answer this question. This is where CQRS shines.
 
 We can note that, we can separate the API definition and management in a API gateway.
-
-The [shipment order microservice](https://github.com/ibm-cloud-architecture/refarch-kc-order-ms) is implementing this pattern.
 
 Some implementation items to consider:
 
@@ -165,15 +163,16 @@ Some challenges to always consider:
 
 The CQRS pattern was introduced by [Greg Young](https://www.youtube.com/watch?v=JHGkaShoyNs), and described in [Martin Fowler's work on microservices.](https://martinfowler.com/bliki/CQRS.html)
 
-As you can see in previous figure, as soon as we see two arrows from the same component, we have to ask ourselves how does it work: the write model has to persist Order in its own database and then sends OrderCreated event to the topic... Should those operations be atomic and controlled with transaction? We detail this in next section.
+As you can see in previous figure, as soon as we see two arrows from the same component, we have to ask ourselves how does it work: the write model has to persist `Order` in its own database and then sends `OrderCreated` event to the topic... Should those operations be atomic and controlled with transaction? We detail this in next section.
 
 ## Keeping the write model on Mainframe
 
-It is very important to note that the system of records and transaction processing is still easier to run on mainframe to support strong consistency. But with the move to cloud native development, it does not mean we have to move all the system of records to the cloud. Data pipelines can be put in place, but CQRS should help by keeping the write model on the current system of records and without impacting the current MIPS utilization move data in the eventual consistency workd of the cloud native, distributed computing world.
+A lot of transactional systems are based on Mainframe computers. It is very important to note that the system of records and transaction processing is still easier to run on mainframe to support strong consistency. But with the move to cloud native development, it does not mean we have to move all the system of records to the cloud. Data pipelines can be put in place, but CQRS should help by keeping the write model on the current system of records and without impacting the current MIPS utilization move data in the eventual consistency workd of the cloud native, distributed computing world.
 
- ![](./images/cqrs-mainframe.png)
+ ![](./images/cqrs-mainframe.png){ width=600 }
 
-In the figure above, the write model follows the current transaction processing on the mainframce, change data capture push data to Event backbone for getting real time visibility into the distributed world. The read is the costly operation, dues to the joins to be done to build the projection views needed to expose data depending of the business use cases. This is more true with distributed microservices. All the write operations for the business entities kept in the mainframe's system of records are still done via the transaction. 
+In the figure above, the write model follows the current transaction processing on the mainframce, change data capture pushes data to Event backbone for getting real-time visibility into the distributed world. The read is the costly operation, dues to the joins to be done to build the projection views needed to expose data depending of the business use cases. This applies with distributed microservices. All the write operations for the business entities kept in the mainframe's system of records are still done via the transaction. 
+
 Reference data can be injected in one load job to topic and persisted in the event store so streaming applications can leverage them by joining with transactional data. 
 
 ## The consistency challenges
@@ -186,18 +185,17 @@ With event sourcing pattern, the source of trust is the event source, which acts
 
 ![6](./images/cqrs-es-error-handling.png)
 
-The steps for syncronizing changes to the data are:
+The steps for synchronizing changes to the data are:
 
-1. The write model creates the event and publishes it
-1. The consumer receives the event and extracts its payload
-1. The consumer updates its local datasource with the payload data
-1. If the consumer fails to process the update, it can persist the event to an error log
-1. Each error in the log can be replayed
+1. The write model creates the event and publishes it.
+1. The consumer receives the event and extracts its payload.
+1. The consumer updates its local datasource with the payload data.
+1. If the consumer fails to process the update, it can persist the event to an error log or dead letter queue.
+1. Each error in the log can be replayed.
 1. A command line interface replays an event via an admin API, which searches in the topic using this order id to replay the save operation
 
-This implementation causes a problem for the `createOrder(order): string` operation: The Order Service is supposed to return the new order complete with the order id that is a unique key, a key most likely created by the database. If updating the database fails, there is no new order yet and so no database key to use as the order ID. To avoid this problem, if the underlying technology supports assigning the new order's key, the service can generate the order ID and use that as the order's key in the database.
+This implementation causes a problem for the `createOrder(order): string` operation: The Order Service is supposed to return the new order completed event with the order id that is a unique key, a key most likely created by the database. If updating the database fails, there is no new order yet and so no database key to use as the order ID. To avoid this problem, if the underlying technology supports assigning the new order's key, the service can generate the order ID and uses that as the order's key in the database.
 
-It is important to clearly study the Kafka consumer API and the different parameters on how to support the read offset. We are addressing those implementation best practices in [our consumer note.](../../technology/kafka-consumers)
 
 ### CQRS and Change Data Capture
 
@@ -206,13 +204,13 @@ There are other ways to support this dual operations level:
 * When using Kafka, [Kafka Connect](https://kafka.apache.org/documentation/#connect) has the capability to subscribe to databases via JDBC, allowing to poll tables for updates and then produce events to Kafka.
 * There is an open-source change data capture solution based on extracting change events from database transaction logs, [Debezium](https://debezium.io/) that helps to respond to insert, update and delete operations on databases and generate events accordingly. It supports databases like MySQL, Postgres, MongoDB and others.
 * Write the order to the database and in the same transaction write to an event table (["outbox pattern"](../intro#transactional-outbox)). Then use a polling to get the events to send to Kafka from this event table and delete the row in the table once the event is sent.
-* Use the Change Data Capture from the database transaction log and generate events from this log. The IBM [Infosphere CDC](https://www.ibm.com/support/knowledgecenter/cs/SSTRGZ_10.2.0/com.ibm.cdcdoc.mcadminguide.doc/concepts/overview_of_cdc.html) product helps to implement this pattern. For more detail about this solution see [this product tour](https://www.ibm.com/cloud/garage/dte/producttour/ibm-infosphere-data-replication-product-tour).
+* Use the Change Data Capture from the database transaction log and generate events from this log. 
 
 The CQRS implementation using CDC will look like in the following diagram:
 
 ![](./images/cqrs-cdc.png)
 
-What is important to note is that the event needs to be flexible on the data payload. We are presenting a [event model](https://ibm-cloud-architecture.github.io/refarch-kc-order-ms/#data-and-event-model) in the reference implementation.
+What is important to note is that the event needs to be flexible on the data payload. 
 
 On the view side, updates to the view part need to be idempotent.
 
@@ -220,7 +218,7 @@ On the view side, updates to the view part need to be idempotent.
 
 There is a delay between the data persistence and the availability of the data in the Read model. For most business applications, it is perfectly acceptable. In web based data access most of the data are at stale.
 
-When there is a need for the client, calling the query operation, to know if the data is up-to-date, the service can define a versioning strategy. When the order data was entered in a form within a single page application like our [kc- user interface](https://github.com/ibm-cloud-architecture/refarch-kc-ui), the "create order" operation should return the order with its unique key freshly created and the Single Page Application will have the last data. Here is an example of such operation:
+When there is a need for the client, calling the query operation, to know if the data is up-to-date, the service can define a versioning strategy. When the order data was entered in a form within a single page application, the "create order" operation should return the order with its unique key freshly created and the Single Page Application will have the last data. Here is an example of such operation:
 
 ```java
 @POST
