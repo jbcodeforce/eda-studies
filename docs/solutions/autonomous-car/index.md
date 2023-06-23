@@ -5,11 +5,11 @@
 
 The customer wants to go from one address or geographic location to another one, within a big city, using the Acme Autonomous Car Ride mobile app.
 
-The high-level component architecture may look like in the following figure:
+The application context looks like in the following diagram:
 
-![](../../diagrams/classical-sync-arch.drawio.png){ width=800 }
+![](./diagrams/app-context.drawio.png){ width=600 }
 
-This architecture is interesting, it embraces microservices architecture, mostly synchronous HTTP based traffic. 
+Travellers use mobile application to book a ride between two locations within the same city, the Car Ride Solution dispatch an autonomous vehicle, use traffic report to compute ETA and pricing. The application is also monitoring existing rides via car telemetries. The Marketing analysis is an example of external system interested to look at the solution generated data. 
 
 ## Requirements
 
@@ -62,22 +62,37 @@ We will mock an event storming exercise which generates the following elements:
 
 * Bounded Contexts 
 
-    * Autonomous Car
+    * Autonomous Car bounded context:
 
     ![](./diagrams/car-context.drawio.png)
 
-    * Ride Context
+    * Car Ride bounded context:
 
     ![](./diagrams/ride-context.drawio.png)
 
+    * Customer and payment bounded contexts are not represented as we will mock them up.
+
 ## Component description
 
-From the Domain-driven design bounded context we can build a set of microservices. 
+From the Domain-driven design bounded contexts, we may derive a set of microservices as illustrated in the following figure:
+
+![](../../diagrams/classical-sync-arch.drawio.png){ width=800 }
+
+This architecture is interesting, it embraces microservices architecture, mostly synchronous HTTP based traffic. 
 
 * The **traveller** user is using a mobile app, connected to the classical **Backend For Frontend** service, which exposes RESTful API, with may be also a websocket connection to push notifications back to the mobile app to support traffic from backend to user.
 * The major component is the **Car Ride manager** service which exposes API for the user to initiate a ride to go from a geolocation A to geolocation B, and may be an API for historical rides query.
 * The **address finder**, geolocation mapper, is an utility service to map address to geo-location and any other metadata to facilitate the search for the optimal itinerary and nearest available car. It is a very important service, and may be complex to implement. It exposes HTTP APIs and must respond in sub millisecond.
-* The Car Ride service needs to integrate with other services, like the Payment service once the ride is terminated, and car dispatcher to get an autonomous car.
-* A car dispatcher needs to find the closest car to support the pickup within the shortest time. The computation may take sometime, but the response to the end user will be something like: "your car will arrive in 3 minutes and the target arrival time will be 15 minutes, do you want to proceed?". Once commited the car will move to pickup address and sends car telemetries. 
-* The metrics are processed by the route monitoring service, which computes ETA, and other interesting real-time, time-windowing logic.
-* When the travel is completed, the payment service needs to trigger the payment and the reward program service may update the number of travel, and may be also rate the consumer. As there is no driver, there is no more driver rating. 
+* The **Car Ride** service needs to integrate with other services, like the **Payment** service once the ride is terminated, and the **Car dispatcher** to get an autonomous car.
+* A **car dispatcher** needs to find the closest car to support the pickup within the shortest time. The computation may take sometime, but the response to the end user will be something like: "your car will arrive in 3 minutes and the target arrival time will be 15 minutes, do you want to proceed?". Once commited the car will move to pickup address and sends car telemetries. 
+* The metrics are processed by the **route monitoring** service, which computes ETA, and other interesting real-time, time-windowing logic.
+* When the travel is completed, the **payment** service needs to trigger the payment and the reward program service may update the number of travel, and may be also rate the consumer. As there is no driver, there is no more driver rating. 
+
+## Adopting an event-driven approach to the implementation
+
+The fact that we discovered event during the DDD phase does not mean we adopt EDA. Other non functional requirements need to be considered, like scalability, contract coupling, streaming data to integrate as part of creating derived business event that are important to the business process. As introduced in the SOA to EDA section, a business process model can be done to understand the flow of command / data and even events. 
+
+Let revisit the business process flow in more detail using the commands, aggregates and events we discovered during DDD: 
+
+![](./diagrams/bpm-flow.drawio.png){ width=1000 }
+

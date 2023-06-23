@@ -15,6 +15,7 @@ existing bounded contexts and the new microservices. One of the challenges will 
 This is where event driven architecture helps.
 * [Scatter-gather](#scatter-gather) to dispatch work among microservice and gather their results to build an aggregated answer.
 * [Event sourcing](./event-sourcing/): persists, to an append log, the states of a business entity, such as an Order, as a sequence of immutable state-changing events.
+* [Choreography](#choreography) 
 * [Command Query Responsibility Segregation](./cqrs/): helps to separate queries from commands and help to address queries with cross-microservice boundary.
 * [Saga pattern:](./saga/) Microservices publish events when something happens in the scope of their control like an update in the business entities they are responsible for. A microservice, interested in other business entities, subscribes to those events and it can update its own state and business entities on receipt of these events. Business entity keys need to be unique and immutable.
 * [Event reprocessing with dead letter](./dlq/): event driven microservices may have to call external services via a synchronous call. We need to process failure in order to get response from those services using event backbone.
@@ -43,6 +44,8 @@ The facade needs to be scalable and not a single point of failure. It needs to s
 The following figure illustrates an implementation using an event driven solution with data replication to synchronize the write model to the read model on the mainframe.
 
 ![2](./images/strangler-2.png){ width=1000 }
+
+## Choreography
 
 ## Scatter-gather
 

@@ -1,30 +1,34 @@
 # Handle duplicate delivery with AWS EventBridge
 
-The problem we are trying to demonstrate is how to handle duplicate records?. 
+The problem we are trying to demonstrate is how to handle duplicate records when using AWS EventBridge as event backbone?. 
 
-This is a common pattern in any messaging system, where producer or consumer retries can generate the same message multiple times.
+This is a common problem in many messaging system, where producer retries can generate the same message multiple times or consumer retries may generate duplicate processing of the messsage.
 
-The following diagram presents the potential problem:
+The following diagram presents the potential problem. The left lambda function expose an API to create "CarRide" and send message to event bridge that the CarRide was created. The same apply if the carRide is updated, like for example the customer accept the proposed deal so a car can be dispatched:
 
-![](./diagrams/eb-duplicate-problem.drawio.png)
+![](./diagrams/eb-duplicate-problem.drawio.png){ width=700}
 
 Producer to EventBridge may generate duplicate messages while retrying to send a message because of communication issue or not receiving acknowledgement response. The producer code needs to take into account connection failure, and manage retries.
 
-The SDK for EventBridge includes a method called [put_events](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html) to send 1 to many events to a given EventBus URL. The records sent are encapsulated with an envelop with, at the high level, has the following structure:
+The SDK for EventBridge includes a method called [put_events](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html) to send 1 to many events to a given EventBus URL. Each record sent include an envelop with the following structure:
 
 ```json
-{ "Source": "reference of the producer",
-  "Resources": "aws ARN"
-  "DetailType": "CarRideEventType",
-  "Time": datetime.today().strftime('%Y-%m-%d'),
-  "Detail": data,
-  "EventBusName": targetBus
-}
+"Entries": [
+    { "Source": "reference of the producer",
+    "Resources": "aws ARN of the producer app"
+    "DetailType": "CarRideEventType",
+    "Time": datetime.today().strftime('%Y-%m-%d'),
+    "Detail": data,
+    "EventBusName": targetBus
+    }
+]
 ```
 
-The returned response includes the event Id for each entry sent, so it may be possible that some of the event failed processing, and in this case there will be an error code.
+The message is in fact including more parameters as a set of [common parameters](https://docs.aws.amazon.com/eventbridge/latest/APIReference/CommonParameters.html) are defined for each different API mostly for versioning and security token. 
 
-Only the consumer of the message can identify duplicate record. EventBridge is not a technology where the broker support a protocol to avoid duplication, as Kafka does. 
+The returned response includes the event Id (created by EventBridge) for each entry sent, so it may be possible that some of the event failed processing, and in this case there will be an error code. When sending multiple message in the `Entries` array, then the response will match the position in the array.
+
+Only the consumer of the message can identify duplicate records. EventBridge is not a technology where the broker supports a protocol to avoid duplication, like Kafka does with the idempotence configuration. 
 
 So with EventBridge we need to assign a unique identifier to each message, and a counter and track the processed messages using this identifier and the current count. 
 
