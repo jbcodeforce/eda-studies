@@ -179,6 +179,12 @@ width: 8rem;
 /* headings */
 .md-typeset h1, .md-typeset h2 {
     font-weight: 500;
+    color:hsla(6, 74%, 63%, 1)
+}
+
+.md-typeset h3, .md-typeset h4 {
+    font-weight: 300;
+    color:hsla(6, 74%, 63%, 1)
 }
 
 .md-typeset .admonition {

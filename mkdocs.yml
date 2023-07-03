@@ -8,13 +8,16 @@ nav:
     - Domain driven design: ddd/index.md
   - Design patterns:
     - Common patterns: patterns/index.md
+    - Saga: patterns/saga/index.md
     - CQRS: patterns/cqrs/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md
   - AWS assets: 
       - Autonomous Car Ride: solutions/autonomous-car/index.md
+      - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md
   - IBM assets: ibm-assets.md
+  - AWS studies: https://jbcodeforce.github.io/aws-studies
   - Return to main: https://jbcodeforce.github.io
 theme: 
   name: material
