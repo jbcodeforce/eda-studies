@@ -164,7 +164,7 @@ In the autonomous car rideexample, choreography may be used, as it seems that so
 As introduced in the event backbone component description above, there are different messaging capabilities. Consider queue system for:
 
 * Exactly once delivery, and to participate into two phase commit transaction.
-* Asynchronous request / reply communication: the semantic of the communication is for one component to ask a second to do something on its data. This is a command pattern with delay on the response.
+* Asynchronous request/reply communication: the semantic of the communication is for one component to ask a second component to do something on its data. This is a **Command pattern** with delay on the response.
 * Messages in queue are kept until consumer(s) got them.
 
 Consider streaming system, like Kafka, AWS Kinesis data stream, as pub/sub and persistence system for:
@@ -173,3 +173,10 @@ Consider streaming system, like Kafka, AWS Kinesis data stream, as pub/sub and p
 * Get continuous visibility of the data Streams.
 * Keep data once consumed, for future consumers, and for replay-ability.
 * Scale horizontally the message consumption.
+
+Consider event router, like Amazon EventBridge when we need to apply routing to targets using business logic when
+
+* Routing events to target based on rules
+* Being able to apply filter and transformation
+* Many to many routing with EventBus
+* Point to point with enrichment with Pipes

@@ -188,7 +188,7 @@ The DynamoDB configuration is mono-region multi AZ for high availability.
 
 ### Demonstrate with a simulator
 
-The [code repository](https://gitlab.aws.dev/boyerje/autonomous-car-solution/-/tree/main/CarRideSimulator), supports the following deployment and instructions to deploy it using [AWS Serverless Application Management]()
+The [code repository](https://gitlab.aws.dev/boyerje/autonomous-car-solution/-/tree/main/CarRideSimulator), supports the following deployment and instructions to deploy it using [AWS Serverless Application Management](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
 
 ![](./diagrams/eb-duplicate-capestone.drawio.png)
 
@@ -234,9 +234,16 @@ The problem is how to evict older events from the cache. A scheduled processing 
 
 ## Alternates
 
-Another may be more elegant implementation is to use the outbox pattern, and write the events to a table in DynamoDB, do change data capture on this outbox table, using DynamoDB Streams, use EventBridge pipe to process the streaming data and the send to targets, which could be a SNS.
+### Powertool for AWS Lambda
+
+[Powertools for AWS Lambda (Python)](https://docs.powertools.aws.dev/lambda/python/latest/) supports idempotency constructs via annotations and persistence into DynamoDB which should help to support idempotency processing inside of a Lambda function. This is a valuable solution. Lambda oriented. To use CloudEvents there is a way to define `jmespath` to get idempotency key from the json message.  
+
+### Use Outbox pattern
+
+Another, may be more elegant, implementation is to use the Outbox pattern apply from the producer database, and write the events to a table in DynamoDB, do change data capture on this outbox table, using DynamoDB Streams, use EventBridge pipe to process the streaming data and then to send it to SNS target, to scatter and gather to multiple consumers.
 
 ![](./diagrams/exactly-once-eb-dynamo.drawio.png){ width=1000 }
+
 
 Other considerations:
 
