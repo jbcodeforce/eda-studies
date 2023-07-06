@@ -1,19 +1,19 @@
 # A event-driven sample solution around autonomous car ride
 
-??? info "Updated"
-    06/09/2023
+???+ info "Updated"
+    07/06/2023
 
 The customer wants to go from one address or geographic location to another one, within a big city, using the Acme Autonomous Car Ride mobile app.
 
 The application context looks like in the following diagram:
 
-![](./diagrams/app-context.drawio.png){ width=600 }
+![](./diagrams/app-context.drawio.png){ width=800 }
 
-Travellers use mobile application to book a ride between two locations within the same city, the Car Ride Solution dispatch an autonomous vehicle, use traffic report to compute ETA and pricing. The application is also monitoring existing rides via car telemetries. The Marketing analysis is an example of external system interested to look at the solution generated data. 
+Travellers use mobile application to book a ride between two locations within the same city, the Car Ride Solution dispatches an autonomous vehicle, uses traffic report to compute ETA and pricing. The application is also monitoring existing rides via car telemetries. The Marketing analysis is an example of external system interrested by the solution generated data. 
 
 ## Requirements
 
-* Demonstrate an end to end solution with Domain Driven Design elements, focusing on an Event-Driven Architecture implementation (top down with techno mapping)
+* Demonstrate an end-to-end solution with Domain Driven Design elements, focusing on an Event-Driven Architecture implementation (top down with techno mapping)
 * Handle duplicate delivery from AWS EventBridge. [See proposed solution](./es-duplicate-evt.md).
 * A Command Query Responsibility Segregation example
 * An event-driven Saga chorerography
@@ -29,7 +29,7 @@ CQRS is used in a lot of distributed solution, to be able to scale the read mode
 
 ### Saga pattern
 
-The classical implementation of Saga is to use an orchestrator to manage the state of the Saga and being able to rollback the transaction with compensation API. For more details see the [Saga pattern explanation]().
+The classical implementation of Saga is to use an orchestrator to manage the state of the Saga and being able to rollback the transaction with compensation API. For more details see the [Saga pattern explanation](../../patterns/saga/index.md).
 
 
 ## Domain-driven design applied
@@ -40,35 +40,35 @@ We will mock an event storming exercise which generates the following elements:
 
 * Discovered Events from a process point of view. Mostly happy path
 
-    ![](./diagrams/events-ddd.drawio.png)
+    ![](./diagrams/events-ddd.drawio.png){ width=1000 }
 
 * Event Reorganized by concerns: Rides, Autonomous Car, Payment, Award
 
-    ![](./diagrams/events-concern-ddd.drawio.png)
+    ![](./diagrams/events-concern-ddd.drawio.png){ width=1000 }
 
-### DDD
+### Domain-Driven Design Elements
 
 * Aggregates: represent the main business entity within the domain and sub-domain
 
-    ![](./diagrams/aggregate-ddd.drawio.png)
+    ![](./diagrams/aggregate-ddd.drawio.png){ width=800 }
 
 * Domain/Sub-domains
 
-    ![](./diagrams/domain-ddd.drawio.png)
+    ![](./diagrams/domain-ddd.drawio.png){ width=800 }
 
 * Commands
 
-    ![](./diagrams/command-ddd.drawio.png)
+    ![](./diagrams/command-ddd.drawio.png){ width=800 }
 
-* Bounded Contexts 
+* **Bounded Contexts:**
 
     * Autonomous Car bounded context:
 
-    ![](./diagrams/car-context.drawio.png)
+    ![](./diagrams/car-context.drawio.png){ width=800 }
 
     * Car Ride bounded context:
 
-    ![](./diagrams/ride-context.drawio.png)
+    ![](./diagrams/ride-context.drawio.png){ width=800 }
 
     * Customer and payment bounded contexts are not represented as we will mock them up.
 
@@ -90,9 +90,33 @@ This architecture is interesting, it embraces microservices architecture, mostly
 
 ## Adopting an event-driven approach to the implementation
 
-The fact that we discovered event during the DDD phase does not mean we adopt EDA. Other non functional requirements need to be considered, like scalability, contract coupling, streaming data to integrate as part of creating derived business event that are important to the business process. As introduced in the SOA to EDA section, a business process model can be done to understand the flow of command / data and even events. 
+The fact that we discovered event during the DDD phase does not mean we adopt EDA. Other non functional requirements need to be considered, like scalability, contract decoupling, reactive system needs, streaming data, complex event processing to integrate derived business events inside the business process. As introduced in the SOA to EDA section, a business process model can be used to understand the flow of commands / data and events. 
 
 Let revisit the business process flow in more detail using the commands, aggregates and events we discovered during DDD: 
 
 ![](./diagrams/bpm-flow.drawio.png){ width=1000 }
 
+Commands are visible as APIs for each task in the flow: CarRideManager swimlane will have at least one service responsible to manage the CarRide, and the activities in the process flow will be exposed as APIs (`createCarRide`, `updateCarRide`). 
+
+Now by looking at this same swin lane, we may want to clearly separate the computation of next available car, and the estimated  time of arrival to a service which manage car information: a CarManager service. The same notifying a customer, may be in a CustomerManager. 
+
+So swim lane to service mapping may be a wrong way  to think about decomposition into service. This is why bounded context is a better approach to discover microservices. 
+
+Now the communication between those services could be synchronous, HTTP based, and using RESTful architecture... or asynchronous using one or more messaging systems. Between the mobile and the API to create a CarRideOrder, we could design it, with RESTful API, stateless. Now once the CarRideOrder is persisted to find an autonomous car could be make asynchronously with event propagation. A subdecomposition by applying clear separation of concern could lead to the following components:
+
+* The CarRideManagerService uses a Database to persist the CarRide business entity, and generates an event CarRideCreated
+
+![](./diagrams/carridecreated-processing.drawio.png)
+
+* The event can be sent to a queue for exactly once processing, and ordered as we do not want to see an `CarRideUpdated` event before a `CarRideCreated` event for the same `CarRideEntity`. 
+* The search for an autonomous car and the computation of the ETA and pricing could be done in the `CarDispatching` service. The command is not exposed as an API but triggered by the consumption of the `CarRidCreated` Event. This is a EDA approach with choreography. 
+
+## Physical Deployment
+
+### CarRideManager
+
+The component is a Java Quarkus Application running as container inside a ECS cluster with Fargate runtime. The following figure illustrates the main components defined in the [cdk definition]().
+
+![](./diagrams/carride-deployment.drawio.png)
+
+The RDS Postgresql database is in the private subnet. Database admin user is created in AWS Secret Manager.

@@ -43,9 +43,10 @@ The main goals of this architecture are to support scaling, decoupling, and acti
 * **Event Backbone** is the core middleware that supports asynchronous communication and storage of events, with high availability and replayability capabilities.
 * **New event-driven applications**:  microservices or functions, producers and consumers of events. Event is part of their design on day one. Those services expose APIs to be used by web apps, mobile apps, or B2B apps. So they supports synchronous and asynchronous protocols.
 * **Events** are persisted for very long time persistence to target sinks like data lakes. But it can be dat a warehouse, SaaS partners...
-* The last piece of the architecture acts on those events, in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation – pipeline, and Complex Event Processing.
+* **Sinks** represent longer term persistence of the event data or the downstream backend processing. Sink integrations are difficult to implement as the sink software may not support idempotency, and may be challenging to support exactly-once delivery. Normally consistency boundaries are before reaching the sinks.  
+* The last piece of the architecture acts on those events (**Event Processing**), in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation ,data pipeline, and Complex Event Processing.
 
-### A zoom into the event backbone
+### A zoom into the Event Backbone
 
 The Event Backbone is not supported by a unique technology as different needs bring different tools. We will go over a simple decision tree to facilitate when to use what in a section below. In asynchronous communication, the applications produce messages, consume them, or do both in the form of consume-process-produce processing.
 

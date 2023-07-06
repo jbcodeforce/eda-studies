@@ -2,17 +2,19 @@
 
 **Problem statement**: how to handle duplicate records when using AWS EventBridge as event backbone?. 
 
-This is a common problem in many messaging systems, where producer retries can generates the same message multiple times or consumer retries on the subscribed topic, may generate duplicate processing of the received message. Producer retries because it did not received an acknowledge message from the receiver (which in our case is EventBridge), may be due to network failure.   
+This is a common problem in many messaging systems, where producer retries can generates the same message multiple times or consumer retries on the subscribed topic, may generate duplicate processing of the received message. 
 
-The following diagram presents the potential problem. The left lambda function exposes an API to create "CarRide" and send message to Event Bus that the CarRide was created. The same applies if the carRide is updated, like for example, the customer accepts the proposed deal so a car can be dispatched:
+Producer retries because it did not received an acknowledge message from the receiver (which in our case is EventBridge), may be due to network failure.   
 
-![](./diagrams/eb-duplicate-problem.drawio.png){ width=700}
+The following diagram presents the potential problem. The left lambda function exposes an API to create "CarRide" entity and then to send message to Event Bus that the CarRide was created. The same applies if the CarRide is updated, like for example, the customer accepts the proposed deal so a autonomous car can be dispatched:
 
-EventBridge is not a technology where the broker supports a protocol to avoid duplication, like Kafka does with the idempotence configuration for producer. So producer may generate duplicate. As we will see in producer section below, we can add event id specific to the application to trace duplicate records end to end. If the producer timeout after not receiving the acknowledge it will send the message again. If the returned answer from EventBridge includes errors, the only things that can be done in producer code is to send messages not processed by the event bus to a Dead Letter Queue. 
+![](./diagrams/eb-duplicate-problem.drawio.png){ width=900}
 
-As duplicates will exist, we need to have consumers supporting idempotency. As stated by Woolf, Hohpe wrote in their "Enterprise Integration Patterns book" , supporting **idempotency** is to be able to process a message with the same effect, whether it is received once or multiple times.
+EventBridge is not a technology where the broker supports a protocol to avoid duplication, like Kafka does with the idempotence configuration for producer. So producer may generate duplicates. As we will see in producer section below, we can add event id specific to the application to trace duplicate records end to end (we use idempotencyID which has no business meaning, in real life it may be relevant to do a combined key with busines transaction ID). If the producer timeout after not receiving the acknowledge, it will send the message again. If the returned answer from EventBridge includes errors, the only things that can be done in producer code is to send messages not processed by the Event Bus to a Dead Letter Queue. 
 
-Also remember that in a pure EDA point of view, consumer can be added over time to support new use cases, producers should not be aware of those consumers, they just publish events as their internal state changes. 
+As duplicates will exist, we need to have consumers supporting idempotency. As Woolf and Hohpe wrote in their "Enterprise Integration Patterns book" , supporting **idempotency** is to be able to process a message with the same effect, whether it is received once or multiple times.
+
+Also remember that in a pure EDA point of view, consumer can be added, as subscribers, over time to address new use cases. Producers should not be aware of those consumers, they just publish events as their internal business entity state changes. 
 
 Amazon [EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguid) has the following important characteristics that we can leverage to address de-duplication:
 
@@ -56,16 +58,16 @@ The returned response includes an event `Id` (created by EventBridge) for each e
 ]
 ```
 
-As for each record, the index of the response element is the same as the index in the Entries array, it is possible to identify the message in error and to resend it or to move it to a Dead letter queue. 
+As for each record, the index of the response element is the same as the index in the Entries array, it is then possible to identify the message in error and to resend it or to move it to a Dead Letter Queue. 
 
-There are some error due to the EventBridge service, like a `ThrottlingException` or `InternalFailure` that may be retried. Other errors should never be retried but message sent to a DLD queue or saved in a temporary storage for future processing. 
+There are some errors reported that are due to the EventBridge service, like a `ThrottlingException` or `InternalFailure` that may be retried. Other errors should never be retried but message sent to a DLD queue or saved in a temporary storage for future processing. 
 
 To better support an EDA approach, we need to assign a unique idempotency identifier to each message, with a sequencer and track the processed messages using this identifier and the current count. We should not leverage the eventID created by the event bus, as it is local to this bus, and we may need to go over other components or even another event bus in another region. Also this eventId is not idempotent.
 
 Here is an example of payload creation in python, with the idempotencyId (the one from the producer point of view and not the EventBridge created one) as part of the `attributes` element (the metadata part of [CloudEvents.io](https://cloudevents.io)): 
 
 ```python
-def defineEvent(data):
+def defineCloudEvent(data):
     attributes = {
         "type": "acme.acr.CarRiderCreatedEvent",
         "source": "acr.com.car-ride-simulator",
@@ -73,13 +75,12 @@ def defineEvent(data):
         "eventTime": datetime.today().strftime('%Y-%m-%d %H:%M:%S.%f'),
         "eventCount": 1
     }
-    eventToSend = { "attributes": attributes, "data": data}
-    print(eventToSend)
+    cloudEventToSend = { "attributes": attributes, "data": data}
     entries = [
                 { "Source": attributes["source"],
                 "DetailType": "CarRideEvent",
                 "Time": datetime.today().strftime('%Y-%m-%d'),
-                "Detail": json.dumps(eventToSend),
+                "Detail": json.dumps(cloudEventToSend),
                 "EventBusName": targetBus,
                 "TraceHeader": "carRideProcessing"
                 },
@@ -185,9 +186,19 @@ The code then uses something like the following snippet, doing nothing in case o
 
 The DynamoDB configuration is mono-region multi AZ for high availability. 
 
+### Demonstrate with a simulator
+
+The [code repository](https://gitlab.aws.dev/boyerje/autonomous-car-solution/-/tree/main/CarRideSimulator), supports the following deployment and instructions to deploy it using [AWS Serverless Application Management]()
+
+![](./diagrams/eb-duplicate-capestone.drawio.png)
+
+Here is an example of record persisted in the DynamoDB CarRideEvents table, illustrating that `eventCount` is always 1.
+
+![](./diagrams/event-in-dynamoDB.png)
+
 ### Single application instance:
 
-If we do not use DynamoDB, we can use simple cache. When an application is running continuously, with a single instance, we can use HashMap. 
+The simplest in memory solution uses  a simple HashMap as cache. It may work for an application running continuously, with a single instance. The basic code may look like: 
 
 ```python
 
@@ -202,6 +213,8 @@ def lambda_handler(event, context):
         logger.info("%s most likely duplicate ", idempotencyId)
         logger.info(event)
 ```
+
+[See the code here.](https://gitlab.aws.dev/boyerje/autonomous-car-solution/-/blob/main/CarRideSimulator/consumers/app.py) and how to run it. 
 
 ### Using Caching with Redis
 
