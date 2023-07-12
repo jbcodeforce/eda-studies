@@ -15,7 +15,8 @@ existing bounded contexts and the new microservices. One of the challenges will 
 This is where event driven architecture helps.
 * [Scatter-gather](#scatter-gather) to dispatch work among microservice and gather their results to build an aggregated answer.
 * [Event sourcing](./event-sourcing/): persists, to an append log, the states of a business entity, such as an Order, as a sequence of immutable state-changing events.
-* [Choreography](#choreography) 
+* [Choreography](#choreography) to do decentralized coordination between services.
+* [Orchestration](#orchestration) to centralize the coordination between distributed systems with compensation flow.
 * [Command Query Responsibility Segregation](./cqrs/): helps to separate queries from commands and help to address queries with cross-microservice boundary.
 * [Saga pattern:](./saga/) Microservices publish events when something happens in the scope of their control like an update in the business entities they are responsible for. A microservice, interested in other business entities, subscribes to those events and it can update its own state and business entities on receipt of these events. Business entity keys need to be unique and immutable.
 * [Event reprocessing with dead letter](./dlq/): event driven microservices may have to call external services via a synchronous call. We need to process failure in order to get response from those services using event backbone.
@@ -46,6 +47,24 @@ The following figure illustrates an implementation using an event driven solutio
 ![2](./images/strangler-2.png){ width=1000 }
 
 ## Choreography
+
+Service choreography and service orchestration are two different approaches to coordinating the interactions and behaviors of distributed services. 
+
+Service choreography refers to a decentralized coordination approach where each participating service in a system collaborates autonomously, following predefined rules or processes. Services interact directly with each other, exchanging messages and performing actions based on the received messages.There is no central coordinator. It emphasizes the autonomy and independence of each service, allowing for more flexibility and scalability. Service choreography can be compared to a dance, where each participant knows their steps and responds to the cues from others.
+
+It is more complex to implement to manage the exception and error recovery. The process model on top of this choreography is more difficult to understand and model. Reverse engineering the service traces to build the story of what happened to a given business transaction.
+
+With event routing based middlewares, the event pushes to services participing to the choreography is done via routing rules. So the business process flow is controlled by the routing policies.
+
+Here is an example of choreography with squares representing events from the different services, and topics to keep events related to the same entity: CarRideOrders, AutonomousCar, Customers, Payments
+
+![](./images/choreography.drawio.png){ width=700 }
+
+The detail of the flow is described in [this design note](../solutions/autonomous-car/#adopting-an-event-driven-approach-to-the-implementation)
+
+## Orchestration
+
+Service orchestration, is a centralized coordination approach where a central entity, known as an orchestrator or process engine, controls and coordinates the interactions between the participating services. The orchestrator defines the flow of activities, sequences, and conditions that govern the execution of the services. It actively manages the interactions, determining the order of service invocations, handling exception and compensation scenarios, and ensuring the overall process logic is followed. Service orchestration provides a higher level of control and visibility over the execution flow but may introduce a single point of failure or performance bottleneck. In the world of SOA, BPEL engines were used for orchestration, with long running transactions. Java supports 
 
 ## Scatter-gather
 

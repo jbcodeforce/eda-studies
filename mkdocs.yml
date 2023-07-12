@@ -10,6 +10,8 @@ nav:
     - Common patterns: patterns/index.md
     - Saga: patterns/saga/index.md
     - CQRS: patterns/cqrs/index.md
+  - OOS technologies:
+    - Kafka: techno/kafka/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md

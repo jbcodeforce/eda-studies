@@ -31,6 +31,7 @@ CQRS is used in a lot of distributed solution, to be able to scale the read mode
 
 The classical implementation of Saga is to use an orchestrator to manage the state of the Saga and being able to rollback the transaction with compensation API. For more details see the [Saga pattern explanation](../../patterns/saga/index.md).
 
+An alternate is to use Choroegraphy. 
 
 ## Domain-driven design applied
 
@@ -109,7 +110,9 @@ Now the communication between those services could be synchronous, HTTP based, a
 ![](./diagrams/carridecreated-processing.drawio.png)
 
 * The event can be sent to a queue for exactly once processing, and ordered as we do not want to see an `CarRideUpdated` event before a `CarRideCreated` event for the same `CarRideEntity`. 
-* The search for an autonomous car and the computation of the ETA and pricing could be done in the `CarDispatching` service. The command is not exposed as an API but triggered by the consumption of the `CarRidCreated` Event. This is a EDA approach with choreography. 
+* The search for an autonomous car and the computation of the ETA and pricing could be done in the `CarDispatching` service. The command is not exposed as an API but triggered by the consumption of the `CarRidCreated` Event. This is a EDA approach with choreography. The following figure 
+
+![](./diagrams/choreography.drawio.png){ width=800}
 
 ## Physical Deployment
 
