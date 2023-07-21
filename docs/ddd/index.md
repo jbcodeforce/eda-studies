@@ -54,7 +54,7 @@ Core domains represent what will differentiate the company business value. Domai
 
 At the high level, when doing the analysis, we should have some insight decisions of the top level application to develop, with some ideas of the other systems to interact with. A classical "system context diagram" is a efficient tool to represent the application this high level context. The external systems to integrate with, are strongly correlated to the domains discovered from previous step. 
 
-Each interface to those system needs to be documented using the [interface characteristics approach](https://www.ibm.com/developerworks/websphere/techjournal/1201_clark/1201_clark.html) presented by IBM Kim Clark.
+Each interface to those system needs to be documented using the [interface characteristics approach](https://developer.ibm.com/articles/mw-1606-clark-trs/?mhsrc=ibmsearch_a&mhq=kim%20clark) presented by Kim Clark from IBM.
 
 #### Interface Characteristics
 

@@ -2,28 +2,30 @@
 
 ## Why EDA is important in 2020s
 
-Since 15 years, we saw stories of different industries completely disrupted by the adoption of software solutions as a key strategic differentiator to run business. Examples in retail, movie rental, taxis, banking have demonstrated that new companies, focusing on using software, agile development, continuous deployment of new features, completely transformed legacy, brick and mortar, businesses.
+Since 15 years, we saw stories of different industries completely disrupted by the adoption of software solutions as a key strategic differentiator to run business. Examples in retail, movie rental, taxis, banking have demonstrated that new companies, focusing on using software, agile development, continuous deployment, completely transformed legacy, brick and mortar, businesses.
 
-This is what we could call an "industry becoming software": IT is no more a cost center or a set of computing capabilities used to run accounting, inventory, manufactoring applications... to improve a rigid business process.
+This is what we could call an "industry becoming software": IT is no more a cost center or a set of computing capabilities used to run accounting, inventory, ERP, CRM applications... to improve rigid business processes.
 
-So what are the key capabilities those companies used that makes them so successful. There are four major capabilities which are really defining the change to move to "business with software" at the core of the business model:
+So what are the key capabilities those companies used that makes them so successful? 
 
-1. **Cloud**: is to rethink about data centers and optimize the compute power usage, changing the pricing model from capex to pay as you go. Cloud also provide elastic capability that developer will never be able to access in the past for adhoc use cases. 
+There are four major capabilities which are really defining the change to move to "business with software" at the core of the business model:
+
+1. **Cloud**: is to rethink about data centers and optimize the compute power usage, changing the pricing model from capex to pay-as-you-go. Cloud also provides elastic capability that developers will never be able to access in the past to address adhoc use cases. 
 1. **AI / machine learning** improves our way to take decisions, and automate complex tasks.
-1. **Mobile** apps are redefining user experience and how we interact with businesses. Users expect a unified user interface to access the business services and get notifications when somethings interesting is happening.
+1. **Mobile** apps are redefining user experience and how we interact with business backend services. Users expect a unified user interface to access the business services and get notifications when somethings interesting is happening.
 1. **Data** and specially **data in motion** is very important to guide user experiences, take good decisions, automate processes, and enabling new type of applications. Data need to be available every where and in real-time, and then applications need to react when  data is created, updated...
 
-Data architecture is evolving from a set of dedicated databases or data warehouse to distributed, decentralized architecture based on data in motion and data lake. 
+Data architecture is evolving from a set of dedicated databases or data warehouse to distributed, decentralized architecture based on data in motion and data lakes. 
 
-The consideration of Data as a core differentiator to run a business, and as a competitive advantages, it is important that the IT architecture supports the need to get visibility of the data as soon as it created, and be able to act on it in close to real-time.
+The consideration of Data as a core differentiator to run a business, and as a competitive advantages, enforces IT architecture to support the need to get visibility of the data as soon as it created, and be able to act on it in close to real-time.
 
-Recent studies demonstrate the quality of business decision on data are inversely proportional of the age of the data. The value of the data dismishes over time. They have a short shelf like of actionability. This is perfectly relevant in AI model and we will see how EDA helps in the data pipeline and feature engineering and storage for Machine Learning model.
+Recent studies demonstrate the quality of business decision on data are inversely proportional of the age of the data. The value of the data dismishes over time. They have a short shelf live of actionability. This is perfectly relevant in AI model and we will see how EDA helps in the data pipeline and feature engineering and storage for Machine Learning model.
 
-Early 2000s, the adoption of service oriented architecture help to think about business applications as a group of business services that can be ubiquitous and accessible using internet. SOAP and XML were the technologies of choice. But as early as 2004, Event-driven architecture was positioned as an evolution of SOA to scale the number of data producer or data consumer and improve inter-dependencies. The following diagram illustrates this evolution.
+Early 2000s, the adoption of Service Oriented Architecture helped to think about business applications as a group of business services that can be ubiquitous and accessible using internet protocols. SOAP and XML were the technologies of choice. But as early as 2004, Event-driven architecture was positioned as an evolution of SOA to scale the number of data producers or data consumers and improve inter-dependencies. The following diagram illustrates this evolution.
 
 ![](./images/soa-to-eda.png){ width=800 }
 
-What is clear is that asynchronous communication helps in decoupling and scaling. Since mid 2010s, EDA was adopted by startup companies as a way to scale their demands, at million of users, but also to get data visibility via events. With events, it is possible to act on data as soon as created, and improve business decision automation. 
+What is clear is that asynchronous communication helps in decoupling and scaling. Since mid 2010s, EDA was adopted by startup companies as a way to scale their demands, at million of users, but also to get data visibility via events. With events, it is possible to act on data as soon as created, and improves business decision automation. 
 
 Decoupling event producers and consumers from one another, helps increasing the scalability, resilience but also the development effort.
 
@@ -44,7 +46,9 @@ The main goals of this architecture are to support scaling, decoupling, and acti
 * **New event-driven applications**:  microservices or functions, producers and consumers of events. Event is part of their design on day one. Those services expose APIs to be used by web apps, mobile apps, or B2B apps. So they supports synchronous and asynchronous protocols.
 * **Events** are persisted for very long time persistence to target sinks like data lakes. But it can be dat a warehouse, SaaS partners...
 * **Sinks** represent longer term persistence of the event data or the downstream backend processing. Sink integrations are difficult to implement as the sink software may not support idempotency, and may be challenging to support exactly-once delivery. Normally consistency boundaries are before reaching the sinks.  
-* The last piece of the architecture acts on those events (**Event Processing**), in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation ,data pipeline, and Complex Event Processing.
+* The last important piece of the architecture acts on those events (**Event Processing**), in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation ,data pipeline, and Complex Event Processing.
+
+The cross-cutting capabilies of **security, devops and governance**, need to be across all those components, and Infrastructure as Code supported by any technology supporting this architecture, while governance needs to address data lineage, schema, APIs management,...
 
 ### A zoom into the Event Backbone
 
@@ -95,6 +99,10 @@ I like to apply the [reactive manifesto principles](https://www.reactivemanifest
 * **Resilient**: stay responsive in the face of failure, this is a key characteristics. It implies distributed systems.
 * **Message driven**: the underlying behavior is to have an asynchronous message driven backbone, to enable loose coupling of the application components by exchanging asynchronous messages to minimize or isolate the negative effects of resource contention, coherency delays and inter-service communication network latency. It is the base to support the other reactive characteristics. It also helps for isolation and support location transparency.
 
+The relationships between those characteristics are very important to also illustrate the need for exchanging messages asynchronously:
+
+![](./diagrams/reactive.drawio.png){ width=500 }
+
 ### Event sinks
 
 ### Event streaming processing
@@ -137,15 +145,15 @@ To have some fun, this is how BPM experts would have modeled, at the high level,
 
 ![](./diagrams/classical-bpm.drawio.png){ width=1100 }
 
-We will not dig into the details of this process flow, but what is interesting still, is the sequencing of actions over time which led to identify the commands to perform within the flow, which helped to design the service interfaces. The approach had vertue as it engages business users in modeling the business process. Defining term, some data element, and some business rules. The technology enforced creating monolythic applications.  
+We will not dig into the details of this process flow, but what is interesting still, is the sequencing of actions over time which led to identify the commands to perform within the flow, which helped to design the service interfaces. The approach had vertue as it engages business users in modeling the business process. Defining terms, data elements, and business routing rules. The technology enforced creating monolythic applications.  
 
-In previous diagram, the failover and compensation flows are not highlighted. But this is where all the architecture decisions have to be made to select the best implementation choice, to identify when the process execution reached a non-idempotent service. 
+In previous diagram, the failover and compensation flows are not highlighted. But this is where all the architecture decisions have to be made, to select the best implementation choice, to identify when the process execution reached a non-idempotent service, to design the operations for compensation... 
 
-Which leads to my next argument: there are a lot of people who are currently claiming that EDA will be the silver bullet to address service decoupling, scaling, resilience... For example, I have heard architects claiming the following challenges of the above component view diagram:
+Which leads to my next argument: there are a lot of people who are currently claiming that EDA will be the silver bullet to address service decoupling, scaling, resilience... From the previous example, I have heard architects claiming the following challenges that only could be addressed with EDA:
 
-* order service is responsible to talk to multiple services, and orchestrates service calls. 
-* orchestration logic should be outside of the microservice. I want to immediatly react on this one, as service orchestration is done to follow a business process. As seen in process flow above, there is a business logic to route the execution flow among those steps: it is part of the context of the order service to implement the process about an order. We are in the domain-driven design bounded context. The implementation of this orchestration flow can be in code, or in business process engine, in state machine, but at least owned by one team.
-* strong coupling between the components. The order service needs to understand the semantic of the other services. Which is partially true, but it really needs to understand the interface characteristics of the services. Which includes data model, protocol, SLA, communication type, ... The data model is part of the interface contract and is the main argument for coupling. Any change to the API of the downstream services impact the order / orchestrator service. There are way to go over that, by using contract testing, so each change to the contracts can be seen during CI/CD pipeline executions. Now it is true that when a service is used by a big number of other services then API versioning becomes a challenge. On the other side of the argument, on most of simple business application the number of services stands to stay low and interface characteristics do not change that often. Data model coupling still exists in messaging based solutions. Schema registry and the metadata exchanged within the message helps to address those coupling, but it means now, consumers need to be aware of the producer. This is an inversion of control. 
+* Order service is responsible to talk to multiple services, and orchestrates service calls. 
+* Orchestration logic should be outside of the microservice. I want to immediatly react on this one, as service orchestration is done to follow a business process. As seen in the process flow above, there is a business logic to route the execution flow among those steps: it is part of the context of the order service to implement the process about an order. We are in the domain-driven design bounded context. The implementation of this orchestration flow can be in code, or in business process engine, in state machine, but at least owned by one team.
+* Strong coupling between the components. The order service needs to understand the semantic of the other services. Which is partially true, as what it really needs to understand, is the interface characteristic of the services. Which includes data model, protocol, SLA, interaction type, communication type, ... The data model is part of the interface contract and is the main argument for coupling. Any change to the API of the downstream services impact the order / orchestrator service. There are way to go over that, by using contract testing, so each change to the contracts can be seen during CI/CD pipeline executions. Now it is true that when a service is used by a big number of other services then API versioning becomes a challenge. On the other side of the argument, on most of simple business application the number of services stands to stay low and interface characteristics do not change that often. Data model coupling still exists in messaging based solutions. Schema registry and the metadata exchanged within the message helps to address those coupling, but it means now, consumers need to be aware of the producer. This is an inversion of control. 
 * Choreography of APIs is hard to do. I touched on this point before, but one thing important is to differentiate choreography from orchestration. I have seen arguments for EDA by illustrating how difficult to implement compensation flow with synchronous processing. I am not sure about that, as it was done in the SOA world before. The problem is not the way we interact with service, but by the lack of transactionality support in RESTful API as it was possible to do with SOAP WS-Transaction protocol. Asynchronous messaging, event bus,... do not help that much on compensation flow. 
 
 ??? "Choreography vs Orchestration"
@@ -154,7 +162,7 @@ Which leads to my next argument: there are a lot of people who are currently cla
     * **Orchestration** is when one controller is responsible to drive each participant on what to do and when. 
     * **Choreography** applies each service produces and listens to other service’s events and decides if an action should be taken or not.
 
-In the autonomous car rideexample, choreography may be used, as it seems that some services are maintaining states of the overall ride transaction: the order, the car dispatching, the route...
+In the autonomous car ride example, choreography may be used, as it seems that some services are maintaining states of the overall ride transaction: the order, the car dispatching, the route...
 
 * Another argument is related to availability: if one of the service is not responding quickly, then all the components in the calling chain are impacted. And in case of outages, if one component fails, error will propagate back to caller chain. There are patterns to handle such issues, like circuit braker, throttling, or bulkhead. Now this is true, asynchronous processing helps to support failure and slower services. 
 
