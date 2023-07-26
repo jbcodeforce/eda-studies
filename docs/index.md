@@ -1,6 +1,11 @@
 # Introduction
 
-Updated 07/05/2023
+!!! Info "Site updated 07/25/2023"
+    - Add Choreography and orchestration introduction in design pattern
+    - Add Scatter-gather in design pattern
+    - Add Kafka connect content
+    - Add event sourcing 
+    - Tune Saga pattern content
 
 ## Why this site?
 
@@ -13,6 +18,8 @@ Overall, event-driven architecture offers numerous benefits, including improved 
 I see Entreprise Architects, Solution Architects, and developer leaders will be interested in this content.
 
 ## What kind of problems are we trying to solve?
+
+Event-driven architecture is a very loaded term, those days, and very oriented by the software vendor product capabilities. This site will have some implementation done with certain products, but it tries to be product agnostics and present what a EDA should be.
 
 When moving to cloud native implementation architects need to address:
 

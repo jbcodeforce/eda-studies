@@ -9,9 +9,11 @@ nav:
   - Design patterns:
     - Common patterns: patterns/index.md
     - Saga: patterns/saga/index.md
+    - Event Sourcing: patterns/event-sourcing/index.md
     - CQRS: patterns/cqrs/index.md
   - OOS technologies:
     - Kafka: techno/kafka/index.md
+    - Kafka Connect: techno/kafka-connect/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md
