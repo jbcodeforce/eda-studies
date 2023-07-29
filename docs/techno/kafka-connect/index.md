@@ -104,7 +104,7 @@ producer.override.acks: 1
 TBD 
 
 * [S3 Sink connector]()
-* [Kinesis data stream source connector]()
+* [Kinesis data stream source connector](https://github.com/jbcodeforce/MSK-labs)
 
 ## Further Readings
 

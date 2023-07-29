@@ -1,6 +1,8 @@
 # Introduction
 
-!!! Info "Site updated 07/25/2023"
+???- Info "Site updated 07/25/2023"
+    July: 
+    
     - Add Choreography and orchestration introduction in design pattern
     - Add Scatter-gather in design pattern
     - Add Kafka connect content

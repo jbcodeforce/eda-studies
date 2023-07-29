@@ -54,7 +54,7 @@ The figure below illustrates one topic having multiple partitions, replicated wi
 
 Partitions are basically used to parallelize the event processing when a single server would not be able to process all events, using the broker clustering. So to manage increase in the load of messages, Kafka uses partitions.
 
-![partitions](../images/topic-part-offset.png)
+![partitions](./diagrams/topic-part-offset.drawio.png)
 
 * Each broker may have zero or more partitions per topic. When creating topic we specify the number of partition to use.
 * Kafka tolerates up to N-1 server failures without losing any messages. N is the replication factor for a given partition.
