@@ -2,9 +2,9 @@
 
 ## Why EDA is important in 2020s
 
-Since 15 years, we saw stories of different industries completely disrupted by the adoption of software solutions as a key strategic differentiator to run business. Examples in retail, movie rental, taxis, banking have demonstrated that new companies, focusing on using software, agile development, continuous deployment, completely transformed legacy, brick and mortar, businesses.
+During the last 15 years, we saw stories of different industries completely disrupted by the adoption of software solutions as a key strategic differentiator to run business. Examples in retail, movie rental, taxis, banking have demonstrated that new companies, focusing on using software, agile development, continuous deployment, completely disrupting legacy, brick and mortar, businesses.
 
-This is what we could call an "industry becoming software": IT is no more a cost center or a set of computing capabilities used to run accounting, inventory, ERP, CRM applications... to improve rigid business processes.
+This is what we could call an "industry becoming software": IT is no more a cost center or a set of computing capabilities used to run accounting, inventory, ERP, CRM applications, but a business differentiator to win new markets, new customers, being closer to the customers, continuously knowing what they are doing with the company's products. Those companies are data driven, and even better, are able to act as soon as data is created.
 
 So what are the key capabilities those companies used that makes them so successful? 
 
@@ -13,15 +13,15 @@ There are four major capabilities which are really defining the change to move t
 1. **Cloud**: is to rethink about data centers and optimize the compute power usage, changing the pricing model from capex to pay-as-you-go. Cloud also provides elastic capability that developers will never be able to access in the past to address adhoc use cases. 
 1. **AI / machine learning** improves our way to take decisions, and automate complex tasks.
 1. **Mobile** apps are redefining user experience and how we interact with business backend services. Users expect a unified user interface to access the business services and get notifications when somethings interesting is happening.
-1. **Data** and specially **data in motion** is very important to guide user experiences, take good decisions, automate processes, and enabling new type of applications. Data need to be available every where and in real-time, and then applications need to react when  data is created, updated...
+1. **Data** and specially **data as event** is very important to guide user experiences, take good decisions, automate processes, and enabling new type of applications. Data need to be available every where and in real-time, and then applications need to react when  data is created, updated...
 
 Data architecture is evolving from a set of dedicated databases or data warehouse to distributed, decentralized architecture based on data in motion and data lakes. 
 
 The consideration of Data as a core differentiator to run a business, and as a competitive advantages, enforces IT architecture to support the need to get visibility of the data as soon as it created, and be able to act on it in close to real-time.
 
-Recent studies demonstrate the quality of business decision on data are inversely proportional of the age of the data. The value of the data dismishes over time. They have a short shelf live of actionability. This is perfectly relevant in AI model and we will see how EDA helps in the data pipeline and feature engineering and storage for Machine Learning model.
+Recent studies demonstrate the quality of business decision on data are inversely proportional of the age of the data. The value of the data dismisses over time. They have a short shelf live of actionability. This is perfectly relevant in AI model and we will see how EDA helps in the data pipeline and feature engineering and storage for Machine Learning model.
 
-Early 2000s, the adoption of Service Oriented Architecture helped to think about business applications as a group of business services that can be ubiquitous and accessible using internet protocols. SOAP and XML were the technologies of choice. But as early as 2004, Event-driven architecture was positioned as an evolution of SOA to scale the number of data producers or data consumers and improve inter-dependencies. The following diagram illustrates this evolution.
+Early 2000s, the adoption of Service Oriented Architecture helped to think about business applications as a group of business services that can be ubiquitous and accessible using internet protocols. SOAP and XML were the technologies of choice. But as early as 2004, Event-driven architecture was positioned as an evolution of SOA to scale the number of data producers or data consumers and improve inter-dependencies. The following diagram, from 2004, illustrates this evolution.
 
 ![](./images/soa-to-eda.png){ width=800 }
 
@@ -31,11 +31,11 @@ Decoupling event producers and consumers from one another, helps increasing the 
 
 Cloud helps enterprises' software capabilities to scale horizontally, when needed for supporting workload peaks. Cloud native practice is helping to support rapid code change, adopting agile and continuous deployment to production of new feature versions, multiple times a week to million of users…
 
-Budget allocated to run server, update operating system, apply security patch, is used for innovating on new features for end users.
+Budget used to be allocate to run server, update operating system, apply security patch, is now used for innovating on new features for end users.
 
 ## Components of the architecture
 
-At first it is important to consider, without any technology bias, EDA in the term of high level building blocks which we will find in any architecture. The diagram below illustrates those high-level component.
+At first, it is important to consider, without any technology bias, EDA in term of high level building blocks which we will find in any reference architecture. The diagram below illustrates those high-level components:
 
 ![](./diagrams/eda-hl.drawio.png){ width=800 }
 
@@ -44,11 +44,11 @@ The main goals of this architecture are to support scaling, decoupling, and acti
 * **Event sources** are any applications we want to get data from. Most of those sources are not event oriented per design, but it is possible to get events from them by pulling/querying their APIs or the data storage (database), or by connecting change data capture agent to get continuous event feeds. 
 * **Event Backbone** is the core middleware that supports asynchronous communication and storage of events, with high availability and replayability capabilities.
 * **New event-driven applications**:  microservices or functions, producers and consumers of events. Event is part of their design on day one. Those services expose APIs to be used by web apps, mobile apps, or B2B apps. So they supports synchronous and asynchronous protocols.
-* **Events** are persisted for very long time persistence to target sinks like data lakes. But it can be dat a warehouse, SaaS partners...
+* **Events** are persisted for very long retention time inside the backbone and to target sinks like data lakes. 
 * **Sinks** represent longer term persistence of the event data or the downstream backend processing. Sink integrations are difficult to implement as the sink software may not support idempotency, and may be challenging to support exactly-once delivery. Normally consistency boundaries are before reaching the sinks.  
-* The last important piece of the architecture acts on those events (**Event Processing**), in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation ,data pipeline, and Complex Event Processing.
+* The last important piece of the architecture acts on those events (**Event Processing**), in the form of consume-process-publish semantic, used in data-processing, real-time analytics, where we will find stateful aggregate computation, data transformation, data pipeline, and Complex Event Processing.
 
-The cross-cutting capabilies of **security, devops and governance**, need to be across all those components, and Infrastructure as Code supported by any technology supporting this architecture, while governance needs to address data lineage, schema, APIs management,...
+The cross-cutting capabilities of **security, devops and governance**, need to be across all those components, and Infrastructure as Code supported by any technology supporting this architecture, while governance needs to address data lineage, schema, APIs management,...
 
 ### A zoom into the Event Backbone
 
