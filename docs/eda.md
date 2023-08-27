@@ -50,35 +50,35 @@ The main goals of this architecture are to support scaling, decoupling, and acti
 
 The cross-cutting capabilities of **security, devops and governance**, need to be across all those components, and Infrastructure as Code supported by any technology supporting this architecture, while governance needs to address data lineage, schema, APIs management,...
 
-### A zoom into the Event Backbone
+### A zoom into the Event Backbone capabilities
 
-The Event Backbone is not supported by a unique technology as different needs bring different tools. We will go over a simple decision tree to facilitate when to use what in a section below. In asynchronous communication, the applications produce messages, consume them, or do both in the form of consume-process-produce processing.
+As of now, the Event Backbone is not supported by a unique technology, as different requirements bring different tools. We will go over a simple decision tree to facilitate when to use what in a section below. In asynchronous communication, the applications produce messages, consume them, or do both in the form of consume-process-produce processing.
 
 ![](./diagrams/event-backbone.drawio.png){ width=800 }
 
 For **the producer** we can illustrate two behaviors: 
 
-1. applications want to ask another service to do something for themselves: this is the classical command pattern, there is one interested consumer, exchange request/reply messages, with exactly once delivery, message ordering, no data loss. **Queues** are the best technology to support that.
-1. applications want to broadcast their main business entity state change. This is the events production as immutable facts. Pub/sub model on topic is the technology approach. There are two technology, the older one based on the topic semantic, like in JMS and the streaming one. Records are immutable.
+1. applications want to ask another service to do something for themselves: this is the classical **command pattern**. There is one interested consumer, the exchange between the two applications, is using request/reply messages, with exactly once delivery, message ordering, no data loss. **Queues** are the best technology to support that type of communication.
+1. applications want to broadcast their main business entity state change. This is the events production as immutable facts. Pub/sub model on topic is the technology approach. There are two technologies to consider, the older one based on the topic semantic, like in JMS, or the streaming one supported by product like Apache Kafka. 
 
-For **consumers**, they subscribe to the queue or topic, and pull messages, or get messages as part of their subscription in a push model. With pulling the consumer needs to filter out the messages it is not interested of. With pushing the event bus can apply filtering and routing rules. It is important to note that in queueing system message read are deleted, and in classical topic implementation, messages are kept until all known subscribers received the message.
+For **consumers**, they subscribe to the queue or topic, and pull messages, or get messages as part of their subscription in a push model. With pulling the consumer needs to filter out the messages it is not interested of. With pushing mechanism, the event backbone can apply filtering and routing rules. It is important to note that in queueing system, messages read are deleted, and in classical topic implementation, messages are kept until all known subscribers received the message. For Kafka messages disappear after a retention time or after reaching a log size threshold. With streaming from topic, one consumer can read many messages from different topics, and one message can be read by many consumers coming at different time too.
 
-The consume-process-produce is a processing that we find in Kafka streaming, and the 3 step of this mini processus are transactional and supports exactly once delivery. Other technology like Flink or Spark streaming may support such implementation, the most important pattern is that the new facts are created from the processing. This is valuable approach for data pipeline, stateful aggregation using time window, real-time analytics. 
+The **consume-process-produce** is a processing that we find in Kafka Stream, and the three steps of this mini process are transactional and support exactly once delivery. Other technology like Apache Flink or Apache Spark Streaming may support such implementation, the most important pattern is that the new facts are created from the processing and publish to another topic. This is valuable approach for data pipeline, stateful aggregation using time window, real-time analytics, and complex event processing. 
 
-Talking about streaming, topic, can be ordered, and messages in the topic include timestamp. So complex-event processing logic can be implemented, with semantic to look at event sequencing, or not sequencing. 
+Talking about streaming, topic, can be ordered, and messages in the topic include timestamp. So complex-event processing logic can be implemented, with semantic to look at event sequencing, or event missing or out of order. 
 
-Topic or queues should support persistence, for resiliance, and even being able to replay history, or restart from a specific message. This is supported differently depending of the technology, Kafka having offset management, partition and files on disk of the broker.
+Topic or queues should support persistence, for resilience, and even being able to replay history, or restart from a specific message. This is supported differently depending of the technology, Kafka having offset management, partitions and files on event broker's disks.
 
 Event backbone should scale, and support clustering of brokers. 
 
-There is something already strange about this, is why we call it event backbone as it supports queue, and in the world of queueing, there is no concept of event, but messages. A better name should be messaging middleware or system. This is indeed confusing but at the end, looking at APIs (JMS, Kafka, Kinesis,...) the underlying data structure is a record or message. It is admitted in modern days that the message concept is used when records are persisted until consumed, message consumers are typically directly targeted and related to the producer who cares that the message has been delivered and processed. Events are persisted as a replayable stream. Event consumers are not tied to the producer, and can consume at any point of time.
+There is something already strange about this, is why we call it event backbone as it supports queue, and in the world of queueing middleware, there is no concept of event, only messages. A better name should be messaging middleware or messaging system. This is indeed confusing but at the end, looking at APIs (JMS, Kafka, Kinesis,...) the underlying data structure is a record or message. It is admitted in modern days that the message concept is used when records are persisted until consumed, message consumers are typically directly targeted and related to the producer who cares that the message has been delivered and processed. Events are persisted as a replay able stream. Event consumers are not tied to the producer, and can consume at any point of time.
 
-In most topic implementation, there is the concept of partition or shard to be able to scale the number of consumers in parellel. 
+In most topic implementation, there is the concept of partition or shard, to be able to scale the number of consumers in parallel. 
 
-Finally there are two services that are necessary in this middleware to support the minimum governance: 
+Finally, there are two services that are necessary in this middleware to support the minimum governance needed by most EDA: 
 
-* the **schema registry** to control the contract between producer and consumer by defining the data model schema fo the message exchanged. The message includes metadata about the schema version, and may be the URL of the schema registry so the consumer can get, at run time, the schema definition of the message to consume. With this capability consumer can replay old messages and new ones from the same topic or queue.
-* **AsyncAPI** support, this is a quite new capability that needs to be addressed: as we have standard, via OpenAPI to define HTTP interface, the [AsyncAPI](https://www.asyncapi.com/) is the open standard for asynchronous communication and binding. So the component is an api manager which faciliate the governance and consumer boilerplace code generation.
+* the **schema registry** to control the contract between producer and consumer by defining the data schema used to exchange messages. The message includes metadata about the schema version, and may be the URL of the schema registry so the consumer can get, at run time, the schema definition of the message to consume. With this capability consumer is able to replay old messages as well as new ones from the same topic or queue. 
+* **AsyncAPI** definition support: we have a new [standard from AsyncAPI](https://www.asyncapi.com/) for asynchronous communication and binding. To manage AsyncAPI definitions, we should use an API manager solution which includes consumer boilerplate code generation from the defined binding.
 
 ### Event sources
 
@@ -169,10 +169,15 @@ In the autonomous car ride example, choreography may be used, as it seems that s
 
 ## Selecting event bus technologies
 
-As introduced in the event backbone component description above, there are different messaging capabilities. Consider queue system for:
+As introduced in the event backbone capabilities section above, there are different messaging capabilities to support. There is not yet a product that supports all those needs. An enterprise deployment for an event-driven architecture needs to address all those capabilities at different level, and at different time. It is important to any EDA adoption to start small, and add on top of existing event-driven applications. 
 
-* Exactly once delivery, and to participate into two phase commit transaction.
-* Asynchronous request/reply communication: the semantic of the communication is for one component to ask a second component to do something on its data. This is a **Command pattern** with delay on the response.
+### Event Backbone queueing needs:
+
+Consider queue system for:
+
+* Support point to point delivery (asyncronous implementation of the command pattern): Asynchronous request/reply communication: the semantic of the communication is for one component to ask a second component to do something on its data.
+* Exactly once delivery, and to being able to participate into two-phase commit transaction (certain Queueing system support XA transaction).
+* Ordering of message is important.
 * Messages in queue are kept until consumer(s) got them.
 
 Consider streaming system, like Kafka, AWS Kinesis data stream, as pub/sub and persistence system for:
