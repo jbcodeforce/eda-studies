@@ -11,6 +11,7 @@ nav:
     - Saga: patterns/saga/index.md
     - Event Sourcing: patterns/event-sourcing/index.md
     - CQRS: patterns/cqrs/index.md
+    - Reactive: patterns/reactive/index.md
   - OOS technologies:
     - Kafka: techno/kafka/index.md
     - Kafka Connect: techno/kafka-connect/index.md

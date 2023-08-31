@@ -2,3 +2,4 @@ site/
 **/.venv/
 **/node_modules/
 **/log/
+eda-tree-tracking.txt

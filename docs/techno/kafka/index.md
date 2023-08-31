@@ -169,7 +169,7 @@ spec:
                 min.insync.replicas: 2
 ```
 
-Bu it can be specified at the topic level:
+But it can be specified at the topic level:
 
 ```yaml
 kind: KafkaTopic
@@ -276,3 +276,32 @@ We are detailing consumer group implementation in [this note](./consumer#consume
 ## Kafka Streams
 
 An api to develop streaming processing application. See [summary and labs in separate repository](https://github.com/jbcodeforce/kafka-studies)
+
+
+## Additional readings
+
+### Microservices and event-driven patterns
+
+* [API for declaring messaging handlers using Reactive Streams](https://github.com/eclipse/microprofile-reactive-messaging/blob/master/spec/src/main/asciidoc/architecture.asciidoc)
+* [Microservice patterns - Chris Richardson](https://www.manning.com/books/microservices-patterns)
+* [Develop Stream Application using Kafka](https://Kafka.apache.org/32/documentation/streams/)
+
+### Kafka
+
+* [Start by reading Kafka introduction - a must read!](https://kafka.apache.org/intro)
+* [Another introduction from Confluent, one of the main contributors of the open source.](http://www.confluent.io/blog/introducing-Kafka-streams-stream-processing-made-simple)
+* [Using Kafka Connect to connect to enterprise MQ systems - Andrew Schofield](https://medium.com/@andrew_schofield/using-kafka-connect-to-connect-to-enterprise-mq-systems-5674d53fe55e)
+* [Does Apache Kafka do ACID transactions? - Andrew Schofield](https://medium.com/@andrew_schofield/does-apache-kafka-do-acid-transactions-647b207f3d0e)
+* [Spark and Kafka with direct stream, and persistence considerations and best practices](http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html)
+* [Example in scala for processing Tweets with Kafka Streams](https://www.madewithtea.com/processing-tweets-with-kafka-streams.html)
+
+### Conferences, Talks, and Sessions
+
+* [Kafka Summit 2016 - San Francisco](https://www.confluent.io/resources/kafka-summit-san-francisco-2016/)
+* [Kafka Summit 2017 - New York](https://www.confluent.io/resources/kafka-summit-new-york-2017/)
+* [Kafka Summit 2017 - San Francisco](https://www.confluent.io/resources/kafka-summit-san-francisco-2017/)
+* [Kafka Summit 2018 - San Francisco](https://www.confluent.io/resources/kafka-summit-san-francisco-2018/)
+* [Kafka Summit 2019 - San Francisco](https://www.confluent.io/resources/kafka-summit-san-francisco-2019/)
+* [Kafka Summit 2019 - London](https://www.confluent.io/resources/kafka-summit-london-2019/)
+* [Kafka Summit 2020 - Virtual](https://www.confluent.io/resources/kafka-summit-2020/)
+* [Kafka Summit 2022 - Recap](https://www.confluent.io/en-gb/blog/kafka-summit-london-2022-recap/)

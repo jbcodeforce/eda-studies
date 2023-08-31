@@ -103,6 +103,8 @@ The relationships between those characteristics are very important to also illus
 
 ![](./diagrams/reactive.drawio.png){ width=500 }
 
+For more information on reactive systems, see [this chapter](./patterns/reactive/index.md)
+
 ### Event sinks
 
 ### Event streaming processing
