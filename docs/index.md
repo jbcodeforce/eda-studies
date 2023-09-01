@@ -1,6 +1,11 @@
 # Introduction
 
-???- Info "Site updated 07/25/2023"
+???- Info "Site updated 08/31/2023"
+    August:
+    
+    - Reactive systems
+    - EDA content for event backbone criteria
+
     July: 
     
     - Add Choreography and orchestration introduction in design pattern

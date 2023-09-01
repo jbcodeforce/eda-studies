@@ -14,6 +14,7 @@ nav:
     - Reactive: patterns/reactive/index.md
   - OOS technologies:
     - Kafka: techno/kafka/index.md
+    - Kafka Consumer: techno/kafka/consumer.md
     - Kafka Connect: techno/kafka-connect/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis

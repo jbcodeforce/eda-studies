@@ -107,6 +107,12 @@ For more information on reactive systems, see [this chapter](./patterns/reactive
 
 ### Event sinks
 
+Event sinks are target to the downstream processing. It will have different flavor depending of the asynchronous middleware used. 
+
+Writing to a sink application is not easy and the solution may loose the exactly once delivery if the backend does not support transaction. So writing to sink, needs a lot of attention from a solution design point of view. 
+
+TBC
+
 ### Event streaming processing
 
 This is one of the major value of EDA as it helps addressing one of the major AI/ML requirements for modern data pipelines and act on data as early as possible after creation. 
@@ -122,6 +128,29 @@ The following diagram illustrates this concept of modern data pipeline to prepar
 This is using the autonomous car system, where each car can send telemetries to a topic. The raw data is consumed, transformed, mapped according to the processing defined by the Data engineer, may compute some aggregate and produce, what we used to call in the CEP, a synthetic event. This event is in another topic, and may be relevant for other consumers. From a EDA this is an important value proposition to share events for multiple use cases. One of the consumer will be a sink adapter which write to a Feature store. The Feature store, which includes also data coming from warehouse or data lake, is used by the predictive service to prepare the data for the ML model. The car dispatcher service may be a user of the predictive service to get for example the Estimated travel time. 
 
 In a lot of EDA deployments, this logic of consuming - processing - and publishing events is very common and bring a lot of flexibility on the data processing. Data becoming real asset, in real-time, shareable as needed.
+
+### Scalability
+
+Event-Driven architectures are highly scalable by design. The use of an event-driven backbone allows for the addition (and removal) of consumers based on the number of messages waiting to be consumed from a topic. This is good for architectures where in-stream transformation is needed, like data pipeline workflows. Messages can be consumed and transformed extremely fast, which is advantageous for processes where millisecond decision making is necessary. 
+
+When using a system like Apache Kafka, the data (in a given topic) is partitioned by the broker, which allows for parallel processing of the data for consumption. Consumers are usually assigned to one partition.  
+
+As well as scaling up, there is also the ability to scale down (even to zero). When scaling up and down happens autonomously, promoting energy and cost efficiency, it is referred as 'elasticity'. 
+
+### Resiliency
+
+The reduction in inter-dependency between applications that is enabled in an Event-Driven architecture helps increasing resiliency. If services fail, they can restart autonomously and, subsequently, recover events and replay them if needed. Their ability to self-heal, means that the functionality of the whole system is less reliant on certain services being immediately available. We are detailing how consumer offset management works and how to rebuild data projection after recovery [in the **Kafka Consumer article**](../../techno/kafka/consumer/).
+
+Reduced coupling between services means, they do not need to have any knowledge of the services to which they produce to or from whom they consume from. There are a number of advantages to this. For example, even if a service goes down, events will still be produced or consumed once it has recovered, known as 'Guaranteed Delivery'. 
+
+For instance, let's say we run a shipping company that operates a fleet of container ships. The containers themselves could be smart IoT devices, in that they collect data about the health of the container (temperature, position etc). At the vessel level, we can use edge computing with local event backbone to do some simple aggregations and correlations before sending those data back at regular intervals to a central onshore monitoring platform. If the vessels's network goes offline and the refrigerator containers can not send back the data, it can still be collected and will be sent once the service is available again. We have resilience between data centers. Here is diagram illustrating those concepts with some underlying technologies.
+
+ ![](./images/resilience.png){ width=700}
+
+
+Applications on the right, run in a data center or cloud provider region, and receive aggregated data coming from the Kafka cluster running on the vessel. The topic data replication is done via [**Mirror Maker 2**](../../techno/kafka/mirrormaker.md). 
+
+Then a second level of real time analytics could compute aggregates between all the vessels sailing over seas. If the connection is lost the mirroring will get the records when reconnecting. On the vessel level, multiple brokers ensure high availability, and replication cross broker ensures data resilience. Real time analytic components can scale horizontally, even when computing global aggregate by using [**kafka streams capability** of Ktable and store](../../techno/kafka/streams/#interactive-queries). 
 
 ## From SOA to EDA
 
