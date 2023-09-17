@@ -3,11 +3,11 @@
 !!! Info "Update"
     Created 07/01/2023 - Updated 07/10/2023
 
-This content is a summary of the things we need to know around Apache Kafka, one of the main event backbone to support EDA. It does not replace [the excellent introduction](https://Kafka.apache.org/intro) every developer using Kafka should read.
+This content is a summary of the things we need to know around Apache Kafka, one of the main event backbone to support EDA. It does not replace [the excellent introduction](https://kafka.apache.org/intro) every developer using Kafka should read.
 
 ## Introduction
 
-[Kafka](https://Kafka.apache.org) is a distributed real time event streaming platform with the following key capabilities:
+[Kafka](https://kafka.apache.org) is a distributed real time event streaming platform with the following key capabilities:
 
 * Publish and subscribe streams of records. Data are stored on disk so consuming applications can pull the information when they need, and keep track of what they have seen so far.
 * It can handle hundreds of read and write operations per second from many producers and consumers.
@@ -271,7 +271,7 @@ See [dedicated chapter](./consumer.md).
 
 This is the way to group consumers so the processing of event is parallelized. 
 The number of consumers in a group is the same as the number of partition defined in a topic. 
-We are detailing consumer group implementation in [this note](./consumer#consumer-group).
+We are detailing consumer group implementation in [this note](./consumer.md#consumer-group).
 
 ## Kafka Streams
 

@@ -7,7 +7,7 @@ A source connector collects data from a system. A sink connector delivers data f
 
 Here is the basic concepts of Kafka Connect integration with Kafka Cluster and external systems
 
-![](./diagrams/Kafka-connect.drawio.png)
+![](./diagrams/kafka-connect.drawio.png)
 
 
 The general concepts are detailed in the [Robin Moffatt's video](https://talks.rmoff.net/DQkDj3). Here is a quick summary:

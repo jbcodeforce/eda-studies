@@ -68,5 +68,5 @@ See also [this article](https://microservices.io/patterns/data/saga.html) from C
 
 ## Repositories to demonstrate the Saga patterns
 
-* [Saga choerography implementation with Kafka](https://github.com/jbcodeforce/saga-choreography-kafka)
-* [Saga orchestration on top of queueing]()
+* [Saga choerography implementation with Kafka](https://jbcodeforce.github.io/saga-choreography-kafka/)
+* [Saga orchestration on top of queueing (AWS SQS)]()

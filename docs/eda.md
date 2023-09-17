@@ -139,7 +139,7 @@ As well as scaling up, there is also the ability to scale down (even to zero). W
 
 ### Resiliency
 
-The reduction in inter-dependency between applications that is enabled in an Event-Driven architecture helps increasing resiliency. If services fail, they can restart autonomously and, subsequently, recover events and replay them if needed. Their ability to self-heal, means that the functionality of the whole system is less reliant on certain services being immediately available. We are detailing how consumer offset management works and how to rebuild data projection after recovery [in the **Kafka Consumer article**](../../techno/kafka/consumer/).
+The reduction in inter-dependency between applications that is enabled in an Event-Driven architecture helps increasing resiliency. If services fail, they can restart autonomously and, subsequently, recover events and replay them if needed. Their ability to self-heal, means that the functionality of the whole system is less reliant on certain services being immediately available. We are detailing how consumer offset management works and how to rebuild data projection after recovery [in the **Kafka Consumer article**](./techno/kafka/consumer.md).
 
 Reduced coupling between services means, they do not need to have any knowledge of the services to which they produce to or from whom they consume from. There are a number of advantages to this. For example, even if a service goes down, events will still be produced or consumed once it has recovered, known as 'Guaranteed Delivery'. 
 
@@ -150,7 +150,7 @@ For instance, let's say we run a shipping company that operates a fleet of conta
 
 Applications on the right, run in a data center or cloud provider region, and receive aggregated data coming from the Kafka cluster running on the vessel. The topic data replication is done via [**Mirror Maker 2**](../../techno/kafka/mirrormaker.md). 
 
-Then a second level of real time analytics could compute aggregates between all the vessels sailing over seas. If the connection is lost the mirroring will get the records when reconnecting. On the vessel level, multiple brokers ensure high availability, and replication cross broker ensures data resilience. Real time analytic components can scale horizontally, even when computing global aggregate by using [**kafka streams capability** of Ktable and store](../../techno/kafka/streams/#interactive-queries). 
+Then a second level of real time analytics could compute aggregates between all the vessels sailing over seas. If the connection is lost the mirroring will get the records when reconnecting. On the vessel level, multiple brokers ensure high availability, and replication cross broker ensures data resilience. Real time analytic components can scale horizontally, even when computing global aggregate by using [**kafka streams capability** of Ktable and store](). 
 
 ## From SOA to EDA
 

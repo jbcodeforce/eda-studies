@@ -1,6 +1,11 @@
 # Introduction
 
-???- Info "Site updated 08/31/2023"
+???- Info "Site updated 09/17/2023"
+    September:
+    - microservice challenges in patterns chapter
+    - flow architecture summary
+    - Dead letter queue pattern
+
     August:
     
     - Reactive systems

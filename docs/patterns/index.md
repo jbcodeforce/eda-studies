@@ -2,6 +2,75 @@
 
 In this set of articles, we will detail some of the most important event-driven design patterns that can be used during an event-driven microservice implementation.
 
+## Microservice challenges
+
+As we have seen in the [introduction](../eda.md), modern business application needs to responds to events in real time, as the events happen, so it can deliver better user experiences and apply business logic on those events. The key is to be able to act quickly on those facts. Acting may involve computing real-time analytics or use predictive scoring with machine trained models. 
+
+On top of that, a modern cloud native application needs to be reactive, responsive by adopting the [reactive manifesto](./reactive/index.md). 
+
+When adopting microservice implementation, the bounded context is defined with events and main business entity. 
+Each microservice is responsible to manage the operations of creating, updating and reading the data from a 
+main business entity. This clear separation, leads to exchange data between services, where they used to be
+integrated in the same monolytic application before.
+
+A web application, single page app (SPA), accesses the different microservices using RESTful APIs, 
+to get the different data views, or create new data elements within one of the service.The following diagram illustrates a simple view of the microservice challenges:
+
+ ![1](./diagrams/microserv-1.drawio.png)
+
+When the user interface exposes entry form to create new data for one of the business entity, 
+it calls a REST end point with a HTTP POST operation, then data are saved to data store: document oriented database or SQL based RDBMS.
+
+When a microservice (1) needs to access data from another service, it calls another service end point via an HTTP GET. Coupling still exists, via the protocol and the data schema definition level: 
+a change to the data model, from the source microservice, impacts the service contract and so all the API consumers. This may be acceptable when there is few microservices, but could become a real pain when the number increase.
+
+When the microservice dependencies grows in size and complexity, as illustrated by the following figure from [Jack Kleeman's Monzo study](https://monzo.com/blog/we-built-network-isolation-for-1-500-services), 
+we can see any change to the API from adding a new function will impact all the related services, and will increase cost to maintain such complexity:
+
+ ![2](./images/microserv-2.png)
+
+Finally, imagine we need to join data coming from two different services to address an urgent business request.
+Who will implement the join, service A or B? May be the simplest is to add a service C and 
+implement a join: it will call two API end points, and try to reconcile data using primary keys 
+on both business entities. With this clear separation we can scale service C, but we still add coupling:
+
+ ![3](./diagrams/microserv-3.drawio.png)
+
+With event-driven microservices, the communication point becomes the Pub/Sub layer of 
+the event backbone. Adopting an event-based implementation, enhances the loose coupling nature of microservices because it decouples producers and consumers at the protocol level. The figure below illustrates, that microservices A and B produces facts about their business entities to topic in the pub/sub event backbone:
+
+ ![4](./diagrams/microserv-4.drawio.png)
+
+The microservice C consumes those facts to build, its own projections to support the join query.
+
+When adopting technology like Kafka as messaging backbone, the data sharing is done via an event log, which can be kept for a very long time period, and is replayable to improve resilience. 
+
+These event-driven characteristic is an important decision we need to take when starting developing microservices. Microservice applications are a combination of synchronous API, and asynchronous, event-driven, communication. 
+
+There is something important to add to the discussion, is the fact that there is a coupling by the data.  Messaging structures are defined with JSON schema or Avro schema and managed inside a Schema registry, so messaging applications can still manage the data contract.  
+
+The following figure presents a potential structure for event-driven microservice: 
+
+In Java, APIs are defined using microprofile OpenAPI annotations in one or more JAXRS resource 
+classes. Those APIs can then be managed within an API management product:
+
+![](./images/evt-driv-ms.png){ width=300}
+
+The rest of the application structure reflects the DDD approach of onion architecture. 
+The business logic is in its own layer with DDD aggregate, ubiquitous language, services,
+business rules, etc…
+The repository layer supports persisting those aggregates to an external document-oriented 
+or SQL-based database.
+As most of the new microservices are message-driven, we are adding a messaging layer 
+that may use queues or topics. Use queue for request/response exactly once delivery 
+and topic for sharing facts in append log.
+In Java, the Microprofile Reactive Messaging is used to define the different publishing 
+channels, being queue, topic, or both.
+From the JSON or Avro schema defining the messages or events structure, 
+developers can build an AsyncAPI specification which may also be managed by an API product.
+
+## Common Patterns
+
 Adopting messaging (Pub/Sub or queueing) as a microservice communication approach involves using, at least, the following patterns:
 
 * [Decompose by subdomain](https://microservices.io/patterns/decomposition/decompose-by-subdomain.html): The domain-driven design approach is useful to identify and classify business
@@ -14,12 +83,12 @@ Applying a domain driven design approach, you may strangle the application using
 existing bounded contexts and the new microservices. One of the challenges will be to define where the write and read operations occurs, and how data should be replicated between the contexts.
 This is where event driven architecture helps.
 * [Scatter-gather](#scatter-gather) to dispatch work among microservice and gather their results to build an aggregated answer.
-* [Event sourcing](./event-sourcing/): persists, to an append log, the states of a business entity, such as an Order, as a sequence of immutable state-changing events.
+* [Event sourcing](./event-sourcing/index.md): persists, to an append log, the states of a business entity, such as an Order, as a sequence of immutable state-changing events.
 * [Choreography](#choreography) to do decentralized coordination between services.
 * [Orchestration](#orchestration) to centralize the coordination between distributed systems with compensation flow.
-* [Command Query Responsibility Segregation](./cqrs/): helps to separate queries from commands and help to address queries with cross-microservice boundary.
-* [Saga pattern:](./saga/) Microservices publish events when something happens in the scope of their control like an update in the business entities they are responsible for. A microservice, interested in other business entities, subscribes to those events and it can update its own state and business entities on receipt of these events. Business entity keys need to be unique and immutable.
-* [Event reprocessing with dead letter](./dlq/): event driven microservices may have to call external services via a synchronous call. We need to process failure in order to get response from those services using event backbone.
+* [Command Query Responsibility Segregation](./cqrs/index.md): helps to separate queries from commands and help to address queries with cross-microservice boundary.
+* [Saga pattern:](./saga/index.md) Microservices publish events when something happens in the scope of their control like an update in the business entities they are responsible for. A microservice, interested in other business entities, subscribes to those events and it can update its own state and business entities on receipt of these events. Business entity keys need to be unique and immutable.
+* [Event reprocessing with dead letter](./dlq/index.md): event driven microservices may have to call external services via a synchronous call. We need to process failure in order to get response from those services using event backbone.
 * [Transactional outbox](#transactional-outbox): A service command typically needs to update the database and send messages/events.
 The approach is to use an outbox table to keep the message to sent and a message relay process to publish events inserted into database to the event backbone. (Source Chris Richardson - Microservices Patterns)
 
@@ -60,7 +129,7 @@ Here is an example of choreography with squares representing events from the dif
 
 ![](./images/choreography.drawio.png){ width=700 }
 
-The detail of the flow is described in [this design note](../solutions/autonomous-car/#adopting-an-event-driven-approach-to-the-implementation)
+The detail of the flow is described in [this design note](../solutions/autonomous-car/index.md#adopting-an-event-driven-approach-to-the-implementation)
 
 ## Orchestration
 

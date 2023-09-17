@@ -203,7 +203,7 @@ There are other ways to support this dual operations level:
 
 * When using Kafka, [Kafka Connect](https://kafka.apache.org/documentation/#connect) has the capability to subscribe to databases via JDBC, allowing to poll tables for updates and then produce events to Kafka.
 * There is an open-source change data capture solution based on extracting change events from database transaction logs, [Debezium](https://debezium.io/) that helps to respond to insert, update and delete operations on databases and generate events accordingly. It supports databases like MySQL, Postgres, MongoDB and others.
-* Write the order to the database and in the same transaction write to an event table (["outbox pattern"](../intro#transactional-outbox)). Then use a polling to get the events to send to Kafka from this event table and delete the row in the table once the event is sent.
+* Write the order to the database and in the same transaction write to an event table (["transactional outbox pattern"](../index.md#transactional-outbox)). Then use a polling to get the events to send to Kafka from this event table and delete the row in the table once the event is sent.
 * Use the Change Data Capture from the database transaction log and generate events from this log. 
 
 The CQRS implementation using CDC will look like in the following diagram:

@@ -52,7 +52,7 @@ When replaying the events, it may be important to avoid generating side effects.
 
 Sometime it may be too long to replay hundreds of events. In that case we can use snapshot, to capture the current state of an entity, and then replay events from the most recent snapshot. This is an optimization technique not needed for all event sourcing implementations. When state change events are in low volume there is no need for snapshots.
 
-Kafka is supporting the event sourcing pattern with [the topic and partition](../../techno/kafka/#topics). 
+Kafka is supporting the event sourcing pattern with [the topic and partition](../../techno/kafka/index.md#topics). 
 
 The event sourcing pattern is well described in [this article on microservices.io](https://microservices.io/patterns/data/event-sourcing.html). It is a very important pattern to support eventual data consistency between microservices and for data synchronization between system as the event store becomes the source of truth.
 
