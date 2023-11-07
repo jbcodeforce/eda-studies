@@ -148,7 +148,7 @@ For instance, let's say we run a shipping company that operates a fleet of conta
  ![](./images/resilience.png){ width=700}
 
 
-Applications on the right, run in a data center or cloud provider region, and receive aggregated data coming from the Kafka cluster running on the vessel. The topic data replication is done via [**Mirror Maker 2**](../../techno/kafka/mirrormaker.md). 
+Applications on the right, run in a data center or cloud provider region, and receive aggregated data coming from the Kafka cluster running on the vessel. The topic data replication is done via [**Mirror Maker 2**](./techno/mirrormaker/index.md). 
 
 Then a second level of real time analytics could compute aggregates between all the vessels sailing over seas. If the connection is lost the mirroring will get the records when reconnecting. On the vessel level, multiple brokers ensure high availability, and replication cross broker ensures data resilience. Real time analytic components can scale horizontally, even when computing global aggregate by using [**kafka streams capability** of Ktable and store](). 
 

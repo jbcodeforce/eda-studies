@@ -1,9 +1,15 @@
+# Event Storming
 
-In this article we are presenting an end to end set of activities to run a successful Minimum Viable Product for an event-driven solution using cloud native microservices and event backbone as the core technology approach.
+Often running into solution from simple problem statement leads to wrong technology choices. While fit for purpose practices are very important, undetstanding the problem from a business domain point of view, understanding the business process to support is the most important work to be done by a system architect and software developers.
 
-The discovery and analysis of the MVP scope starts with an [event storming workshop](#event-storming-workshop-introduction) where designer, architect work hand to hand with business users and domain subject matter experts. From the different outcomes of the workshop, the development team starts to outline components, microservices, business entity life cycle, etc... in a short [design iteration](#design-iteration). The scope is well defined Epics, Hill and user stories defined, at least for the first iterations, and the MVP can start.
+Domain-driven design has growth in the adoption while implementing service oriented architecture, but are becoming more valuable in the microservice, and EDA design. Before getting to the element of DDD, event storming is a methodology to model the business process from an event point of view, facts that happened, which is far simpler than modeling with Business Process Management Notation. The design team may start as soon as possible with the domain subject matter expert to understand the flow of events, and then extends by adding DDD constructs like aggregates, commands, domain, sub-domains, bounded contexts.
 
-## Event Storming workshop introduction
+In this article we are presenting the end to end set of activities to run a successful event-driven solution using cloud native microservices.
+
+The target audiance are solution architects, designers (Design Thinking), lead developers.
+
+
+## Event Storming introduction
 
 Event storming is a workshop format for quickly exploring complex business domains by focusing on *domain events* generated in the context of a business process or a business application. A **domain event** is something meaningful to the experts that happened in the domain. The workshop focuses on communication between product owner, domain experts and developers.
 
@@ -224,4 +230,3 @@ An event is the result or outcome of a user story. Events can be added as part o
 * [Eric Evans: "Domain Driven Design - Tacking complexity in the heart of software"](https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software)
 * [Domain drive design with event storming introduction video](https://learning.oreilly.com/videos/domain-driven-design-distilled/9780134593449/9780134593449-DDDD_07_01?autoplay=false)
 * [Patterns related to Domain Driven Design](https://martinfowler.com/tags/domain%20driven%20design.html) by Martin Fowler
-

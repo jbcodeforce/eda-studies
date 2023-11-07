@@ -22,7 +22,7 @@ DDD suits better long term projects, where the domain of knowledge is important 
 The event-storming methodology is used to model the to-be scenario with an end-to-end business process discovery. Discovering events using event storming simplifies the process discovery and sequencing of tasks. BPMN modeling may also being used to model a process but it has
  the tendency to lock the thinking in a flow, while event storming focuses on what happened as facts, and so it easier to get events sequencing. 
 
-Also events coming from no-where could still be discovered and have their value. Event storming workshop help to identify domain driven design elements such as:
+Also events coming from no-where could still be discovered and have their value. Event storming workshop helps to identify domain driven design elements such as:
 
 * Domains - sub domains
 * Event Sequence flow.
