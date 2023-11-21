@@ -10,8 +10,6 @@ Here is a list of those assets.
 * [The main EDA content website](https://ibm-cloud-architecture.github.io/refarch-eda)
 * [Main EDA reference implementation](https://ibm-cloud-architecture.github.io/refarch-kc)
 * [Vaccine reference implementation](https://ibm-cloud-architecture.github.io/vaccine-solution)
-* [Kafka notes](https://ibm-cloud-architecture.github.io/refarch-eda/technology/kafka-overview/)
-* [Kafka Streams](https://ibm-cloud-architecture.github.io/refarch-eda/technology/kafka-streams/)
 * [Kafka Connect](https://ibm-cloud-architecture.github.io/refarch-eda/technology/kafka-connect/) with hand-on lab
 * [Mirror maker 2](https://ibm-cloud-architecture.github.io/refarch-eda/use-cases/kafka-mm2/)
 * [Consumer group](https://ibm-cloud-architecture.github.io/refarch-eda/technology/event-streams/consumergrp/)

@@ -9,6 +9,7 @@ nav:
     - Vaccine Examples: event-storming/vaccine-dt-es-ddd.md
   - Design patterns:
     - Common patterns: patterns/index.md
+    - Messaging vs events: patterns/events-versus-messages/index.md
     - Saga: patterns/saga/index.md
     - Event Sourcing: patterns/event-sourcing/index.md
     - CQRS: patterns/cqrs/index.md
@@ -25,7 +26,9 @@ nav:
   - AWS assets: 
       - Autonomous Car Ride: solutions/autonomous-car/index.md
       - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md
-  - IBM assets: ibm-assets.md
+  - IBM technologies: 
+      - Assets: ibm-assets.md
+      - MQ: techno/ibm-mq/index.md
   - AWS studies: https://jbcodeforce.github.io/aws-studies
   - Return to main: https://jbcodeforce.github.io
 theme: 
