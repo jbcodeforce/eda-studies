@@ -45,10 +45,10 @@ We encourage to read the [article from Richard Coppen's: 'IBM MQ fundamentals'](
 
 The figure below illustrates the different ways to organize the MQ brokers according to the applications' needs.
 
-![](./diagrams/decentralized.drawio.png){ width = "800" }
+![](./diagrams/decentralized.drawio.png){ width =800 }
 
 * On the top row, applications have decoupled queue managers, with independent availability / scalability reuquirements. The ownership is decentralized, as each application also owns the broker configurations and deployments.
-Such cloud native applications may adopt the [Command Query Responsability Seggregation](../../patterns/cqrs/) pattern and use queues to propagage information between the microservices. The deployment of both brokers and microservices follows the same CI/CD pipeline, with a `kustomize` for Kubernetes, for example, to describe the broker configuration.
+Such cloud native applications may adopt the [Command Query Responsability Seggregation](../../patterns/cqrs/index.md) pattern and use queues to propagage information between the microservices. The deployment of both brokers and microservices follows the same CI/CD pipeline, with a `kustomize` for Kubernetes, for example, to describe the broker configuration.
 * A central MQ broker can still be part of the architecture to support legacy applications integrations and federated queues. 
 * MQ Brokers are connected together to build a mesh.
 
@@ -68,7 +68,7 @@ With IBM MQ on multiplatforms, a message is stored on exactly one queue manager.
 
 A set of MQ topologies can be defined to support HA:
 
-![topology](./diagrams/mq-topologies.drawio.png){ width = "1000" }
+![topology](./diagrams/mq-topologies.drawio.png){ width=800 }
 
 1. **Single resilient** queue manager: MQ broker runs in a VM or a single container, and if it stops, the VM or pod scheduler will restart it. This is using the platform resynch capability combined with **HA storage**. IP Address is kept between the instances. The queue content is saved to a storage supporting HA. In the case of container, new restarted pod will connect to existing storage, and the IP gateway routes traffic to the active instance via service and app selector.
 1. **Multi-instance** queue manager: active - standby topology - Failover is triggered on failure of the active instance. IP Address is also kept. When using k8s, the stand-by broker is on a separate node, ready to be activated. The pods use persistence volumes with ReadWriteMany settings.
@@ -77,7 +77,7 @@ A set of MQ topologies can be defined to support HA:
 The deployed MQ broker is defined in k8s as a `StatefulSet` which may not restart automatically in case of node failure. So there is a time to fail over.
 A service will provide consistent network identity to the MQ broker.
 
-On kubernetes, MQ relies on the availability of the data on the persistent volumes. The availability of the storage providing the persistent volumes, defines IBM MQ availability.
+On Kubernetes, MQ relies on the availability of the data on the persistent volumes. The availability of the storage providing the persistent volumes, defines IBM MQ availability.
 
 For multi-instance deployment, the shared file system must support write through to disk on flush operation, to keep transaction integrity (ensure writes have been safely committed before acknowledging the transaction), must support exclusive access to files so the queue managers write access is synchronized. Also it needs to support releasing locks in case of failure.
 
@@ -86,9 +86,9 @@ See [product documentation for testing message integrity](https://www.ibm.com/do
 
 ### Active-active with uniform cluster
 
-With [Uniform Cluster](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=clusters-uniform) and  Client Channel Definition Tables it will be possible to achieve high availability with at least three brokers and multiple application instances accessing brokers group via the CCDT. The queue managers are configured almost identically, and application interacts with the group.
+With [Uniform Cluster](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=clusters-uniform) and  Client Channel Definition Tables, it will be possible to achieve high availability with at least three brokers and multiple application instances accessing brokers group via the CCDT. The queue managers are configured almost identically, and application interacts with the group.
 
-![](./images/uniform-cluster.png){ width = "1000" }
+![](./diagrams/uniform-cluster.drawio.png){ width=800 }
 
 You can have as many application instances as there are queue managers in the cluster. 
 
@@ -104,12 +104,13 @@ The brokers are communicating their states between each others, and connection r
 With the same approach, we can add new Queue manager
 See [this video from David Ware abour active - active with Uniform cluster](https://www.youtube.com/watch?v=LWELgaEDGs0) to see how this rebalancing works between queue managers as part of a Uniform queue manager.
 
+![type:video](https://www.youtube.com/embed/LWELgaEDGs0)
+
 See [the 'MQ Uniform Cluster' related repository](https://github.com/ibm-messaging/mq-uniform-clusters).
 
 ### Native HA
 
-[Native HA](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=operator-native-ha) queue managers involve an active and two replica Kubernetes `Pods`, which run as part of a 
-Kubernetes `StatefulSet` with exactly three replicas each with their own set of Kubernetes Persistent Volumes.
+[Native HA](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=operator-native-ha) queue managers involves an active and two replica brokers, each with their own set of Kubernetes Persistent Volumes.
 
 Native HA provides built in replication of messages and state across multiple sets of storage, removing the 
 dependency of replication and locking from the file system.
@@ -118,9 +119,9 @@ Each replica writes to its own recovery log, acknowledges the data, and then upd
 
 ![](./diagrams/native-ha.drawio.svg)
 
-A Kubernetes Service is used to route TCP/IP client connections to the current active instance. 
+When deployed on Kubernetes, a Service is used to route TCP/IP client connections to the current active instance.
 
-Set the availability in the queueManager configuration.
+Set the availability in the queueManager configuration in the CRD:
 
 ```yaml
   queueManager:
@@ -128,12 +129,13 @@ Set the availability in the queueManager configuration.
       type: NativeHA
 ```
 
-### Disaster recovery
+## Hands-on
 
-For always on deployment we need three data center and active-active on the three data center. So how is it supported with MQ?
+### Installation on AWS EC2
 
 
-## Installation with Cloud Pak for Integration
+
+### Installation on Kubernetes
 
 Starting with release 2020.2, MQ can be installed via Kubernetes Operator on Openshift platform. From the operator catalog search for MQ. See the [product documentation installation guide](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=iumorho-installing-mq-operator-using-red-hat-openshift-web-console) for up to date details.
 
@@ -262,7 +264,8 @@ data:
     ALTER QMGR CHLAUTH (DISABLED)
     REFRESH SECURITY TYPE(CONNAUTH)
 ```
-## Running MQ in docker
+
+### Running MQ in docker
 
 The [following recent article](https://developer.ibm.com/tutorials/mq-connect-app-queue-manager-containers/) from Richard J. Coppen presents such deployment, and can be summarized as:
 
@@ -409,5 +412,5 @@ CCDT provides encapsulation and abstraction of connection information for applic
 
 ## Code repositories
 
-* [Store simulator - JMS producer to MQ](https://github.com/ibm-cloud-architecture/refarch-eda-store-simulator)
+* [Store simulator - JMS producer to MQ](https://github.com/jbcodeforce/refarch-eda-store-simulator)
 * [AMQP and reactive messaging](https://github.com/jbcodeforce/life-insurance-demo/tree/main/lf-tx-simulator)

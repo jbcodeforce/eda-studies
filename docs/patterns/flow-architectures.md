@@ -229,7 +229,9 @@ Need to assess which insights require understanding the emerging behavior of a s
 
 Interesting presentations:
 
-* [Voxxed Athens 2018 - Eventing, Serverless, and the Extensible Enterprise by Clemens Vasters](https://www.youtube.com/watch?v=qCNXUUlhJJE)
+* The Voxxed Athens 2018 - Eventing, Serverless, and the Extensible Enterprise by Clemens Vasters:
+
+![type:video](https://www.youtube.com/embed/qCNXUUlhJJE)
 
 ## 5- Model Flow
 

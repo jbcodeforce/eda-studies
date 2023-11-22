@@ -20,6 +20,7 @@ nav:
     - Kafka: techno/kafka/index.md
     - Kafka Consumer: techno/kafka/consumer.md
     - Kafka Connect: techno/kafka-connect/index.md
+    - Mirror Maker 2: techno/mirrormaker/index.md
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md
@@ -58,6 +59,7 @@ plugins:
       lang: en
   - minify:
       minify_html: true
+  - mkdocs-video
 markdown_extensions:
   - abbr
   - attr_list

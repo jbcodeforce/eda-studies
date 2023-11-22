@@ -78,4 +78,6 @@ One derived challenge is that the command may be executed multiple times, especi
 
 * [Martin Fowler - event sourcing pattern](https://martinfowler.com/eaaDev/EventSourcing.html)
 * [Microservice design pattern from Chris Richardson](https://microservices.io/patterns/data/event-sourcing.html)
-* [Greg Young video on event sourcing at the goto; conference](https://www.youtube.com/watch?v=8JKjvY4etTY)
+* Greg Young video on event sourcing at the goto; conference:
+
+![type:video](https://www.youtube.com/embed/8JKjvY4etTY)

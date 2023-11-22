@@ -161,7 +161,11 @@ Some challenges to always consider:
 * How much data to keep in the event store (history)?
 * How to adopt data duplication which results to eventual data consistency?.
 
-The CQRS pattern was introduced by [Greg Young](https://www.youtube.com/watch?v=JHGkaShoyNs), and described in [Martin Fowler's work on microservices.](https://martinfowler.com/bliki/CQRS.html)
+The CQRS pattern was introduced by Greg Young:
+
+![type:video](https://www.youtube.com/embed/JHGkaShoyNs)
+
+ and described in [Martin Fowler's work on microservices.](https://martinfowler.com/bliki/CQRS.html)
 
 As you can see in previous figure, as soon as we see two arrows from the same component, we have to ask ourselves how does it work: the write model has to persist `Order` in its own database and then sends `OrderCreated` event to the topic... Should those operations be atomic and controlled with transaction? We detail this in next section.
 
