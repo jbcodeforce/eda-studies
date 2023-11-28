@@ -24,6 +24,7 @@ nav:
   - AWS technologies:
       - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
       - EventBridge: aws/eventbridge.md
+      - AWS messaging: https://jbcodeforce.github.io/aws-messaging-study
   - AWS assets: 
       - Autonomous Car Ride: solutions/autonomous-car/index.md
       - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md

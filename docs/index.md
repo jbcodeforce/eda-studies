@@ -1,7 +1,14 @@
 # Introduction
 
-???- Info "Site updated 09/17/2023"
+???- Info "Site updated 11/27/2023"
+    November:
+    
+    - Update to event storming
+    - Add event storming example for vaccine delivery
+    - Added summary of IBM MQ
+    
     September:
+
     - microservice challenges in patterns chapter
     - flow architecture summary
     - Dead letter queue pattern
