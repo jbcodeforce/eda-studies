@@ -195,21 +195,28 @@ Which leads to my next argument: there are a lot of people who are currently cla
 
 In the autonomous car ride example, choreography may be used, as it seems that some services are maintaining states of the overall ride transaction: the order, the car dispatching, the route...
 
-* Another argument is related to availability: if one of the service is not responding quickly, then all the components in the calling chain are impacted. And in case of outages, if one component fails, error will propagate back to caller chain. There are patterns to handle such issues, like circuit braker, throttling, or bulkhead. Now this is true, asynchronous processing helps to support failure and slower services. 
-
+* Another argument is related to availability: if one of the service is not responding quickly, then all the components in the calling chain are impacted. And in case of outages, if one component fails, error will propagate back to caller chain. There are patterns to handle such issues, like circuit braker, throttling, or bulkhead. Now this is true, asynchronous processing helps to support failure and slower services.
 
 ## Selecting event bus technologies
 
-As introduced in the event backbone capabilities section above, there are different messaging capabilities to support. There is not yet a product that supports all those needs. An enterprise deployment for an event-driven architecture needs to address all those capabilities at different level, and at different time. It is important to any EDA adoption to start small, and add on top of existing event-driven applications. 
+As introduced in the event backbone capabilities section above, there are different messaging capabilities to support. There is no product on the market that supports all those requirements. Enterprise deployment for an event-driven architecture needs to address all those capabilities at different level, and at different time. It is important to any EDA adoption to start small, and add on top of existing foundations but always assess the best fit for purpose.
 
-### Event Backbone with queues:
+### Event Backbone with queues
 
-Consider queue system for:
+Consider queue system when we need to:
 
-* Support point to point delivery (asyncronous implementation of the command pattern): Asynchronous request/reply communication: the semantic of the communication is for one component to ask a second component to do something on its data.
-* Exactly once delivery, and to being able to participate into two-phase commit transaction (certain Queueing system support XA transaction).
-* Ordering of message is important.
-* Messages in queue are kept until consumer(s) got them. Consumer has the responsibility to remove the message from the queue, which means, in case of interruption, the record may be processed more than one time.
+* Support point-to-point delivery (asyncronous implementation of the Command pattern): Asynchronous request/reply communication: the semantic of the communication is for one component to ask a second component to do something on its data. The state of the caller depends of the answer from the called component.
+* Deliver exactly-once semantic: not loosing message, and no duplication. 
+* Participate into two-phase commit transaction (certain Queueing system support XA transaction).
+* Keep strict message ordering. This is optional, but FIFO queues are needed in some business application.
+* Scale, be resilient and always available.
+
+Messages in queue are kept until consumer(s) got them. Consumer has the responsibility to remove the message from the queue, which means, in case of interruption, the record may be processed more than one time. So if we need to be able to replay messages, and consider timestamp as an important element of the message processing, then streaming is a better fit.
+
+Queueing system are non-idempotents, but some are.
+
+### Pub/sub with topics
+
 
 ### Streaming capabilities
 

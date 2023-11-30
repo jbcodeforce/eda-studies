@@ -13,7 +13,7 @@ This site includes a lot of content around Kafka as the backbone to support EDA,
 I will prefer to mention that EDA is about modern asynchronous microservice based solution, that needs to exchange messages. Messages can be sent to Queues or Topics or both.
 IBM MQ delivers different features than Kafka and, as an architect, it is important to assess the fit for purpose.
 
-## Concepts to keep in mind 
+## Key concepts
 
 IBM MQ queue managers are the main component to define queues and where applications connect to. 
 They can be organized in network to deliver messages between applications and locations. 
@@ -32,6 +32,11 @@ We encourage to read the [article from Richard Coppen's: 'IBM MQ fundamentals'](
 * **MQ clusters** are tight couplings of queue managers, enabling higher levels of scaling and availability
 * **Point to point** for a single consumer. Senders produce messages to a queue, and receivers asynchronously consume messages from that queue. With multiple receivers, each message is only consumed by one receiver, distributing the workload across them all.
 * **Publish/subscribe** is supported via topic and subscription, and MQ sends copies of the message to those subscribing applications
+* **MQI** is the message queue interface to control MQ objects. It supports commands like create queue, start, stop QM, alter objects' attributes, create channels...
+* [MQSC commands](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=reference-mqsc-commands) are commands to intereact with MQ objects. Adminstrator can use those commands with [runmqsc](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=reference-runmqsc-run-mqsc-commands), and they can be in a script to configure the broker at [start up time](https://www.ibm.com/docs/en/ibm-mq/9.3?topic=commands-automatic-configuration-from-mqsc-script-startup).
+
+??? example "Custom configuration with a MQ docker image"
+    Create a config.mqsc file with all the MQSC commands, and then get the Dockerfile copy the file to `/etc/mqm` folder. See an example [here.](https://github.com/jbcodeforce/aws-messaging-study/blob/main/ibm-mq/src/Dockerfile).
 
 ## Major MQ benefits in EDA
 
