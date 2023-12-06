@@ -159,5 +159,11 @@ To summarize this pattern, the approach is to use an `outbox` table to keep the 
 ![3](./images/outbox.png){ width=700 }
 
 
+## Integration patterns
 
+### One-way asynchronous
+
+The sender does not expect a response, and share its information to a message channel
+
+![](./diagrams/)
 

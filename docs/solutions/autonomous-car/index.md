@@ -1,13 +1,17 @@
 # A event-driven sample solution around autonomous car ride
 
 ???+ info "Updated"
-    07/06/2023
+    Created 07/06/2023 - Updated 12/05/23
 
-The customer wants to go from one address or geographic location to another one, within a big city, using the Acme Autonomous Car Ride mobile app.
+This article illustrates how to apply domain-driven design, and event storming to implement and event-driven solution to deploy on AWS services. It is a source for demonstrating different EDA patterns like SAGA, CQRS, event sourcing in a Serverless deployment.
+
+## Context
+
+The customer wants to go from one address or geographic location to another one, within a big city, using the Acme Autonomous Car Ride mobile app. The cars are autonomous cars with no pilot.
 
 The application context looks like in the following diagram:
 
-![](./diagrams/app-context.drawio.png){ width=800 }
+![](./diagrams/acr/app-context.drawio.png){ width=800 }
 
 Travellers use mobile application to book a ride between two locations within the same city, the Car Ride Solution dispatches an autonomous vehicle, uses traffic report to compute ETA and pricing. The application is also monitoring existing rides via car telemetries. The Marketing analysis is an example of external system interrested by the solution generated data. 
 
@@ -41,37 +45,44 @@ We will mock an event storming exercise which generates the following elements:
 
 * Discovered Events from a process point of view. Mostly happy path
 
-    ![](./diagrams/events-ddd.drawio.png){ width=1000 }
+    ![](./diagrams/acr/events-ddd.drawio.png){ width=1000 }
 
 * Event Reorganized by concerns: Rides, Autonomous Car, Payment, Award
 
-    ![](./diagrams/events-concern-ddd.drawio.png){ width=1000 }
+    ![](./diagrams/acr/events-concern-ddd.drawio.png){ width=1000 }
 
 ### Domain-Driven Design Elements
 
 * Aggregates: represent the main business entity within the domain and sub-domain
 
-    ![](./diagrams/aggregate-ddd.drawio.png){ width=800 }
+    ![](./diagrams/acr/aggregate-ddd.drawio.png){ width=800 }
 
 * Domain/Sub-domains
 
-    ![](./diagrams/domain-ddd.drawio.png){ width=800 }
+    ![](./diagrams/acr/domain-ddd.drawio.png){ width=800 }
 
 * Commands
 
-    ![](./diagrams/command-ddd.drawio.png){ width=800 }
+    ![](./diagrams/acr/cmd-actor-event.drawio.png){ width=800 }
+
+    ![](./diagrams/acr/command-ddd.drawio.png){ width=800 }
 
 * **Bounded Contexts:**
 
     * Autonomous Car bounded context:
 
-    ![](./diagrams/car-context.drawio.png){ width=800 }
+    ![](./diagrams/acr/car-context.drawio.png){ width=800 }
 
     * Car Ride bounded context:
 
-    ![](./diagrams/ride-context.drawio.png){ width=800 }
+    ![](./diagrams/acr/ride-context.drawio.png){ width=800 }
 
     * Customer and payment bounded contexts are not represented as we will mock them up.
+
+* Business service map
+
+    ![](./diagrams/acr/acr-biz-comp.drawio.png)
+
 
 ## Component description
 
@@ -115,6 +126,9 @@ Now the communication between those services could be synchronous, HTTP based, a
 ![](./diagrams/choreography.drawio.png){ width=800}
 
 ## Physical Deployment
+
+![](./diagrams/acr/acr-maptoaws.drawio.png)
+
 
 ### CarRideManager
 
