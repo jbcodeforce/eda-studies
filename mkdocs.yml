@@ -10,6 +10,7 @@ nav:
   - Design patterns:
     - Common patterns: patterns/index.md
     - Messaging vs events: patterns/events-versus-messages/index.md
+    - Devising the data models: patterns/model/index.md
     - Saga: patterns/saga/index.md
     - Event Sourcing: patterns/event-sourcing/index.md
     - CQRS: patterns/cqrs/index.md
