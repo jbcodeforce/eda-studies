@@ -17,6 +17,7 @@ nav:
     - Reactive: patterns/reactive/index.md
     - Flow architecture: patterns/flow-architectures.md
     - Dead letter queue: patterns/dlq/index.md
+    # - Governance: patterns/governance/index.md
   - OOS technologies:
     - Kafka: techno/kafka/index.md
     - Kafka Consumer: techno/kafka/consumer.md

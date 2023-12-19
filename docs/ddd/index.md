@@ -35,6 +35,8 @@ Also events coming from no-where could still be discovered and have their value.
 * Business Policies.
 * Event prediction and probability flows.
 
+![Event Storming Order](./images/event-storming-order.png)
+
 From there, we complement the first analysis by extending it with the domain driven design elements.
 
 ## Domain driven design steps
@@ -48,7 +50,15 @@ Domain may be composed of sub-domains. A "Core" domain is a part of the business
 
 During the event storming analysis, we define the domains and groups a set of sub-domains together. 
 
-Core domains represent what will differentiate the company business value. Domains are decompose in sub-domain. Supporting domains may be integrated and are not core to the main business, but support business processes. Payment for example are classically delegated to SaaS provider or Financial providers. 
+Core domains represent what will differentiate the company business value. Domains are decomposed in sub-domains. Supporting domains may be integrated and are not core to the main business, but support business processes. Payment for example are classically delegated to SaaS provider or Financial providers.
+
+In the following figure, the container shipping domain is what the application we have to develop belongs to, 
+and is composed of sub-domains like order, shipping, inventory, .... Other domains like weather, CRM, invoice, 
+are supporting the shipping domain but are not the focus of the design. Here is an example of such domain and subdomains:
+
+![DDD Subdomains](./images/domain-subdomains.png)
+
+We have three core sub-domains and the rest are supports. Shipping over seas company needs to excel at managing container inventory, managing the shipping, the itineraries, and vessels.
 
 ### Step 2: Define the application context
 
@@ -130,8 +140,11 @@ They have a life cycle that is important to model, specially in the context of a
 
 **Value Objects** represent things in the domain but without identity, and they are frequently transient, created for an operation and then discarded.
 
-Some time, in a certain context, a value object could become an entity. As an example, an Order will be a value object in the 
-context of a Fullfilment domain, while a core entity in order management domain.
+Some time, in a certain context, a value object could become an entity. As an example, an Order will be a value object in the context of a Fullfilment domain, while a core entity in order management domain.
+
+Below is an example of entities (Customer and Shipping Order) and value objects (delivery history and delivery specification):
+
+![4](./images/ent-vo.png)
 
 #### Aggregate boundaries
 
@@ -151,9 +164,7 @@ A Bounded Context sets the limits around what a specific team works on and helps
 that particular context. When we define a bounded context, we define who uses it, how they use it, where it applies within
  a larger application context, and what it consists of, in terms of things like OpenAPI documentation and code repositories.
 
-Within a business context every use of a given domain terms, phrases, or sentences, **the Ubiquitous Language**, inside
- the boundary has a specific contextual meaning. So *order context* is a bounded context and groups order, ordered product type, 
- pickup and shipping addresses, delivery specifications, delivery history....
+Within a business context every use of a given domain terms, phrases, or sentences, **the Ubiquitous Language**, inside the boundary has a specific contextual meaning. So *order context* is a bounded context and groups order, ordered product type, pickup and shipping addresses, delivery specifications, delivery history....
 
 #### Context maps
 
@@ -176,6 +187,10 @@ for the consumer. This is the *published language*.
 Avoid this solution when integrating sub-domains.
 
 The context map illustrates the integration between bounded contexts. It is the first high level design of the system components and the models they implement.
+
+The diagram below represents a simple view of e-commerce domain with the sub domains and bounded contexts
+
+![](./images/context-map.png)
 
 #### Business operation API
 
@@ -334,3 +349,4 @@ For non-state-changing queries, for which the response is always instantaneously
 
 * [Eric Evans' book](https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215/ref=asc_df_0321125215)
 * [Scott Millet and Nick Tune's book: "Patterns, Principles, and Practices of Domain-Driven Design"](https://www.amazon.com/Patterns-Principles-Practices-Domain-Driven-Design/dp/1118714709/ref=sr_1_3)
+* [Kyle Brown's article: Apply Domain-Driven Design to microservices architecture](https://www.ibm.com/garage/method/practices/code/domain-driven-design/)

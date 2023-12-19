@@ -165,5 +165,5 @@ To summarize this pattern, the approach is to use an `outbox` table to keep the 
 
 The sender does not expect a response, and share its information to a message channel
 
-![](./diagrams/)
+![](./diagrams/p2p-mq-jms.drawio.png)
 
