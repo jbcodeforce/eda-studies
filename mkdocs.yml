@@ -1,4 +1,4 @@
-site_name: Event-Driven Architecture Studies
+site_name: Event-Driven Architecture Book
 repo_url: https://github.com/jbcodeforce/eda-studies.git
 nav:
   - Introduction: index.md
@@ -24,16 +24,13 @@ nav:
     - Kafka Connect: techno/kafka-connect/index.md
     - Mirror Maker 2: techno/mirrormaker/index.md
   - AWS technologies:
-      - Streaming: https://jbcodeforce.github.io/aws-studies/kinesis
-      - EventBridge: aws/eventbridge.md
+      - Streaming: https://jbcodeforce.github.io/yarfba/kinesis
       - AWS messaging: https://jbcodeforce.github.io/aws-messaging-study
-  - AWS assets: 
-      - Autonomous Car Ride: solutions/autonomous-car/index.md
+      - Autonomous Car Ride: https://jbcodeforce.github.io/autonomous-car-iac
       - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md
   - IBM technologies: 
       - Assets: ibm-assets.md
       - MQ: techno/ibm-mq/index.md
-  - AWS studies: https://jbcodeforce.github.io/aws-studies
   - Return to main: https://jbcodeforce.github.io
 theme: 
   name: material

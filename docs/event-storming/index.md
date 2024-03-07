@@ -6,7 +6,7 @@ Domain-driven design has growth in the adoption while implementing service orien
 
 In this article we are presenting the end to end set of activities to run a successful event-driven solution using cloud native microservices.
 
-The target audiance are solution architects, designers (Design Thinking), lead developers.
+The target audience are solution architects, designers (Design Thinking), lead developers.
 
 
 ## Event Storming introduction
@@ -19,7 +19,7 @@ This article describes in general terms all the steps to run an event storming w
 
 ## Conducting the event and insight storming workshop
 
-Before conducting an event storming workshop, complete a Design Thinking Workshop in which Personas and Empathy Maps are developed and business pains and goals are defined. The event storming workshop adds more specific design on the events occuring at each step of the process, natural contexts for microservices and predictive insights to guide operation of the system. With this approach, a team that includes business owners and stakeholders can define a Minimal Viable Prototype (MVP) design for the solution.  The resulting design is organized as a collection of loosely coupled microservices linked through an event-driven architecture and one or more event backbones. This style of design can be deployed into multicloud execution environments and allows for scaling and agile deployment.
+Before conducting an event storming workshop, complete a Design Thinking Workshop in which Personas and Empathy Maps are developed and business pains and goals are defined. The event storming workshop adds more specific design on the events occurring at each step of the process, natural contexts for microservices and predictive insights to guide operation of the system. With this approach, a team that includes business owners and stakeholders can define a Minimal Viable Prototype (MVP) design for the solution.  The resulting design is organized as a collection of loosely coupled microservices linked through an event-driven architecture and one or more event backbones. This style of design can be deployed into multi-cloud execution environments and allows for scaling and agile deployment.
 
 Preparations for the event storming workshop include the following steps:
 
@@ -51,13 +51,13 @@ A timeline of domain events is the critical output of the first step in the even
 
 One-View Figure.
 
-* **Actors** consume data by using a user interface and use the UI to interact with the system via commands. Actors could also be replace by articial intelligent agents.
+* **Actors** consume data by using a user interface and use the UI to interact with the system via commands. Actors could also be replace by artificial intelligent agents.
 * **Commands** are the result of some user decision or policy, and act on relevant data which are part of a Read model in the [CQRS](../patterns/cqrs/index.md) pattern.
 * **Policies** (represented by lilac stickies) are reactive logics that take place after an event occurs, and trigger other commands. Policies always start with the phrase "whenever...". They can be a manual step a human follows, such as a documented procedure or guidance, or they may be automated. When applying the [Agile Business Rule Development methodology](http://abrd.github.io) it will be mapped to a Decision within the [Decision Model Notation](https://www.omg.org/spec/DMN/About-DMN/).
 * **External systems** produce events.
 * **Data** can be presented to users in a user interface or modified by the system.
 
-Events can be created by commands or  by external systems including IOT devices.  They can be triggerred by the processing of other events or by some period of elapsed time. When an event is repeated or occurs regularly on a schedule, draw a clock or calendar icon in the corner of the sticky note for that event.
+Events can be created by commands or  by external systems including IOT devices.  They can be triggered by the processing of other events or by some period of elapsed time. When an event is repeated or occurs regularly on a schedule, draw a clock or calendar icon in the corner of the sticky note for that event.
 As the events are identified and sequenced into a time line, you might find multiple independent subsequences that are not directly coupled to each other and that represent different perspectives of the system, but occur in overlapped periods of time. These parallel event streams can be addressed by putting them into separate swimlanes delineated by using horizontal blue painter's tape. As the events are organized into a timeline, possibly with swim lanes, you can identify pivotal events. Pivotal events indicate major changes in the domain and often form the boundary between one phase of the system and another. Pivotal events will typically separate (a [bounded context](https://martinfowler.com/bliki/BoundedContext.html) in DDD terms). Pivotal events are identified with vertical blue painters tape (crossing all the swimlanes).
 
 An example of a section of a completed event time line with pivotal events and swimlanes is shown below.
@@ -81,7 +81,7 @@ You don't need to describe all the events in your domain, but you must cover the
 
 In this step, you retell the story by talking about how to relate events to particular personas. A member of the team (often the facilitator, but others can do this as well)  acts this out by taking on the perspective of a persona in the domain, such as a "manufacturer" who wants to ship a widget to a customer, and asking which events follow which other events. Start at the beginning of that persona's interaction and ask "what happens next?". Pick up and rearrange the events that the team storms.  If you discover events that are duplicates, take those off the board.  If events are in the wrong order, move them into the right order.
 
-When some parts are unclear, add questions or comments by using the red stickies.. Red stickies indicate that the team needs to follow up and clarify issues later. Likewise you want to use this time to document assumptions on the definition stickies. This is also a good time to rephrase events as you proceed through the story. Sometimes you need to rephrase an event description by putting the verbing in past tense, or adjusting the terms that are used to relate clearly to other identified events.
+When some parts are unclear, add questions or comments by using the red stickies.. Red stickies indicate that the team needs to follow up and clarify issues later. Likewise you want to use this time to document assumptions on the definition stickies. This is also a good time to rephrase events as you proceed through the story. Sometimes you need to rephrase an event description by putting the verbs in past tense, or adjusting the terms that are used to relate clearly to other identified events.
 In this step you focus on the mainline "happy" end-to-end path to avoid getting bogged down in details of exceptions and error handling. Exceptions can be added later
 
 
@@ -164,14 +164,14 @@ Keep the model strictly consistent within these bounds.
 
 #### Step 8: Looking forward with insight storming
 
-In event atorming for Event Driven Architecture (EDA) solutions it is helpful to include an additional method step at this point identifying useful predictive analytics insights.
+In event storming for Event Driven Architecture (EDA) solutions it is helpful to include an additional method step at this point identifying useful predictive analytics insights.
 
 Insights storming extends the basic methodology by looking forward and considering what if you could know in advance that an event is going to occur. How would this change your actions, and what would you do in advance of that event actually happening?
 You can think of insight storming as extending the analysis to **Derived Events**.  Rather than being the factual recording of a past event, a derived event is a forward-looking or predictive event, that is, "this event is probably going to happen at some time in the next n hours”.
 
 By using this forward-looking insight combined with the known business data from earlier events,   human actors and event triggering policies can make better decisions about how to react to new events as they occur. Insight storming amounts to asking workshop participants the question: "What data would be helpful at each event trigger to assist the human user or automated event triggering policy make the best possible decision of how and when to act?"
 
-An important motivation that drives the use of an event-driven architecture is that it simplifies design and realization of highly responsive systems that react immediately and intelligently, that is, in a personalized and context-aware way, and optimally to new events as they occur.  This immediately suggests that predictive analytics and models to generate predictive insights have an important role to play. Predictive analytic insights are effectively probabilistic statements about which future events are likely to occur and what are the likely properties of those events. These probabilistic statements are typicaly generated by using models created by data scientists or using AI or ML. Correlating or joining independently gathered sources of information can also generate important predictive insights or be input to predictive analytic models.
+An important motivation that drives the use of an event-driven architecture is that it simplifies design and realization of highly responsive systems that react immediately and intelligently, that is, in a personalized and context-aware way, and optimally to new events as they occur.  This immediately suggests that predictive analytics and models to generate predictive insights have an important role to play. Predictive analytic insights are effectively probabilistic statements about which future events are likely to occur and what are the likely properties of those events. These probabilistic statements are typically generated by using models created by data scientists or using AI or ML. Correlating or joining independently gathered sources of information can also generate important predictive insights or be input to predictive analytic models.
 
 Business owners and stakeholders in the event storming workshop can offer good intuitions in several areas:
 
@@ -195,14 +195,14 @@ The two diagrams below show the results of the insight storming step for the use
 
 ![evt-stm-insight-cntnr](./images/evt-stm-insight-cntnr.PNG)
 
-The second diagram captures insights that could trigger recommendations to adjust ship course or speed in response to expected severe weather forcasts for the route ahead or predicted congestion and expected docking and unloading delays at the next port of call.
+The second diagram captures insights that could trigger recommendations to adjust ship course or speed in response to expected severe weather forecasts for the route ahead or predicted congestion and expected docking and unloading delays at the next port of call.
 
 ![evt-stm-insight-ship](./images/evt-stm-insight-ship.PNG)
 
 
 ## Design iteration
 
-Attention we are not proposing to apply a waterfall approach, but before starting the deeper implementation with iterations, we want to spend sometime to define in more details what we want to build, how to organize the CI/CD projects and pipeline, select the development, test and product plaform, and define epics, user stories, components, microservices... This iteration can take from few hours to a week, depending on the expected MVP goals.
+Attention we are not proposing to apply a waterfall approach, but before starting the deeper implementation with iterations, we want to spend sometime to define in more details what we want to build, how to organize the CI/CD projects and pipeline, select the development, test and product platform, and define epics, user stories, components, microservices... This iteration can take from few hours to a week, depending on the expected MVP goals.
 
 For an event-driven solution a MVP for a single application should not take more than 3 to 4 iterations.
 

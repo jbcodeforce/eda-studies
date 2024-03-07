@@ -2,7 +2,8 @@
 
 ## Problems and Constraints
 
-Most business applications are state based persistent where any update changes the previous state of business entities. The database keeps the last committed update. But some business application needs to **explain how it reaches its current state**. For that the application needs to keep history of business facts.
+Most business applications are state based persistent where any update changes the previous state of the business entities. The database keeps the last committed update. But some business application needs to **explain how an entity reaches its current state**. For that, the application needs to keep history of business facts.
+
 Traditional domain oriented implementation builds a domain data model and maps it to a RDBMS. As an example, in the simple `Order model` below, the database record will keep the last state of the Order entity, with the different addresses and the last ordered items in separate tables.
 
 ![1](./images/evt-src-ex1.png)
@@ -14,7 +15,7 @@ Designing a service to manage the life cycle of this order will, most of the tim
 
 ## Solution and Pattern
 
-**Event sourcing** persists the state of a business entity, such an Order, as a sequence of state-changing events or immuttable "facts", ordered over time. Event sourcing has its roots in the domain-driven design community. 
+**Event sourcing** persists the state of a business entity, such an Order, as a sequence of state-changing events or immutable "facts", ordered over time. Event sourcing has its roots in the domain-driven design community. 
 
 ![2](./images/evt-src.png)
 
