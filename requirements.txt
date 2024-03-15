@@ -1,5 +1,6 @@
 mkdocs-material
 mkdocs-minify-plugin
 mkdocs-video
+mkdocs-mermaid2-plugin
 #matplotlib
 #nbconvert==5.6.1

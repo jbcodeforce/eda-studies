@@ -1,7 +1,8 @@
-:root > * {
-    --md-primary-fg-color:        #86a4d1;
-    --md-primary-fg-color--light: #ECB7B7;
-    --md-primary-fg-color--dark:  #90030C;
+
+  :root > * {
+    --md-primary-fg-color:        #0407ac;
+    --md-primary-fg-color--light: #6f66eb;
+    --md-primary-fg-color--dark:  #2052b1;
   }
 
 .section ul li {

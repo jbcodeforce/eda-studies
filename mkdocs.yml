@@ -21,6 +21,7 @@ nav:
   - OOS technologies:
     - Kafka: techno/kafka/index.md
     - Kafka Consumer: techno/kafka/consumer.md
+    - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
     - Mirror Maker 2: techno/mirrormaker/index.md
   - AWS technologies:
@@ -60,6 +61,7 @@ plugins:
   - minify:
       minify_html: true
   - mkdocs-video
+  - mermaid2
 markdown_extensions:
   - abbr
   - attr_list
@@ -68,7 +70,11 @@ markdown_extensions:
   - codehilite
   - footnotes
   - pymdownx.smartsymbols
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - toc:
       permalink: true
       toc_depth: 3
