@@ -2,7 +2,7 @@
   :root > * {
     --md-primary-fg-color:        #0407ac;
     --md-primary-fg-color--light: #6f66eb;
-    --md-primary-fg-color--dark:  #2052b1;
+    --md-primary-fg-color--dark:  #4c7fdd;
   }
 
 .section ul li {
@@ -159,7 +159,7 @@ width: 8rem;
 
 /* center colum white */
 .md-content {
-    background-color: #fff;
+    background-color: #fffcfc;
 }
 
 /* adjust center column */
@@ -180,12 +180,12 @@ width: 8rem;
 /* headings */
 .md-typeset h1, .md-typeset h2 {
     font-weight: 500;
-    color:hsla(6, 74%, 63%, 1)
+    color:rgb(83, 80, 238)
 }
 
 .md-typeset h3, .md-typeset h4 {
     font-weight: 300;
-    color:hsla(6, 74%, 63%, 1)
+    color:rgb(83, 80, 238)
 }
 
 .md-typeset .admonition {

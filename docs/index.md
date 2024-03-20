@@ -28,7 +28,7 @@
 
 ## Why this site?
 
-This virtual book,  isn't just another static resource on Event-Driven Architecture (EDA). It's your dynamic companion on the journey to mastering this transformative approach.
+This virtual book,  isn't just another static resource on Event-Driven Architecture (EDA). It's your dynamic companion on the journey to mastering this innovative approach.
 
 While the value of cloud adoption and microservices is no longer in question, the "how" of implementing them often remains a challenge. Here, you'll find a comprehensive, continuously evolving source of knowledge tailored to bridge that gap.
 
@@ -91,7 +91,7 @@ Studies reveal a strong correlation between the age of data and the quality of b
 
 While Service-Oriented Architecture (SOA) laid the groundwork for decomposing applications into reusable business services in the early 2000s, EDA emerged as a natural evolution in the mid-2000s. It addressed the limitations of SOA in terms of scalability and inter-dependencies, particularly when dealing with a large number of data producers and consumers. The following diagram, from 2004, illustrates this evolution.
 
-![](./images/soa-to-eda.png){ width=800 }
+![](./concepts/images/soa-to-eda.png){ width=800 }
 
 The mid-2010s witnessed a surge in asynchronous communication and the adoption of Event-Driven Architecture (EDA), particularly among internet startups, to address scalability.  Asynchronous communication, one axe of the adoption, decouples event producers from consumers, enabling independent scaling and improved overall system agility. As EDA leverages data as events, allowing businesses to gain immediate visibility into changes and act on them swiftly. This facilitates faster decision-making and automated workflows.
 
@@ -126,4 +126,4 @@ Event-Driven Architecture (EDA) offers a compelling paradigm for building modern
 
 
 
-[>> Next: - EDA concepts](./eda.md)
+[>> Next: - EDA concepts](./concepts/eda.md)

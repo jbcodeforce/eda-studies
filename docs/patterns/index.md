@@ -4,7 +4,7 @@ In this set of articles, we will detail some of the most important event-driven 
 
 ## Microservice challenges
 
-As we have seen in the [introduction](../eda.md), modern business application needs to responds to events in real time, as the events happen, so it can deliver better user experiences and apply business logic on those events. The key is to be able to act quickly on those facts. Acting may involve computing real-time analytics or use predictive scoring with machine trained models. 
+As we have seen in the [introduction](../concepts/eda.md), modern business application needs to responds to events in real time, as the events happen, so it can deliver better user experiences and apply business logic on those events. The key is to be able to act quickly on those facts. Acting may involve computing real-time analytics or use predictive scoring with machine trained models. 
 
 On top of that, a modern cloud native application needs to be reactive, responsive by adopting the [reactive manifesto](./reactive/index.md). 
 
