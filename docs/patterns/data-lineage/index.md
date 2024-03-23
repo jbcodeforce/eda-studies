@@ -15,26 +15,48 @@ In this chapter, we will explore these components and concepts that are crucial 
 7. **Business Dashboards:** To provide a comprehensive view of the data, our streaming data platform integrates with business dashboards. These dashboards enable users to query both static data at rest and dynamic data in motion. By utilizing interactive and streaming queries, users gain real-time access to critical information, empowering them to make data-driven decisions.
 
 
----
 ## Data lineage requirements
 
-With those simple component view we can already see data lineage will be complex, so we need practices and tools to support it.
-As more data is injected into the data platform, the more you need to be able to answer a set of questions like:
+Data lineage is a comprehensive concept that encompasses various aspects of data management. It describes the origins, movements, characteristics, ownership, and quality of data. As part of a larger data governance initiative, data lineage may also include considerations such as data security, access control, encryption, and confidentiality.
 
-* Where the data is coming from 
-* Who create the data
-* Who own it
-* Who can access those data and where
-* How can we ensure data quality
-* Who modify data in motion
+To effectively implement data lineage, organizations should consider the following requirements:
+
+1. **Data Source Identification**: Clearly identify and document all data sources, including internal systems, external providers, and any other origins of data.
+
+2. **Data Ownership**: Establish clear ownership and responsibilities for each dataset. Assign data owners who are accountable for the accuracy, completeness, and quality of the data.
+
+3. **Data Access Control**: Define and enforce access controls to ensure that only authorized individuals or systems can access specific datasets. Implement role-based access control (RBAC) and maintain an audit trail of data access activities.
+
+4. **Data Quality Measures**: Establish data quality metrics and implement processes to monitor and maintain the quality of data throughout its lifecycle. This may include data validation, cleansing, and reconciliation procedures.
+
+5. **Data Transformation Tracking**: Keep track of all data transformations and modifications that occur as data moves through the platform. Document the logic, algorithms, and any manual interventions applied to the data.
+
+6. **Data Lineage Visualization**: Utilize tools and technologies that provide visual representations of data lineage, making it easier to understand the flow of data and identify dependencies.
 
 
+By addressing these requirements and implementing robust data lineage practices, organizations can gain a clear understanding of their data landscape, ensure data quality, and make informed decisions based on reliable and traceable data.
 
-Data lineage describes data origins, movements, characteristics, ownership and quality. As part of larger data governance initiative, it may encompass data security, access control, encryption and confidentiality. 
+
 
 ## Contracts
 
-In the REST APIs, or even SOA, worlds request/response are defined via standards like OpenAPI or WSDL. In the event and streaming processing the [AsynchAPI](https://www.asyncapi.com/) is the specification to define schema and middleware binding.
+In the world of REST APIs and Service-Oriented Architecture (SOA), request/response interactions are defined using standards such as OpenAPI (formerly known as Swagger) or Web Services Description Language (WSDL). These standards provide a way to describe the structure and format of the data being exchanged between the client and the server.
+
+Similarly, in the realm of event-driven and streaming architectures, [AsyncAPI](https://www.asyncapi.com/) has emerged as a specification for defining message-driven APIs. AsyncAPI allows you to describe the schema of the messages being exchanged and the middleware bindings used for communication.
+
+AsyncAPI is designed to be protocol-agnostic, meaning it can be used with various messaging protocols such as MQTT, AMQP, Kafka, WebSocket, and more. It provides a standardized way to define the structure and format of the messages, as well as the channels or topics on which the messages are published and subscribed.
+
+By using AsyncAPI, you can:
+
+1. Define the message payload structure using JSON Schema or Avro.
+2. Specify the channels or topics for publishing and subscribing to messages.
+3. Describe the message exchange patterns, such as publish/subscribe or request/reply.
+4. Define the security mechanisms and authentication requirements for the API.
+5. Generate documentation, code snippets, and client libraries based on the AsyncAPI specification.
+
+AsyncAPI promotes interoperability, and easier integration between different systems and languages as it enables the creation of tooling and frameworks that can generate code, perform validation, and provide testing capabilities based on the AsyncAPI specification.
+
+---
 
 ### OpenAPI
 
