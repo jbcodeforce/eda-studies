@@ -4,7 +4,13 @@
 
 To provide a comprehensive understanding of event-driven architecture (EDA) and its high-level building blocks, it is crucial to consider the following components without any technology bias. The diagram below illustrates these components:
 
-![](./diagrams/eda-hl.drawio.png){ width=800 }
+
+<figure markdown="span">
+  ![eda hl](./diagrams/eda-hl.drawio.png)
+  <figcaption><b>Event-driven architecture high level view</b></figcaption>
+</figure>
+
+
 
 The main goals of this architecture are to support scaling, decoupling, and acting on data as early as created, while enabling data pipelines for future batch processing and AI/ML development.
 
@@ -18,7 +24,7 @@ The main goals of this architecture are to support scaling, decoupling, and acti
 * **Events** are stored within the event backbone for extended retention periods and can also be directed to target sinks such as data lakes for further processing and analysis.
 * **Sinks** represent longer term storage or downstream backend processing destinations for event data. Integrating with sinks can be challenging, as the sink software may not inherently support idempotency or exactly-once delivery. Normally consistency boundaries are before reaching the sinks.  
 
-* **Event Processing:** The final component of the architecture involves acting on the events through a consume-process-publish semantic. Event processing encompasses activities such as data processing, real-time analytics, stateful aggregate computation, data transformation, data pipelines, and Complex Event Processing.
+* **Event Stream Processing:** The final component of the architecture involves acting on the events through a consume-process-publish semantic. Event processing encompasses activities such as data processing, real-time analytics, stateful aggregate computation, data transformation, data pipelines, and Complex Event Processing.
 
 It is important to note that cross-cutting capabilities such as **security, devops and governance** must be applied across all these components. Infrastructure as Code practices should be leveraged with technologies that support this architecture. Governance efforts need to address critical aspects such as data lineage, schema management, and APIs management.
 
@@ -28,15 +34,16 @@ By considering these high-level building blocks and their interactions, organiza
 
 The Event Backbone is not tied to a specific technology, as different requirements necessitate the use of different tools. In the realm of asynchronous communication, applications produce messages, consume them, or do both in the form of consume-process-produce processing.
 
+<figure markdown="span">
+  ![eda hl](./diagrams/event-backbone.drawio.png)
+  <figcaption><b>Event backbone component view</b></figcaption>
+</figure>
 
-![](./diagrams/event-backbone.drawio.png){ width=800 }
 
 For **the producer**, two behaviors can be illustrated: 
 
 1. When applications need to request another service to perform a task on their behalf, it follows the classical **command pattern**. In this scenario, there is a single interested consumer, and the exchange between the two applications employs request/reply messages. The communication requires exactly-once delivery, message ordering, and no data loss. **Queues** are the ideal technology for supporting this type of communication.
 1. When applications need to broadcast changes in their main business entity's state, they produce events as immutable facts. The appropriate technology approach is the **pub/sub** model on a topic. Two technologies should be considered: the older topic-based approach like JMS, or the streaming approach supported by products like Apache Kafka.
-
-
 
 For **consumers**, they can either subscribe to a queue or topic and pull messages or receive messages as part of their subscription in a push model. With pulling, the consumer needs to filter out messages that it is not interested in. With pushing, the event backbone can apply filtering and routing rules. It's important to note that in a queueing system, messages are deleted once read, while in classical topic implementations, messages are retained until all known subscribers have received the message. In Kafka, messages disappear after a retention time or upon reaching a log size threshold. With streaming from a topic, one consumer can read many messages from different topics, and one message can be read by many consumers arriving at different times.
 
@@ -63,7 +70,11 @@ By incorporating these services into the event backbone, organizations can ensur
 
 As introduced before, in this category, we include applications that were not originally designed to produce events. These applications often use queueing systems and databases. To capture data updates and gain visibility into them, tools like Change Data Capture (CDC) are employed to get records from SQL based database. CDC enables the injection of updated records as messages into queues or topics.
 
-![](./diagrams/event-src.drawio.png)
+<figure markdown="span">
+  ![eda hl](./diagrams/event-src.drawio.png)
+  <figcaption><b>Event sources component view</b></figcaption>
+</figure>
+
 
 For Document oriented database, some change stream softwares are used. Finally for legacy, transactional queueing system, some product, like IBM MQ offers message replication to streaming queue, which can be injected to pub/sub middleware via queue connector.
 

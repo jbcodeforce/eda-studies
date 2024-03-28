@@ -1,6 +1,19 @@
-# Introduction
+# Event-Driven Solutions in Hybrid Cloud
 
-???- Info "Site updated 11/27/2023"
+
+<figure markdown="span">
+  ![Book cover](./diagrams/eda_book_cover.drawio.png)
+  <figcaption>A virtual book about event driven solutions</figcaption>
+</figure>
+
+
+
+???- Info "Site updated 03/2024"
+    March:
+
+    - update to introduction, concepts
+    - Add kafka streams
+    
     November:
     
     - Update to event storming

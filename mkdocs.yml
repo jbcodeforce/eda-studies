@@ -1,6 +1,7 @@
-site_name: Event-Driven Architecture Book - Jerome Boyer 
+site_name: Event-Driven Solutions in Hybrid Cloud - Jerome Boyer 
 repo_url: https://github.com/jbcodeforce/eda-studies.git
-site_url: https://jbcodeforce.github.io/eda-studies
+site_url: https://jeromeboyer.net/eda-studies
+copyright: Copyright &copy; 2018 - 2024 Jerome Boyer
 nav:
   - Introduction: index.md
   - EDA concepts: 
@@ -55,12 +56,9 @@ theme:
       - navigation.sections
       #- navigation.expand
       - navigation.top
+      - navigation.footer
 
-  social:
-    - type: 'github'
-      link: 'https://github.com/jbcodeforce'
-    - type: 'linkedin'
-      link: 'https://linkedin.com/in/jeromeboyer'
+
 extra_css: ["extra.css"]
 plugins:
   - search:
@@ -92,3 +90,12 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.tasklist:
       custom_checkbox: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: 'https://github.com/jbcodeforce'
+    - icon: fontawesome/brands/linkedin
+      link: 'https://linkedin.com/in/jeromeboyer'
+    - icon: fontawesome/solid/paper-plane
+      mailto: jerome@intelligent-automations.com
