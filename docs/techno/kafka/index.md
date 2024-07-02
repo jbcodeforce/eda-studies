@@ -1,38 +1,38 @@
 # Apache Kafka need to know
 
 !!! Info "Update"
-    Created 07/01/2023 - Updated 07/10/2023
+    Created 07/01/2023 - Updated 07/01/2024
 
-This content is a summary of the things we need to know around Apache Kafka, one of the main event backbone to support EDA. It does not replace [the excellent introduction](https://kafka.apache.org/intro) every developer using Kafka should read.
+This content is a summary of the Apache Kafka open-source project, one of the most important event backbone to support EDA. This content does not replace [the excellent introduction](https://kafka.apache.org/intro) every developer using Kafka should read, but provides support for analysis, design and implementation discussions.
 
 ## Introduction
 
-[Kafka](https://kafka.apache.org) is a distributed real time event streaming platform with the following key capabilities:
+[Kafka](https://kafka.apache.org) is a distributed real-time event streaming platform with the following key capabilities:
 
-* Publish and subscribe streams of records. Data are stored on disk so consuming applications can pull the information when they need, and keep track of what they have seen so far.
+* Publish and subscribe streams of records. Data are stored on disks with replication protocol. Consumer applications can pull the information when they need, and keep track of what they have seen so far.
 * It can handle hundreds of read and write operations per second from many producers and consumers.
-* Atomic broadcast, send a record once, every subscriber gets it once.
-* Replicate stream of data within the distributed cluster for fault-tolerance. Persist data for a given time period before delete.
-* Elastic horizontal scaling and transparently with no downtime.
-* Until version 3, it is built on top of the ZooKeeper synchronization service to keep topic, partitions and metadata highly available. After version 3 it uses it own protocol.
+* Supports Atomic broadcast, sends a record once, and every subscriber gets it once.
+* Replicate stream of data within the distributed cluster for fault-tolerance. Persist data during a given time period before deleting records.
+* Elastic horizontal scaling and transparently for the client applications with no downtime.
+* Until version 3, it is built on top of the ZooKeeper synchronization service to keep topic, partitions and metadata highly available. After version 3 it uses the Kraft  protocol, which integrates metadata management into Kafka itself.
 
 Here is the standard architecture view:
 
 ![](./diagrams/kafka-hl-view.drawio.png){ width=900 }
 
-* **Kafka** runs as a cluster of **broker** servers that can, in theory, span multiple availability zones. Each brokers manages data replication, topic/partition management, offset management.
-To cover multiple availability zones within the same cluster, the network latency needs to be very low, at the 15ms or less, as there is a lot of communication between kafka brokers and between kafka brokers and zookeeper servers.
-* The **Kafka** cluster stores streams of records in **topics**. Topic is referenced by producer application to send data to, and subscribed by consumers to get data from. Data in topic is persisted to file systems for a retention time period (Defined at the topic level). The file system can be network based (SAN).
+* **Kafka** runs as a cluster of **broker** servers that can, in theory, span multiple availability zones. Each broker manages data replication, topic/partition management, and offset management.
+To cover multiple availability zones within the same cluster, the network latency needs to be very low, at the 15ms or less, as there is a lot of communication between kafka brokers and between kafka brokers and zookeeper servers. With Kraft the latency still needs to be very low.
+* The **Kafka** cluster stores streams of records in **topics**. Topic is referenced by producer application to send data to, and subscribed by consumers to get data from. Data in topic is persisted to file systems for a retention time period (Defined at the topic level). The file system can be a network based (SAN).
 
 In the figure above, the **Kafka** brokers are allocated on three servers, with data within the topic are replicated two times. In production, it is recommended to use at least five nodes to authorize planned failure and un-planned failure, and when doing replicas, use a replica factor at least equals to three.
 
 ## Zookeeper
 
-Zookeeper is used to persist the component and platform states and it runs in cluster to ensure high availability. One zookeeper server is the leader and other are used in backup.
+Zookeeper is used to persist the component and the platform states. It runs in cluster of at least three nodes to ensure high availability. One zookeeper server is the leader and other are used in backup.
 
 * Kafka does not keep state regarding consumers and producers.
-* Depends on kafka version, offsets are maintained in Zookeeper or in **Kafka**: newer versions use an internal Kafka topic called `__consumer_offsets`. In any case, consumers can read next messages (or from a specific offset) correctly even during broker server outrages.
-* Access Controls are saved in Zookeeper
+* Depending of the kafka version, offsets are maintained in Zookeeper or in **Kafka**: newer versions use an internal Kafka topic called `__consumer_offsets`. In any case, consumers can read next messages (or from a specific offset) correctly even during broker server outrages.
+* Access Controls are saved in Zookeeper.
 
 As of Kafka 2.8+ Zookeeper is becoming optional.
 
@@ -42,7 +42,7 @@ Topics represent end points to publish and consume records.
 
 * Each record consists of a key, a value (the data payload as byte array), a timestamp and some metadata.
 * Producers publish data records to topic and consumers subscribe to topics. When a record is produced without specifying a partition, a partition will be chosen using a hash of the key. If the record did not provide a timestamp, the producer will stamp the record with its current time (creation time or log append time). Producers hold a pool of buffers to keep records not yet transmitted to the server.
-* Kafka store log data in its `log.dir` and topic maps to subdirectories in this log directory.
+* Kafka stores log data in its `log.dir` and topics map to subdirectories in this log directory.
 * **Kafka** uses topics with a pub/sub combined with queue model: it uses the concept of consumer group to divide the processing over a collection of consumer processes, running in parallel, and messages can be broadcasted to multiple groups.
 * Consumer performs asynchronous pull to the connected brokers via the subscription to a topic.
 
@@ -56,16 +56,16 @@ Partitions are basically used to parallelize the event processing when a single 
 
 ![partitions](./diagrams/topic-part-offset.drawio.png){ width=700 }
 
-* Each broker may have zero or more partitions per topic. When creating topic we specify the number of partition to use.
+* Each broker may have zero or more partitions per topic. When creating topic, users specify the number of partition to use.
 * Kafka tolerates up to N-1 server failures without losing any messages. N is the replication factor for a given partition.
-* Each partition is a time ordered immutable sequence of records, that are persisted for a long time period. It is a log. Topic is a labelled log.
+* Each partition is a time ordered immutable sequence of records, that are persisted for a long time period. Topic is a labelled log.
 * Consumers see messages in the order they are stored in the log.
 * Each partition is replicated across a configurable number of servers for fault tolerance. The number of partition will depend on characteristics like the number of consumers, the traffic pattern, etc... You can have 2000 partitions per broker.
-* Each partitioned message has a unique sequence id called **offset** ("abcde, ab, a ..." in the figure above are offsets). Those offset ids are defined when events arrived at the broker level, and are local to the partition. They are immutable.
+* Each partitioned message has a unique sequence id called **offset** ("a,b,c,d,e, .." in the figure above are offsets). Those offset ids are defined when events arrived at the broker level, and are local to the partition. They are immutable.
 * When a consumer reads a topic, it actually reads data from all the partitions. As a consumer reads data from a partition, it advances its offset. To read an event the consumer needs to use the topic name, the partition number and the last offset to read from.
 * Brokers keep offset information in an hidden topic.
 * Partitions guarantee that data with the same keys will be sent to the same consumer and in order.
-* Partitions are saved to disk as append log. The older records are deleted after a given time period or if the size of log goes over a limit.
+* The older records are deleted after a given time period or if the size of log goes over a limit.
 It is possible to compact the log. The log compaction means, the last known value for each message key is kept. Compacted Topics
 are used in Streams processing for stateful operator to keep aggregate or grouping by key. You can read more about [log compaction from the kafka doc](https://kafka.apache.org/documentation/#design_compactionbasics).
 
@@ -76,26 +76,25 @@ Partitions have one leader and zero or more followers.
 
 ![](./diagrams/topic-replication.drawio.png)
 
-The leader manages all the read and write requests for the partition. The followers replicate the leader content. We are addressing data replication in the high availability section below.
+The leader manages all the read and write requests for the partition. The followers replicate the leader content. 
 
 It is not recommended to get the same number of replicas as the number of brokers. 
 
-There is a consumer capability that can be enabled to consume from a replicas. Without this configuration the consumer reads from the partition leader.
+There is a consumer capability, that can be enabled, to consume from a replica, to optimize read latency when consumers are closer to the broker server. Without this configuration the consumer reads from the partition leader.
 
 ## Producer applications
 
 A producer is a thread safe kafka client API that publishes records to the cluster. It uses buffers, thread pool, and serializers to send data. They are stateless: the consumers is responsible to manage the offsets of the message they read. When the producer connects via the initial bootstrap connection, it gets the metadata about the topic - partition and the leader broker to connect to. 
 
-The assignment of messages to partition is done following different algorithms: 
-round-robin if there is no key specified, using the hash code of the key, or custom defined.
+The assignment of messages to partition is done following different algorithms: 1/ round-robin if there is no key specified, 2/ using the hash code of the key, or 3/ custom defined.
 
 ### Design considerations
 
-When developing a record producer we need to assess the followings:
+When developing a record producer, we need to assess the following needs:
 
 * What is the event payload to send? Is is a root aggregate, as defined in domain-driven design, with value objects?  Does it need to be kept in sequence to be used as event sourcing? or order does not matter? Remember that when order is important, messages need to go to the same topic/partition. When multiple partitions are used, the messages with the same key will go to the same partition to guaranty the order. See related discussions [from Martin Kleppmann on confluent web site](https://www.confluent.io/blog/put-several-event-types-kafka-topic/). Also to be exhaustive, it is possible to get a producer doing retries that could generate duplicate records as acknowledges may take time to come: within a batch of n records, if the producer did not get all the n acknowledges on time, it may resend the batch. This is where 'idempotence' becomes important (see later section).
 * Is there a strong requirement to manage the schema definition? When using one topic to manage all events about a unique business entity, then be sure to support a flexible, polymorphic [avro schema](https://avro.apache.org/docs/1.8.1/spec.html).
-* What is the expected throughput to send events? Event size * average throughput combined with the expected latency help to compute buffer size. By default, the buffer size is set at 32Mb, but can be configured with `buffer.memory` property. (See [producer configuration API](https://kafka.apache.org/32/javadoc/org/apache/kafka/clients/producer/ProducerConfig.html))
+* What is the expected throughput to send events? Event size * average throughput combined with the expected latency help to compute buffer size. By default, the buffer size is set at 37Mb, but can be configured with `buffer.memory` property. (See [producer configuration API](https://kafka.apache.org/37/javadoc/org/apache/kafka/clients/producer/ProducerConfig.html))
 * Can the producer batches events together to send them in batch over one send operation? By design kafka producers batch events.
 * Is there a risk for loosing communication? Tune the RETRIES_CONFIG and buffer size, and ensure to have at least 3 or even better 5, brokers within the cluster to maintain quorum in case of one failure. The client API is implemented to support reconnection.
 * When deploying kafka on Kubernetes, it is important to proxy the broker URLs with a proxy server outside of kubernetes. The HAProxy needs to scale, and as the kafka traffic may become important, it may make sense to have a dedicated HAProxy for clients to brokers traffic.
@@ -113,17 +112,17 @@ The producer code, using java or python API, does the following steps:
 * connect to the bootstrap URL, get a broker leader
 * send event records and get resulting metadata.
 
-Producers are thread safe. The `send()` operation is asynchronous and returns immediately once record has been stored in the buffer of records, and it is possible to add a callback to process the broker acknowledgements.
+Producers are thread safe. The `send()` operation is asynchronous and returns immediately once record has been stored in the buffer of records, and it is strongly recommended to add a callback function to process the broker acknowledgements.
 
 [Here is an example of producer code from the quick start.](https://github.com/jbcodeforce/eda-quickstarts/tree/main/quarkus-kafka-producer)
 
 ### Kafka Producer APIs
 
-Here is a list of common API to use in producer producer app:
+Here is a list of common API to use in producer app:
 
-* [KafkaProducer](https://kafka.apache.org/32/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html) A Kafka client that publishes records to the Kafka cluster.  The send method is asynchronous. A producer is thread safe so we can have a per topic thread.
-* [ProducerRecord](https://kafka.apache.org/32/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html) to be published to a topic
-* [RecordMetadata](https://kafka.apache.org/32/javadoc/org/apache/kafka/clients/producer/RecordMetadata.html) metadata for a record that has been acknowledged by the server.
+* [KafkaProducer](https://kafka.apache.org/37/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html) A Kafka client that publishes records to the Kafka cluster.  The send method is asynchronous. A producer is thread safe so we can have a per topic thread.
+* [ProducerRecord](https://kafka.apache.org/37/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html) to be published to a topic
+* [RecordMetadata](https://kafka.apache.org/37/javadoc/org/apache/kafka/clients/producer/RecordMetadata.html) metadata for a record that has been acknowledged by the server.
 
 ### Properties to consider
 
@@ -212,7 +211,7 @@ kafkaProducer.initTransactions()
 
 `initTransactions()` registers the producer with the broker as one that can use transaction, identifying it by its `transactional.id` and a sequence number, or epoch. Epoch is used to avoid an old producer to commit a transaction while a new producer instance was created for that and continues its work.
 
-Kafka streams with a consume-process-produce loop requires transaction and exactly once delivery. Even commiting its read offset is part of the transaction. So Producer API has a [sendOffsetsToTransaction method](https://kafka.apache.org/32/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html#sendOffsetsToTransaction-java.util.Map-org.apache.kafka.clients.consumer.ConsumerGroupMetadata-).
+Kafka streams with a consume-process-produce loop requires transaction and exactly once delivery. Even commiting its read offset is part of the transaction. So Producer API has a [sendOffsetsToTransaction method](https://kafka.apache.org/37/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html#sendOffsetsToTransaction-java.util.Map-org.apache.kafka.clients.consumer.ConsumerGroupMetadata-).
 
 See the [KIP 98 for details.](https://cwiki.apache.org/confluence/display/KAFKA/KIP-98+-+Exactly+Once+Delivery+and+Transactional+Messaging)
 
@@ -284,7 +283,7 @@ An api to develop streaming processing application. See [summary and labs in sep
 
 * [API for declaring messaging handlers using Reactive Streams](https://github.com/eclipse/microprofile-reactive-messaging/blob/master/spec/src/main/asciidoc/architecture.asciidoc)
 * [Microservice patterns - Chris Richardson](https://www.manning.com/books/microservices-patterns)
-* [Develop Stream Application using Kafka](https://Kafka.apache.org/32/documentation/streams/)
+* [Develop Stream Application using Kafka](https://Kafka.apache.org/37/documentation/streams/)
 
 ### Kafka
 
