@@ -8,7 +8,10 @@
 
 
 
-???- Info "Site updated 03/2024"
+???- Info "Site updated 07/2024"
+    July:
+    - Update Kafka content, mirror makers, and add governance
+    
     March:
 
     - update to introduction, concepts

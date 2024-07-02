@@ -8,6 +8,8 @@ nav:
     - Reference architecture: concepts/eda.md
     - From SOA to EDA: concepts/soa-eda.md
     - Event backbone: concepts/backbone.md
+    - Legacy integration: concepts/legacy-itg.md
+    - DAta pipeline: concepts/data-pipeline.md
   - Methodology:
     - Event Storming: event-storming/index.md
     - Domain driven design: ddd/index.md
@@ -23,21 +25,25 @@ nav:
     - Flow architecture: patterns/flow-architectures.md
     - Dead letter queue: patterns/dlq/index.md
     - Data lineage: patterns/data-lineage/index.md
-    # - Governance: patterns/governance/index.md
+    - Governance: patterns/governance/index.md
   - OOS technologies:
     - Kafka: techno/kafka/index.md
     - Kafka Consumer: techno/kafka/consumer.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
     - Mirror Maker 2: techno/mirrormaker/index.md
+    - Flink: https://jbcodeforce.github.io/flink-studies
+    - Active MQ: https://jbcodeforce.github.io/aws-messaging-study/activemq/
+    - Rabbit MQ: https://jbcodeforce.github.io/aws-messaging-study/rabbitmq/
   - AWS technologies:
-      - Streaming: https://jbcodeforce.github.io/yarfba/kinesis
-      - AWS messaging: https://jbcodeforce.github.io/aws-messaging-study
-      - Autonomous Car Ride: https://jbcodeforce.github.io/autonomous-car-iac
-      - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md
+    - Streaming: https://jbcodeforce.github.io/yarfba/kinesis
+    - AWS messaging: https://jbcodeforce.github.io/aws-messaging-study
+    - AWS SQS: https://jbcodeforce.github.io/aws-messaging-study/sqs/
+    - Autonomous Car Ride: https://jbcodeforce.github.io/autonomous-car-iac
+    - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md
   - IBM technologies: 
-      - Assets: ibm-assets.md
-      - MQ: techno/ibm-mq/index.md
+    - Assets: ibm-assets.md
+    - MQ: techno/ibm-mq/index.md
 theme: 
   name: material
   palette:

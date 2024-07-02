@@ -163,5 +163,20 @@ To illustrate this concept, let's consider a shipping company that operates a fl
 
 Applications on the right side run in a data center or cloud provider region and receive aggregated data from the Kafka cluster operating on the vessel. Data replication for the topic is achieved using [**Mirror Maker 2**](../techno/mirrormaker/index.md). A second level of real-time analytics can compute aggregates across multiple vessels even when the connection is lost, as the mirroring mechanism retrieves the records upon reconnection. On the vessel level, multiple brokers ensure high availability, while cross-broker data replication ensures data resilience. Real-time analytic components can scale horizontally, even when computing global aggregates, utilizing the Kafka Streams capability of KTables and stores.
 
+## Kappa architecture
 
-[>>> Selecting event bus technologies](./backbone.md)
+The Kappa Architecture is a software architecture designed for processing streaming data.
+
+The primary premise behind the Kappa Architecture is that it enables both real-time and batch processing, especially for analytics, using a single technology stack. 
+
+![](./images/kappa-ra.png)
+
+The Kappa Architecture achieves this by leveraging a unified, append-only log that serves as the source of truth for all data. This log can be processed in real-time, as events are generated, as well as in batch mode, allowing for flexible and efficient data processing to meet various analytical requirements.
+
+* Streaming processing is the practice of taking action on a series of data at the time the data is created. It
+can be done with different technologies like [Kafka Streams](../techno/kstreams/), Apache Sparks streaming,
+[Apache Flink](https://jbcodeforce.github.io/flink-studies/), Redis streaming, or [Hazelcast](https://hazelcast.com/).
+* The serving layer is where OLAP queries and searches are done, most of the time with indexing and other advanced
+capabilities are needed to offer excellent response time, high throughput and low latency. 
+
+It is a simpler alternative to the Lambda Architecture – as all data is treated as if it were a stream. Both architectures entail the storage of historical data to enable large-scale analytics.
