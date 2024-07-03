@@ -3,13 +3,13 @@ repo_url: https://github.com/jbcodeforce/eda-studies.git
 site_url: https://jeromeboyer.net/eda-studies
 copyright: Copyright &copy; 2018 - 2024 Jerome Boyer
 nav:
-  - Introduction: index.md
+  - Introduction: index.md                        # reviewed 03/2024
   - EDA concepts: 
-    - Reference architecture: concepts/eda.md
+    - Reference architecture: concepts/eda.md     # reviewed 03/2024
     - From SOA to EDA: concepts/soa-eda.md
     - Event backbone: concepts/backbone.md
-    - Legacy integration: concepts/legacy-itg.md
-    - DAta pipeline: concepts/data-pipeline.md
+    - Legacy integration: concepts/legacy-itg.md  # reviewed 07/2024
+    - Data pipeline: concepts/data-pipeline.md
   - Methodology:
     - Event Storming: event-storming/index.md
     - Domain driven design: ddd/index.md
@@ -25,13 +25,15 @@ nav:
     - Flow architecture: patterns/flow-architectures.md
     - Dead letter queue: patterns/dlq/index.md
     - Data lineage: patterns/data-lineage/index.md
-    - Governance: patterns/governance/index.md
+    - Governance: patterns/governance/index.md     # updated 07/2024 - still need work
   - OOS technologies:
-    - Kafka: techno/kafka/index.md
+    - Kafka: techno/kafka/index.md     # reviewed 07/2024
+    - Kafka FAQ: techno/kafka/faq.md   # reviewed 07/2024
+    - Kafka Producer: techno/kafka/producer.md
     - Kafka Consumer: techno/kafka/consumer.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
-    - Mirror Maker 2: techno/mirrormaker/index.md
+    #- Mirror Maker 2: techno/mirrormaker/index.md
     - Flink: https://jbcodeforce.github.io/flink-studies
     - Active MQ: https://jbcodeforce.github.io/aws-messaging-study/activemq/
     - Rabbit MQ: https://jbcodeforce.github.io/aws-messaging-study/rabbitmq/

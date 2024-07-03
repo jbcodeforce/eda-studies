@@ -6,7 +6,7 @@ When developing new digital business applications, developers often need to inte
 
     ![3](./images/hl-arch-data-pipe-mq.png)
 
-2. Where databases support the capture of changes to data, developers can publish changes as events to Kafka integrating them into the event-driven infrastructure. This can be achieved by leveraging the transactional [outbox pattern](../patterns/intro/#transactional-outbox):
+2. Where databases support the capture of changes to data, developers can publish changes as events to Kafka integrating them into the event-driven infrastructure. This can be achieved by leveraging the transactional [outbox pattern](../patterns/index.md/#transactional-outbox):
 
     The application prepares the events representing the data changes and writes them to a dedicated 'outbox' table, as part of the same transaction that updates the main application tables.
 

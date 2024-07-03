@@ -1,17 +1,16 @@
 # Kafka Mirror Maker 2
 
-This section introduces **Mirror Maker 2.0**, the new replication feature of Kafka 2.4, and how it can be used, along with best practices, for data replication between two Kafka clusters. 
+!!! warning "Under construction"
+
+This section introduces [**Mirror Maker 2.0**](https://kafka.apache.org/documentation/#georeplication-overview), the replication feature of Kafka 2.4, and how it can be used, along with best practices, for data replication between two Kafka clusters. 
 Mirror Maker 2.0 was defined as part of the Kafka Improvement Process - [KIP 382](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0) and can be used
-for disaster recovery (active / passive) or for more complex topology with 3 data centers to support always on.
+for disaster recovery (active / passive) or for more complex topology with multiple Kafka Clusters to support "always-on" architecture.
 
 ## Overview
 
-We recommend to start by reading the [IBM Event Streams product documentation](https://ibm.github.io/event-streams/georeplication/about/) on geo-replication to understand the main concepts.
-Some core principles we use in this article:
-
-* We have two data centers in different region and each region has multiple availability zones
-* OpenShift clusters are defined in both region and spread among the three data center. For a better view of the golden topology for OpenShift [see this diagram](https://github.com/ibm-cloud-architecture/eda-tech-academy/blob/main/docs/demo/images/es-golden-topo.png)  with master, worker nodes deployment.
-* At least two Event Streams / Kafka clusters are defined, one as `source` in the active region and one `target` for disaster recovery or passive region.
+* Mirror Maker is built on top of Kafka Connect and it is used to replicate topics and consumer groups metadata by preserving partitioning.
+* OpenShift clusters are defined in both region and spread among the three data centers. For a better view of the golden topology for OpenShift [see this diagram](https://github.com/ibm-cloud-architecture/eda-tech-academy/blob/main/docs/demo/images/es-golden-topo.png)  with master, worker nodes deployment.
+* At least two Kafka clusters are defined, one as `source` in the active region and one `target` for disaster recovery or passive region.
 * Source cluster has producer and consumer applications deployed in the same OpenShift Cluster or deployed on VMs and accessing the Kafka brokers via network load balancer.
 * Producer, consumer or streaming applications deployed within OpenShift use the `bootstrap URL` to kafka broker via internal service definition. Something like `es-prod-kafka-bootstrap.ibm-eventstreams.svc`.
 With such configuration their setting will be the same on the target cluster.
@@ -240,7 +239,7 @@ kind: KafkaMirrorMaker2
 
 ## Consumer coding
 
-We recommend to review the [producer implementation best practices](../kafka-producers/) and the [consumer considerations](../kafka-consumers/).
+We recommend to review the [producer implementation best practices](../kafka/producer.md) and the [consumer considerations](../kafka/consumer.md).
 
 ## Capacity planning
 
@@ -278,7 +277,7 @@ If a new worker starts work, a rebalance ensures it takes over some work from th
 
 Using the REST API it is possible to stop and restart a connector. As of now the recommendation is to start a new MirrorMaker instance with the new version and the same groupId as the existing workers you want to migrate. Then stop the existing version. As each MirrorMaker workers are part of the same group, the internal worker controller will coordinate with the other workers the  'consumer' task to partition assignment.
 
-We have presented a similar approach in [this section](/technology/kafka-mirrormaker/vm-provisioning), where we tested that each instance of MirrorMaker 2 could assume the replication.  First we will stop the Node 1 instance, upgrade it to the latest version, then start it again.  Then we’ll repeat the same procedure on Node 2.  We’ll continue to watch the Consumer VM window to note that replication should not stop at any point.
+First we will stop the Node 1 instance, upgrade it to the latest version, then start it again.  Then we’ll repeat the same procedure on Node 2.  We’ll continue to watch the Consumer VM window to note that replication should not stop at any point.
 
 ![10](./images/mm2-v2v-1.png)
 
@@ -305,4 +304,4 @@ Be sure to verify the product documentation as new version may enforce to have n
 * [IBM Event Streams managed service - Disaster recovery example scenario](https://cloud.ibm.com/docs/EventStreams?topic=EventStreams-disaster_recovery_scenario)
 * [Strimzi configuration for Mirror Maker 2](https://strimzi.io/docs/operators/latest/configuring.html#assembly-deployment-configuration-kafka-mirror-maker-str)
 * [Getting started with Mirror Maker 2 - Tech Academy](https://ibm-cloud-architecture.github.io/eda-tech-academy/getting-started/mm2/)
-* [Using MirrorMaker2 from Dale Lane](https://dalelane.co.uk/blog/?p=4074)
+

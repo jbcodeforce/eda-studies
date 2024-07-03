@@ -9,7 +9,7 @@ This content is a summary of the Apache Kafka open-source project, one of the mo
 
 [Kafka](https://kafka.apache.org) is a distributed real-time event streaming platform with the following key capabilities:
 
-* Publish and subscribe streams of records. Data are stored on disks with replication protocol. Consumer applications can pull the information when they need, and keep track of what they have seen so far.
+* Publish and subscribe streams of records. Data are stored on disks with the kafka replication protocol. Consumer applications can pull the information when they need, and keep track of what they have seen so far.
 * It can handle hundreds of read and write operations per second from many producers and consumers.
 * Supports Atomic broadcast, sends a record once, and every subscriber gets it once.
 * Replicate stream of data within the distributed cluster for fault-tolerance. Persist data during a given time period before deleting records.
@@ -34,11 +34,11 @@ Zookeeper is used to persist the component and the platform states. It runs in c
 * Depending of the kafka version, offsets are maintained in Zookeeper or in **Kafka**: newer versions use an internal Kafka topic called `__consumer_offsets`. In any case, consumers can read next messages (or from a specific offset) correctly even during broker server outrages.
 * Access Controls are saved in Zookeeper.
 
-As of Kafka 2.8+ Zookeeper is becoming optional.
+As of Kafka 2.8+ Zookeeper is becoming optional and the Kraft protocol is used to exchange cluster management metadata.
 
 ## Topics
 
-Topics represent end points to publish and consume records.
+Topics represent end-points to publish and consume records.
 
 * Each record consists of a key, a value (the data payload as byte array), a timestamp and some metadata.
 * Producers publish data records to topic and consumers subscribe to topics. When a record is produced without specifying a partition, a partition will be chosen using a hash of the key. If the record did not provide a timestamp, the producer will stamp the record with its current time (creation time or log append time). Producers hold a pool of buffers to keep records not yet transmitted to the server.
@@ -80,7 +80,7 @@ The leader manages all the read and write requests for the partition. The follow
 
 It is not recommended to get the same number of replicas as the number of brokers. 
 
-There is a consumer capability, that can be enabled, to consume from a replica, to optimize read latency when consumers are closer to the broker server. Without this configuration the consumer reads from the partition leader.
+There is a consumer capability, that can be enabled, to consume from a replica, to optimize read latency when consumers are closer to the broker server. Without this configuration, the consumer reads from the partition leader.
 
 ## Producer applications
 
@@ -219,7 +219,7 @@ In case of multiple partitions, the broker will store a list of all updated part
 
 To support transaction, a transaction coordinator keeps its states into an internal topic (TransactionLog). Control messages are added to the main topic but never exposed to the 'user-app', so that consumers have the knowledge if a transaction is committed or not. 
 
-See the [code in order command](https://github.com/ibm-cloud-architecture/refarch-kc-order-ms/blob/53bbb8cdeac413883ca2ccf521eb0797a43f45a3/order-command-ms/src/main/java/ibm/gse/orderms/infrastructure/kafka/OrderCommandProducer.java#L46) microservice.
+See the [code in order command](https://github.com/jbcodeforce/refarch-kc-order-ms/blob/53bbb8cdeac413883ca2ccf521eb0797a43f45a3/order-command-ms/src/main/java/ibm/gse/orderms/infrastructure/kafka/OrderCommandProducer.java#L46) microservice.
 
 The consumer is also interested to configure the reading of the transactional messages by defining the isolation level. Consumer waits to read transactional messages until the associated transaction has been committed. Here is an example of consumer code and configuration
 
@@ -251,14 +251,14 @@ try {
 }
 ```
 
-There is an interesting [article](https://www.baeldung.com/kafka-exactly-once) from the Baeldung team about exactly once processing in kafka with code example which we have re-used to implement the order processing in our [Reefer Container Shipment reference application](https://ibm-cloud-architecture.github.io/refarch-kc/) and explained [here](https://ibm-cloud-architecture.github.io/refarch-kc/orders/order/)
+There is an interesting [article](https://www.baeldung.com/kafka-exactly-once) from the Baeldung team about exactly once processing in kafka with code example which we have re-used to implement the order processing in our [Reefer Container Shipment reference application](https://jbcodeforce.github.io/refarch-kc/) and explained [here](https://jbcodeforce.github.io/refarch-kc/orders/order/)
 
 ### More readings
 
 * [Creating advanced kafka producer in java - Cloudurable](http://cloudurable.com/blog/kafka-tutorial-kafka-producer-advanced-java-examples/index.html)
 * [Confluent blog: Exactly-once Semantics are Possible: Here’s How Kafka Does it](https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/)
-* [Order management with CQRS in Java](https://github.com/ibm-cloud-architecture/refarch-kc-order-ms)
-* [EDA quickstart Quarkus Producer API](https://github.com/ibm-cloud-architecture/eda-quickstart)
+* [Order management with CQRS in Java](https://github.com/jbcodeforce/refarch-kc-order-ms)
+* [EDA quickstart Quarkus Producer API](https://github.com/jbcodeforce/eda-quickstart)
 * [Event driven microservice template](https://github.com/jbcodeforce/microprofile-event-driven-microservice-template/)
 
 
@@ -274,7 +274,7 @@ We are detailing consumer group implementation in [this note](./consumer.md#cons
 
 ## Kafka Streams
 
-An api to develop streaming processing application. See [summary and labs in separate repository](https://github.com/jbcodeforce/kafka-studies)
+An api to develop streaming processing application. See [deeper dive, demos and labs in the kafka-studies repository](https://github.com/jbcodeforce/kafka-studies)
 
 
 ## Additional readings

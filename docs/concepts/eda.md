@@ -174,7 +174,7 @@ The primary premise behind the Kappa Architecture is that it enables both real-t
 The Kappa Architecture achieves this by leveraging a unified, append-only log that serves as the source of truth for all data. This log can be processed in real-time, as events are generated, as well as in batch mode, allowing for flexible and efficient data processing to meet various analytical requirements.
 
 * Streaming processing is the practice of taking action on a series of data at the time the data is created. It
-can be done with different technologies like [Kafka Streams](../techno/kstreams/), Apache Sparks streaming,
+can be done with different technologies like [Kafka Streams](../techno/kstreams/index.md), Apache Sparks streaming,
 [Apache Flink](https://jbcodeforce.github.io/flink-studies/), Redis streaming, or [Hazelcast](https://hazelcast.com/).
 * The serving layer is where OLAP queries and searches are done, most of the time with indexing and other advanced
 capabilities are needed to offer excellent response time, high throughput and low latency. 
