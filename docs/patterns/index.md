@@ -129,7 +129,7 @@ Here is an example of choreography with squares representing events from the dif
 
 ![](./images/choreography.drawio.png){ width=700 }
 
-The detail of the flow is described in [this design note](../solutions/autonomous-car/index.md#adopting-an-event-driven-approach-to-the-implementation)
+The detail of the flow is described in [this design note](../solutions/autonomous-car/index.md#carridemanager)
 
 ## Orchestration
 

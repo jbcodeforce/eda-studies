@@ -10,14 +10,10 @@ This chapter describes what and why Avro and Schema registry are important eleme
 ## Why this is important
 
 Loosely coupling and asynchronous communication between applications does not mean there is no contract to enforce some constraint between producer and consumer. 
-When we talk about contract we can first think about schema as we did with XSD. In the world of JSON, JSON schema and Avro schemas can be used to define
-data structure of the message. As there is a need to get metadata around messaging, [cloudevents](https://cloudevents.io) is well accepted and adopted as a specification
-to describe event data. Also [AsyncAPI](../../patterns/api-mgt/#support-for-async-api)
-establishes standards for events and messaging in the asynchronous world with an API view, so combining message schema, channels and binding definitions so 
-we have most of the needed information for a consumer to access a data stream or queue. 
+When we talk about contract, we can first think about schema as we did with XSD. In the world of JSON, JSON schema and Avro schemas can be used to define data structure of the messages. As there is a need to get metadata around messaging, [cloudevents](https://cloudevents.io) is well accepted and adopted as a specification
+to describe event data. Also [AsyncAPI](../../patterns/api-mgt/#support-for-async-api) establishes standards for events and messaging in the asynchronous world with an API view, combining message schema, channels and binding definitions so we have most of the needed information for a consumer to access a data stream or queue. 
 
-So the contract is defined with a schema. From an EDA design point of view, the producer owns the definition of the schema as it owns the main business entity
-life cycle, events are generated from. Producer will make sure the message complies with the schema at hand for serializing.
+The contract is defined with a schema. From an EDA design point of view, the producer owns the definition of the schema as it owns the main business entity life cycle, the business events are generated from. Producer will make sure the message complies with the schema at hand for serializing.
 
 On top of those specifications, there are technologies to support the contract management in the form of schema registry and API manager. The following
 figure gives us the foundations for integration between producer, schema registry and consumers.

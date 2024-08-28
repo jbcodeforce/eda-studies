@@ -13,6 +13,7 @@ nav:
   - Methodology:
     - Event Storming: event-storming/index.md
     - Domain driven design: ddd/index.md
+    - EDA Assessment : ddd/eda_assessment.md
     - Vaccine Examples: event-storming/vaccine-dt-es-ddd.md
   - Design patterns:
     - Common patterns: patterns/index.md
@@ -38,11 +39,13 @@ nav:
     - Active MQ: https://jbcodeforce.github.io/aws-messaging-study/activemq/
     - Rabbit MQ: https://jbcodeforce.github.io/aws-messaging-study/rabbitmq/
   - AWS technologies:
+    - Duplicate with EB: solutions/autonomous-car/es-duplicate-evt.md
     - Streaming: https://jbcodeforce.github.io/yarfba/kinesis
+    - MSK: https://jbcodeforce.github.io/yarfba/serverless/msk
     - AWS messaging: https://jbcodeforce.github.io/aws-messaging-study
     - AWS SQS: https://jbcodeforce.github.io/aws-messaging-study/sqs/
     - Autonomous Car Ride: https://jbcodeforce.github.io/autonomous-car-iac
-    - Duplicate with ES: solutions/autonomous-car/es-duplicate-evt.md
+    
   - IBM technologies: 
     - Assets: ibm-assets.md
     - MQ: techno/ibm-mq/index.md
