@@ -1,52 +1,64 @@
----
-title: Apache Avro, Data Schemas and Schema Registry
-description: Apache Avro data serialization, data schemas for data definition and correctness and Schema Registry for data schema management
----
+# Apache Avro, Data Schemas and Schema Registry
 
-**Updates 6/20/2022**
+???- Info Updates"
+  Created 01/2019  Last update 6/20/2022
 
 This chapter describes what and why Avro and Schema registry are important elements of any event-driven solutions.
 
 ## Why this is important
 
-Loosely coupling and asynchronous communication between applications does not mean there is no contract to enforce some constraint between producer and consumer. 
-When we talk about contract, we can first think about schema as we did with XSD. In the world of JSON, JSON schema and Avro schemas can be used to define data structure of the messages. As there is a need to get metadata around messaging, [cloudevents](https://cloudevents.io) is well accepted and adopted as a specification
-to describe event data. Also [AsyncAPI](../../patterns/api-mgt/#support-for-async-api) establishes standards for events and messaging in the asynchronous world with an API view, combining message schema, channels and binding definitions so we have most of the needed information for a consumer to access a data stream or queue. 
+Loosely coupling and asynchronous communication between applications does not imply the absence of a contract to enforce certain constraints between producers and consumers.
 
-The contract is defined with a schema. From an EDA design point of view, the producer owns the definition of the schema as it owns the main business entity life cycle, the business events are generated from. Producer will make sure the message complies with the schema at hand for serializing.
+When we refer to a contract, we can initially think of schemas, as we did with XSD. In the context of JSON, JSON Schema and Avro schemas can be utilized to define the data structure of messages. Given the need for metadata in messaging, [CloudEvents](https://cloudevents.io) has gained widespread acceptance as a specification for describing event data. Additionally, [AsyncAPI](../../patterns/api-mgt/#support-for-async-api) establishes standards for events and messaging in the asynchronous landscape from an API perspective. It combines message schemas, channels, and binding definitions, providing consumers with the essential information needed to access a data stream or queue.
 
-On top of those specifications, there are technologies to support the contract management in the form of schema registry and API manager. The following
-figure gives us the foundations for integration between producer, schema registry and consumers.
+The contract is defined by a schema. From an event-driven architecture (EDA) design perspective, the producer is responsible for defining the schema, as it oversees the life cycle of the main business entities from which business events are generated. The producer ensures that the message complies with the schema for serialization.
 
-![schema registry management](./images/schema-registry.png)
+In addition to these specifications, various technologies support contract management, including schema registries and API managers. The following
+figure presents the foundations for integration between producers, schema registry and consumers.
 
+![schema registry management](./diagrams/schema-registry.drawio.png)
 
-Schema Registry provides producer and consumer APIs so that these can project whether the event they are about to produce or consume is compatible with previous versions or compatible with the version they are expecting. For that, both producers and consumers require the schema definition at hand at serialization and deserialization time. This can be done either by:
+The Schema Registry offers producer and consumer APIs that allow them to determine whether the event they are about to produce or consume is compatible with previous versions or aligns with the expected version. To achieve this, both producers and consumers need access to the schema definition during serialization and deserialization.
 
-1. Reading the schema from a local local resource to your producer such as a file, variable, property (or kubernetes construct such as configmap or secret).
+These can be done either by:
+
+1. Reading the schema from a local resource to the producer application using a file, a variable, a property (or a kubernetes construct such as a configmap or a secret).
 2. Retrieving the schema definition from the Schema Registry given a name/ID.
 
 When the producer wants to send an event to a Kafka topic, two things happen:
 
 1. The producer makes sure the event to be sent complies to the schema. Otherwise, it errors out.
-2. Project whether the event they are about to produce or consume is compatible with previous versions or compatible with the version they are expecting.
+2. Determine  whether the event they are about to produce or consume is compatible with previous versions or compatible with the version they are expecting.
 
-For the first action, the producer already holds the two things it needs: the schema definition the event to be sent needs to comply with and the event itself. The producer is therefore able to carry out that compliance check. However, for the second action, where the producer needs to make sure the schema definition your event complies with is compatible with the existing schema definition for the topic in question (if any), the producer might need to contact the schema registry.
+For the first action, the producer already has what it needs: the schema definition and the event that must comply with it. This enables the producer to perform the compliance check. However, for the second action, where the producer must ensure that the schema definition of the event is compatible with the existing schema for the relevant topic (if one exists), the producer may need to consult the Schema Registry.
 
-Producers (and consumers) maintain a local cache with the schema definitions (and their versions) along with their unique global IDs (all of these retrieved from the schema registry) for the topics they want to produce/consume events to/from. If the producer has a schema definition in its local cache that matches the schema definition at hand for the serialization of the event, it simply sends the event as the schema definitions match and the event complies with such schema definition. However, if the producer does not have any schema definition in its local cache that matches the schema defintion at hand for the serialization of the event, whether because these are different versions or the producer simply does not have any schema definition in its cache, it contacts the schema registry.
+Producers (and consumers) maintain a local cache of schema definitions (and their versions) along with their unique global IDs, all retrieved from the Schema Registry, for the topics they wish to produce or consume events from. If the producer has a schema definition in its local cache that matches the schema definition required for the event's serialization, it can simply send the event, as the definitions match and the event complies with the schema.
 
-* If a schema defintion for the topic in question that matches the schema definition at hand at serialization time in the producer already exists in the schema registry, the producer simply retrieves the global unique ID for that schema definition to locally cache it along with the schema definition itself for future events to be sent so that it avoids contacting the schema registry again.
+However, if the producer does not have a matching schema definition in its local cache—whether due to different versions or simply lacking the definition—it will contact the Schema Registry.
 
-* If a schema definition for the topic in question that matches the schema definition at hand at serialization time in the producer does not already exist in the schema registry, the producer must be able to register the schema definition it has got at hand for the topic in question at serialization time in the schema registry so that such schema definition is now available for any consumer wanting or needing to consume events that comply with such schema definition. For that, the producer must be configured to be able to auto-register schemas and also be provided with the appropriate credentials to register schema definitions from the schema registry perspective if this implements any type of RBAC mechanism (as it is the case for IBM Event Streams).
-  * If the producer is not configured to auto-register schema definitions or its credentials does not allow it to register schema definitions, then the send event action will fail until there is a schema definition for the topic in question that mateches the schema definition at hand at serialization time in the producer registered in the schema registry.
-  * If the producer is configured to auto-register schema definitions and its credentials allows it to register schema definitions, the schema registry validates the compatibility of the schema definition at hand at serialization time in the producer with existing schema definitions for the topic in questions (if any) to make sure that, if this schema definition to be registered is a newer version of any existing schema definition, it is complatible so that no consumer gets affected by this new schema definition version. Afer the schema definition or newer version of an exisint schema definition is registered in the schema registry, the producer retrieves its global unique ID to mantain its local cache up to date.
+
+If a schema definition for the relevant topic that matches the schema definition required for serialization already exists in the Schema Registry, the producer can simply retrieve the global unique ID for that schema definition. It will then locally cache both the schema definition and its ID for future events, thereby avoiding the need to contact the Schema Registry again.
+
+If a schema definition for the relevant topic that matches the schema required for serialization does not already exist in the Schema Registry, the producer must register the schema definition it has on hand for that topic. This ensures that the schema is available for any consumer wishing to consume events that comply with it.
+
+To achieve this, the producer must be configured for auto-registration of schemas and provided with the appropriate credentials to register schema definitions, especially if the Schema Registry implements any form of role-based access control (RBAC).
+
+If the producer is not configured to auto-register schema definitions or if its credentials do not permit registration, the send event action will fail. This will persist until a schema definition for the relevant topic, matching the schema required for serialization, is registered in the Schema Registry.
+
+If the producer is configured to auto-register schema definitions and has the necessary credentials, the Schema Registry validates the compatibility of the current schema definition required for serialization with any existing schema definitions for the relevant topic. This ensures that if the schema definition being registered is a newer version, it remains compatible, preventing any negative impact on consumers.
+
+Once the schema definition or the new version of an existing schema is successfully registered in the Schema Registry, the producer retrieves its global unique ID to keep its local cache up to date.
+
 
 !!! Warning
-    We stongly recommend that producers are not allowed to register schema definitions in the schema registry for better governance and management of schema definitions. It is highly recommended that schema definitions registration is done by someone responsible for such task with appropriate role (such as an admin, an API manager, an asynchronous API manager, a development manager, an operator, etc).
+    We strongly recommend that producers be restricted from registering schema definitions in the Schema Registry to ensure better governance and management. It is advisable that schema definition registration be handled by a designated individual with the appropriate role, such as an administrator, API manager, asynchronous API manager, development manager, or operator.
 
-Once the producer has a schema definition in its local cache, along with its global unique id, that matches the schema definition at hand for serialization of the event to be sent, it produces the event to the Kafka topic using the appropriate `AvroKafkaSerializer` class. The schema definition global unique ID gets serialized along with the event so that the event does not need to travel along with its schema definition as it was the case in older messaging or eventing techonolgies and systems.
 
-By default, when a consumer reads an event, the schema definition for such event is retrieved from the schema registry by the deserializer using the global unique ID, which is specified in the event being consumed. The schema definition for an event is retrieved from the schema registry only once, when an event comes with a global unique ID that can not be found in the schema definition cache the consumer maintains locally. The schema definition global unique ID can be located in the event headers or in the event payload, depending on the configuration of the producer application. When locating the global unique ID in the event payload, the format of the data begins with a magic byte, used as a signal to consumers, followed by the global unique ID, and the message data as normal. For example:
+Once the producer has a schema definition in its local cache, along with its global unique ID, that matches the schema required for the serialization of the event, it produces the event to the Kafka topic using the appropriate `AvroKafkaSerializer` class. The global unique ID of the schema definition is serialized alongside the event, eliminating the need for the event to carry its schema definition, as was the case in older messaging or eventing technologies and systems.
+
+By default, when a consumer reads an event, the schema definition for that event is retrieved from the Schema Registry by the deserializer using the global unique ID specified in the consumed event. The schema definition is retrieved from the Schema Registry only once, when an event contains a global unique ID that is not found in the consumer's local schema definition cache.
+
+The global unique ID can be located either in the event headers or within the event payload, depending on the producer application's configuration. When the global unique ID is located in the event payload, the data format begins with a magic byte, which serves as a signal to consumers, followed by the global unique ID and the message data as usual. For example:
 
 ```
 # ...
@@ -55,26 +67,20 @@ By default, when a consumer reads an event, the schema definition for such event
 [MESSAGE DATA]
 ```
 
-Be aware that non Java consumers use a C library that might require the schema definition at hand for the deserializer too (see https://github.com/confluentinc/confluent-kafka-python/issues/834) as opposed to letting the deserializer retrieve the schema definition from the schema registry as explained above. The strategy would be to have the schema loaded from the schema registry via API.
+Be aware that non-Java consumers may use a C library that also requires the schema definition for the deserializer, as opposed to allowing the deserializer to retrieve the schema definition from the Schema Registry, as explained above. The strategy should involve loading the schema from the Schema Registry via an API. See [Kafka python reported issue](https://github.com/confluentinc/confluent-kafka-python/issues/834)
 
 ## Schema Registry
 
-With a pure open-source strategy, Event Streams within Cloud Pak for integration is using Apicu.io as schema registry. 
-The Event Streams [product documentation](https://ibm.github.io/event-streams/schemas/overview/) is doing an excellent job to 
-present the schema registry, we do not need to rewrite the story, just give you some summary from Apicur.io and links to code samples.
-
 ### Apicurio
 
-[Apicur.io](https://www.apicur.io) includes a [schema registry](https://www.apicur.io/registry/docs/apicurio-registry/2.1.x/index.html) to store schema definitions. 
-It supports Avro, json, protobuf schemas, and an API registry to manage OpenApi and AsynchAPI.
+[Apicur.io](https://www.apicur.io) includes a [schema registry](https://www.apicur.io/registry/docs/apicurio-registry/2.6.x/index.html) to store schema definitions. It supports Avro, Json, protobuf schemas, and an API registry to manage OpenApi and AsynchAPI.
 
-It is a Cloud-native Quarkus Java runtime for low memory footprint and fast deployment times. It supports [different persistences](https://www.apicur.io/registry/docs/apicurio-registry/2.1.x/getting-started/assembly-intro-to-the-registry.html#registry-storage_registry)
+Apicur.io is a Cloud-native Quarkus Java runtime with low memory footprint and fast deployment times. It supports [different persistences](hhttps://www.apicur.io/registry/docs/apicurio-registry/2.6.x/getting-started/assembly-installing-registry-docker.html)
 like Kafka, Postgresql, Infinispan and supports different deployment models.
 
 #### Registry Characteristics
 
 * Apicurio Registry is a datastore for sharing standard event schemas and API designs across API and event-driven architectures.
-In the messaging and event streaming world, data that are published to topics and queues often must be serialized or validated using a Schema.
 * The registry supports adding, removing, and updating the following types of artifacts: OpenAPI, AsyncAPI, GraphQL, Apache Avro, Google protocol buffers, JSON Schema, Kafka Connect schema, WSDL, XML Schema (XSD).
 * Schema can be created via Web Console, core REST API or Maven plugin
 * It includes configurable rules to control the validity and compatibility.
@@ -94,8 +100,8 @@ caches on consumption of each new `_schemas` message to reflect the newly added 
 Updating local state from the Kafka log in this manner ensures durability, ordering, and easy recoverability.
 
 
-The way Event Streams / Apicur.io has to handle schema association to topics is by schema name. Given we have a topic called orders, 
-the schemas that will apply to it are avros-key (when using composite key) and orders-value (most likely based on cloudevents and then custom payload).
+The way Apicur.io has to handle schema association to topics is by schema name. Given we have a topic called orders, 
+the schemas that will apply to it are avros-key (when using composite key) and orders-value (most likely based on CloudEvents and then custom payload).
 
 ## Apache Avro
 
@@ -219,15 +225,8 @@ In this case, the messages are serialized using Avro and sent to a kafka topic. 
 
 ### Articles and product documentation
 
-* [IBM Event Streams-  Schemas overview](https://ibm.github.io/event-streams/schemas/overview/)
 * [Apicur.io schema registry documentation](https://www.apicur.io/registry/docs/apicurio-registry/2.1.x/index.html)
 * [Confluent schema registry overview](https://docs.confluent.io/platform/current/schema-registry/index.html)
-* [Producer code with reactive messaging and apicurio schema registry](https://github.com/ibm-cloud-architecture/eda-quickstarts/tree/main/quarkus-reactive-kafka-producer)
-* [Consumer code with reactive messaging and apicurio schema registry](https://github.com/ibm-cloud-architecture/eda-quickstarts/tree/main/quarkus-reactive-kafka-consumer)
+* [Producer code with reactive messaging and apicurio schema registry](https://github.com/jbcodeforce/eda-quickstarts/tree/main/quarkus-reactive-kafka-producer)
+* [Consumer code with reactive messaging and apicurio schema registry](https://github.com/jbcodeforce/eda-quickstarts/tree/main/quarkus-reactive-kafka-consumer)
 
-### Labs
-
-We have developed two labs, one for the IBM Event Streams product that comes with the IBM CloudPak for Integration installed on a RedHat OpenShift cluster and the other for the IBM Event Streams on IBM Cloud offering, to get hands-on experience working with Apache Avro, data schemas and the IBM Event Streams Schema Registry:
-
-- [IBM Event Streams on IBM Cloud lab](../../use-cases/schema-registry-on-cloud/)
-- [IBM Event Streams from IBM CloudPak for Integration lab](../../use-cases/schema-registry-on-ocp/)

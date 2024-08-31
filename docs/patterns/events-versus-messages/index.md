@@ -6,14 +6,14 @@
 Consider queue system for:
 
 * Exactly once delivery, and to participate into two-phase commit XA transaction.
-* Asynchronous request / reply communication: the semantic of the communication is for one component to ask a second command to do something on its data. This is a command pattern with delay on the response.
-* Recall messages in queue are kept until consumer(s) got them.
+* Asynchronous request / reply communication: the semantic of the communication is for one component to ask a second component to do something on its data. This is a **command pattern** with delay on the response.
+* Recall messages in queue are kept until consumer(s) got them, which fits well in a command pattern as we do not want to get the command done twice.
 
 Consider streaming system, like Kafka, as pub/sub and persistence system for:
 
 * Publish events as immutable facts, with a timestamp, of what happened in an application.
 * Get continuous visibility of the data Streams.
-* Keep data once consumed, for future consumers, for replay-ability.
+* Keep data a longer time in the persistence layer, once consumed, so future consumers can consume those messages, or for replay-ability.
 * Scale the message consumption horizontally.
 
 ## Events and Messages

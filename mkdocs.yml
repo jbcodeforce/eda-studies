@@ -27,6 +27,9 @@ nav:
     - Dead letter queue: patterns/dlq/index.md
     - Data lineage: patterns/data-lineage/index.md
     - Governance: patterns/governance/index.md     # updated 07/2024 - still need work
+  - Demonstrations:
+    - GitOps - IaC: solutions/gitops_IaC/index.md
+    - Real-time Inventory: https://jbcodeforce.github.io/eda-rt-inventory/
   - OOS technologies:
     - Kafka: techno/kafka/index.md     # reviewed 07/2024
     - Kafka FAQ: techno/kafka/faq.md   # reviewed 07/2024
@@ -51,6 +54,8 @@ nav:
     - MQ: techno/ibm-mq/index.md
 theme: 
   name: material
+  logo: images/logo.drawio.png
+  favicon: images/logo-blue.drawio.png
   palette:
     scheme: default
   language: en
@@ -60,8 +65,8 @@ theme:
       - search.highlight
       - navigation.instant
       - navigation.instant.progress
-      - navigation.tabs
-      - navigation.tabs.sticky
+      # - navigation.tabs
+      #- navigation.tabs.sticky
       - navigation.instant
       - navigation.tracking
       - navigation.sections
