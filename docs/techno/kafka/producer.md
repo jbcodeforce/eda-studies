@@ -37,7 +37,8 @@ The producer code, using java or python API, does the following steps:
 
 Producers are thread safe. The `send()` operation is asynchronous and returns immediately once record has been stored in the buffer of records, and it is possible to add a callback to process the broker acknowledgements.
 
-[Here is an example of producer code from the quick start.](https://github.com/jbcodeforce/kafka-studies/tree/main/templates/quarkus-kafka-producer)
+[Here is an example of producer code from the quick start.](https://github.com/jbcodeforce/eda-quickstarts/tree/main/quarkus-kafka-producer)
+
 
 ## Kafka useful Producer APIs
 
@@ -80,7 +81,7 @@ To avoid that we need to have `ack=-1`, three replicas and in-sync-replica=2. Re
 
 ![](./images/ack-all.gif)
 
-Here is an example of cluster configuration with default set for all topic
+Here is an example of cluster replication configuration set for all topics:
 
 ```yaml
 spec:
@@ -91,7 +92,7 @@ spec:
                 min.insync.replicas: 2
 ```
 
-Or at the topic level:
+But it can be specified at the topic level:
 
 ```yaml
 kind: KafkaTopic
@@ -111,7 +112,7 @@ At the best case scenario, with a replica factor set to 3, a broker responding o
 
 ![](./images/exactly-one-0.png)
 
-Sometime the brokers will not send acknowledge in expected time, and the producer may decide to send the records again, generating duplicate...
+Sometime the brokers will not send acknowledge in expected time, and the producer may decide to send the records again, generating duplicate records...
 
 ![](./images/exactly-one-1.png)
 
@@ -174,17 +175,14 @@ try {
 }
 ```
 
-There is an interesting [article](https://www.baeldung.com/kafka-exactly-once) from the Baeldung team about exactly once processing in kafka with code example which we have re-used to implement the order processing in our [Reefer Container Shipment reference application](https://ibm-cloud-architecture.github.io/refarch-kc/) and explained [here](https://ibm-cloud-architecture.github.io/refarch-kc/orders/order/)
+There is an interesting [article](https://www.baeldung.com/kafka-exactly-once) from the Baeldung team about exactly once processing in kafka with code example which we have re-used to implement the order processing in our [Reefer Container Shipment reference application](https://jbcodeforce.github.io/refarch-kc/) and explained [here](https://jbcodeforce.github.io/refarch-kc/orders/order/)
 
-### Code Examples
-
-* [Order management with CQRS in Java](https://github.com/ibm-cloud-architecture/refarch-kc-order-ms)
-* [EDA quickstart Quarkus Producer API](https://github.com/ibm-cloud-architecture/eda-quickstart)
-* [Springboot with kafka template](https://github.com/ibm-cloud-architecture/refarch-kc-container-ms)
-* [Event driven microservice template](https://github.com/jbcodeforce/microprofile-event-driven-microservice-template/)
-
-## More readings
+### More readings
 
 * [Creating advanced kafka producer in java - Cloudurable](http://cloudurable.com/blog/kafka-tutorial-kafka-producer-advanced-java-examples/index.html)
 * [Confluent blog: Exactly-once Semantics are Possible: Here’s How Kafka Does it](https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/)
+* [Order management with CQRS in Java](https://github.com/jbcodeforce/refarch-kc-order-ms)
+* [EDA quickstart Quarkus Producer API](https://github.com/jbcodeforce/eda-quickstart)
+* [Event driven microservice template](https://github.com/jbcodeforce/microprofile-event-driven-microservice-template/)
+
 

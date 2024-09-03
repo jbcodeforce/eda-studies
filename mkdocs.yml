@@ -81,7 +81,7 @@ plugins:
       lang: en
   - minify:
       minify_html: true
-  - mkdocs-video
+  #- mkdocs-video
   - mermaid2
 markdown_extensions:
   - abbr
