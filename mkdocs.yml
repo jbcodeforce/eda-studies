@@ -3,11 +3,11 @@ repo_url: https://github.com/jbcodeforce/eda-studies.git
 site_url: https://jeromeboyer.net/eda-studies
 copyright: Copyright &copy; 2018 - 2024 Jerome Boyer
 nav:
-  - Introduction: index.md                        # reviewed 03/2024
+  - Home: index.md                        # reviewed 03/2024
   - EDA concepts: 
     - Reference architecture: concepts/eda.md     # reviewed 03/2024
     - From SOA to EDA: concepts/soa-eda.md
-    - Event backbone: concepts/backbone.md
+    - Messaging backbone: concepts/backbone.md
     - Legacy integration: concepts/legacy-itg.md  # reviewed 07/2024
     - Data pipeline: concepts/data-pipeline.md
   - Methodology:
@@ -28,31 +28,28 @@ nav:
     - Data lineage: patterns/data-lineage/index.md
     - Governance: patterns/governance/index.md     # updated 07/2024 - still need work
   - Demonstrations:
+    - Getting Started: demos/getting-started.md
     - GitOps - IaC: solutions/gitops_IaC/index.md
     - Real-time Inventory: https://jbcodeforce.github.io/eda-rt-inventory/
-  - OOS technologies:
+  - Technologies:
     - Kafka: techno/kafka/index.md     # reviewed 07/2024
     - Kafka FAQ: techno/kafka/faq.md   # reviewed 07/2024
-    - Kafka Producer: techno/kafka/producer.md
+    - Kafka Producer: techno/kafka/producer.md # reviewed 08/2024
     - Kafka Consumer: techno/kafka/consumer.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
     - Confluent: techno/confluent/index.md
-    #- Mirror Maker 2: techno/mirrormaker/index.md
+    - Mirror Maker 2: techno/mirrormaker/index.md
     - Flink: https://jbcodeforce.github.io/flink-studies
     - Active MQ: https://jbcodeforce.github.io/aws-messaging-study/activemq/
     - Rabbit MQ: https://jbcodeforce.github.io/aws-messaging-study/rabbitmq/
-  - AWS technologies:
-    - Duplicate with EB: solutions/autonomous-car/es-duplicate-evt.md
-    - Streaming: https://jbcodeforce.github.io/yarfba/kinesis
-    - MSK: https://jbcodeforce.github.io/yarfba/serverless/msk
+    - AWS duplicate with EB: solutions/autonomous-car/es-duplicate-evt.md
+    - AWS Kinesis: https://jbcodeforce.github.io/yarfba/kinesis
+    - AWS MSK: https://jbcodeforce.github.io/yarfba/serverless/msk
     - AWS messaging: https://jbcodeforce.github.io/aws-messaging-study
     - AWS SQS: https://jbcodeforce.github.io/aws-messaging-study/sqs/
-    - Autonomous Car Ride: https://jbcodeforce.github.io/autonomous-car-iac
-    
-  - IBM technologies: 
-    - Assets: ibm-assets.md
-    - MQ: techno/ibm-mq/index.md
+    - IBM Assets: ibm-assets.md
+    - IBM MQ: techno/ibm-mq/index.md
 theme: 
   name: material
   logo: images/logo.drawio.png
@@ -66,12 +63,12 @@ theme:
       - search.highlight
       - navigation.instant
       - navigation.instant.progress
-      # - navigation.tabs
-      #- navigation.tabs.sticky
+      - navigation.tabs
+      - navigation.tabs.sticky
       - navigation.instant
       - navigation.tracking
       - navigation.sections
-      #- navigation.expand
+      - navigation.expand
       - navigation.top
       - navigation.footer
 
