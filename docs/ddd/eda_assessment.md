@@ -81,7 +81,12 @@ This section lists a set of questions architects can use to assess the EDA deplo
 
 | Question | Response | Assessment |
 | --- | --- | --- |
+| What are you connecting in term of native applications ? | | |
 | Do you use change data capture today to get event from database? | | |
+| What are data replications ? | | |
+| Where are existing data sources ? | | |
+| Is there any SaaS integration for data source? | | |
+| Do we have requirements for private networking? | | |
 
 ### Event Sinks
 
@@ -89,6 +94,7 @@ This section lists a set of questions architects can use to assess the EDA deplo
 | --- | --- | --- |
 | Do you plan to use Lakehouse technology to persist event?  | | |
 | Do you plan to use database to persist data from event? | | |
+| Where are you connecting to? | | | 
 
 
 ## DevOps

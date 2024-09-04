@@ -1,13 +1,49 @@
 # Confluent Cloud
 
-SaaS offering for the Confluent platform on one of AWS, Azure or GCP cloud.
+SaaS offering for the Confluent platform on one of AWS, Azure or GCP cloud. It runs on its own private network that can be integrated with client virtual private network and on-premises network. 
 
-Below is a set of important information, facts, links on the offering.
+![High level View](./diagrams/hl-view-conf-cloud.drawio.png)
+
+When creating a cluster, developers are connected to the Confluent control plane and can select a cloud provider, then one of the possible regions (not all cloud provider regions are availble).
+
+![](./diagrams/cp-dp.drawio.png)
+
+Below is a set of important information, facts, links on the Confluent offering.
 
 ## Kakfa cluster
 
 * One environment can have multiple clusters
 * To access one API key/secret pair for each Kafka cluster
+* The potential deployment topology pattern for hybrid cloud:
+
+    * One time migration from on-premises Kafka cluster to a Confluent Cloud cluster - In fact in can also being steady state for data propagation to the cloud and may be datalake.
+
+        ![](./diagrams/topo-a.drawio.png)
+    
+    * The second topology, is when both clusters are exchanging data over private link:
+
+        ![](./diagrams/topo-b.drawio.png)
+
+    * The 3nd topology addresses the need to deploy at a global scale, with local market with data sovereignty constraint. Cloud clusters are used to agregate the data for global use, or for read access.
+
+        ![](./diagrams/topo-c.drawio.png)
+
+    * The last topology pattern is a pure cloud play, with different cloud providers, or different regions of the cloud provider, for disaster recovery.
+
+        ![](./diagrams/topo-d.drawio.png)
+
+
+## Networking
+
+Remember that:
+
+* Kafka uses TCP protocol, and get cluster metadata during the bootstrap connection. The broker endpoints is used to send or get data from the brokers. TLS. mTLS, SASL-SSL can be used to secure the connectin and authentication. Confluent Cloud uses SASL-SSL.
+* The traffic between client and broker could not go over a load balancer. The load balancing is done via the list of DNS names and ports of the brokers. To get this list, cliet connect to the advertise listener. 
+* Client apps can connect with TLS v1.2 over public endpoints.
+* Client apps running in VPC connect to Confluent VPC via VPC peering.
+* Client apps running on-premises may connect with Transit Gateway or Private Link.
+* When using public endpoint, Clients need access to internet without proxy. 
+* When using Kafka Connector source and sink connectors, running on Confluent Cloud, those connectors need to be able to accessible the sources over the internet from Confluent Cloud.
 
 ## Schema Registry
 

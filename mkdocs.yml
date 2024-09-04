@@ -37,6 +37,7 @@ nav:
     - Kafka Consumer: techno/kafka/consumer.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
+    - Confluent: techno/confluent/index.md
     #- Mirror Maker 2: techno/mirrormaker/index.md
     - Flink: https://jbcodeforce.github.io/flink-studies
     - Active MQ: https://jbcodeforce.github.io/aws-messaging-study/activemq/
