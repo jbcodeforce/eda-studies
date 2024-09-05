@@ -21,39 +21,42 @@ The following diagram illustrates those principles:
 
 ![](./diagrams/principles.drawio.png)
 
-When zooming in on the replication details, we can observe the source topics from the blue cluster being replicated to the target topics on the green cluster. This configuration is designed for disaster recovery, utilizing an active-passive model. In this setup, only the left side has active applications that are producing and consuming records from the Kafka topics.s
+When zooming in on the replication details, we can observe the source topics from the blue cluster being replicated to the target topics on the green cluster. This configuration is designed for disaster recovery, utilizing an active-passive model. In this setup, only the left side has active applications that are producing and consuming records from the Kafka topics.
 
- ![1](./images/mm2-dr.png)
+ ![1](./diagrams/mm2-dr.drawio.png)
 
-As the mirroring is over longer internet distance, then expect some latency in the data mirroring.
+Since the mirroring occurs over longer internet distances, some latency in data replication is to be expected.
 
-We can extend this deployment by using Mirror Maker 2 to replicate data over multiple clusters with a more active - active deployment which the following diagram illustrates the concepts for an "always-on" deployment:
+We can enhance this deployment by utilizing MirrorMaker 2 to replicate data across multiple clusters in a more active-active configuration. The following diagram illustrates the concepts for an "always-on" deployment:
 
- ![2](./images/mm2-multi-cluster.png)
+
+ ![2](./diagrams/mm2-multi-cluster.drawio.png)
+
+
 
 This model can also being used between cloud providers.
 
-In active - active mode the clusters get data injected in local cluster and replicated data injected from remote cluster. 
-The topic names are prefixed with the original cluster name. In the figure below, the cluster on the right has green local producers and consumers, 
-topics are replicated to the left, the blue cluster. Same for blue topic from the left to the right.
+In active-active mode, data is injected into the local cluster while replicated data is received from the remote cluster. The topic names are prefixed with the original cluster name. In the figure below, the cluster on the right features green local producers and consumers, with topics being replicated to the left into the blue cluster. Similarly, topics from the blue cluster on the left are replicated to the right
 
- ![3](./images/mm2-act-act.png)
 
-Consumers on both sides are getting data from the 'order' topics (local and replicated) to get a complete view of all the orders created on both sides. 
+ ![3](./diagrams/mm2-act-act.drawio.png)
 
-The following diagram zooms into a classical Web based solution design where mobile or web apps are going to a web tier to serve single page application, static content, and APIs.
 
-![](./images/classic-n-tier.png)
+Consumers on both sides receive data from the `orders` topics (both local and replicated) to gain a comprehensive view of all orders created across both clusters.
 
-Then a set of microservices implement the business logic, some of those services are event-driven, so they produce and consumer events from topics. When
-active-active replication is in place it, means the same topology is deployed in another data center and data from the same topic (business entity) arrive
-to the replicated topic. The service can save the record in its own database and cache. (The service Tier is not detailed with the expected replicas, neither the application load balancer displays routes to other data center)
+The following diagram provides a closer look at a classic web-based solution design, where mobile or web applications interact with a web tier to serve single-page applications, static content, and APIs.
 
-If there is a failure on one of the side of the data replication, the data are transparently available. A read model query will return the good result on both side.
+![](./diagrams/classic-n-tier.drawio.png)
 
-In replication, data in topic, topic states and metadata are replicated.
+A set of microservices implements the business logic, with some services being event-driven, producing and consuming events from topics. With active-active replication in place, the same topology is deployed in another data center, allowing data from the same topic (representing a business entity) to arrive at the replicated topic. Each service can then store the record in its own database and cache. (The service tier does not detail the expected replicas, and the application load balancer does not display routes to the other data center.)
 
-IBM Event Streams release 10.0 is supporting Mirror Maker 2 as part of the [geo-replication feature](https://ibm.github.io/event-streams/georeplication/about/).
+In the event of a failure on one side of the data replication, the data remains transparently accessible. A read model query will yield consistent results on both sides.
+
+In replication, the data within the topics, as well as topic states and metadata, are replicated.
+
+
+---
+
 
 ## Mirror Maker 2 components
 

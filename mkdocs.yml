@@ -19,6 +19,7 @@ nav:
     - Common patterns: patterns/index.md
     - Messaging vs events: patterns/events-versus-messages/index.md
     - Devising the data models: patterns/model/index.md
+    - API management: patterns/api-mgt/index.md
     - Saga: patterns/saga/index.md
     - Event Sourcing: patterns/event-sourcing/index.md
     - CQRS: patterns/cqrs/index.md
@@ -37,6 +38,7 @@ nav:
     - Kafka FAQ: techno/kafka/faq.md   # reviewed 07/2024
     - Kafka Producer: techno/kafka/producer.md # reviewed 08/2024
     - Kafka Consumer: techno/kafka/consumer.md
+    - Avro Schema: techno/avro-schemas/index.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
     - Confluent: techno/confluent/index.md

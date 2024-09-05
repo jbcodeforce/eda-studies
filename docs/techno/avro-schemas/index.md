@@ -1,53 +1,52 @@
 # Apache Avro, Data Schemas and Schema Registry
 
-???- Info Updates"
-  Created 01/2019  Last update 6/20/2022
+???+ Info "Updates"
+    Created 01/2019  Last update 9/05/2024
 
 This chapter describes what and why Avro and Schema registry are important elements of any event-driven solutions.
 
 ## Why this is important
 
-Loosely coupling and asynchronous communication between applications does not imply the absence of a contract to enforce certain constraints between producers and consumers.
+Loosely coupling and asynchronous communication between applications does not negate the need for a contract that enforces certain constraints between producers and consumers.
 
-When we refer to a contract, we can initially think of schemas, as we did with XSD. In the context of JSON, JSON Schema and Avro schemas can be utilized to define the data structure of messages. Given the need for metadata in messaging, [CloudEvents](https://cloudevents.io) has gained widespread acceptance as a specification for describing event data. Additionally, [AsyncAPI](../../patterns/api-mgt/#support-for-async-api) establishes standards for events and messaging in the asynchronous landscape from an API perspective. It combines message schemas, channels, and binding definitions, providing consumers with the essential information needed to access a data stream or queue.
 
-The contract is defined by a schema. From an event-driven architecture (EDA) design perspective, the producer is responsible for defining the schema, as it oversees the life cycle of the main business entities from which business events are generated. The producer ensures that the message complies with the schema for serialization.
+When we refer to a contract, schemas often come to mind, similar to how we used XSD. In the context of JSON, both JSON Schema and Avro schemas can be employed to define the data structure of messages. Given the importance of metadata in messaging, [CloudEvents](https://cloudevents.io) has become widely accepted as a specification for describing event data. Additionally, [AsyncAPI](../../patterns/api-mgt/index.md#support-for-async-api) establishes standards for events and messaging within the asynchronous landscape from an API perspective. It integrates message schemas, channels, and binding definitions, providing consumers with the critical information needed to access a data stream or queue.
 
-In addition to these specifications, various technologies support contract management, including schema registries and API managers. The following
-figure presents the foundations for integration between producers, schema registry and consumers.
+The contract is defined by a schema. From an event-driven architecture (EDA) design perspective, the producer is responsible for defining this schema, as it manages the life cycle of the main business entities from which business events are generated. The producer ensures that messages comply with the schema for serialization. While when using the command pattern, most likely with Queue, the consumer is the owner of the schema definition.
+
+In addition to these specifications, various technologies support contract management, including schema registries and API managers. The following figure illustrates the foundations for integration between producers, schema registries, and consumers.
 
 ![schema registry management](./diagrams/schema-registry.drawio.png)
 
-The Schema Registry offers producer and consumer APIs that allow them to determine whether the event they are about to produce or consume is compatible with previous versions or aligns with the expected version. To achieve this, both producers and consumers need access to the schema definition during serialization and deserialization.
+The Schema Registry provides producer and consumer APIs that enable them to determine whether the event they intend to produce or consume is compatible with previous versions or aligns with the expected version. For this process, both producers and consumers must access the schema definition during serialization and deserialization.
 
 These can be done either by:
 
-1. Reading the schema from a local resource to the producer application using a file, a variable, a property (or a kubernetes construct such as a configmap or a secret).
-2. Retrieving the schema definition from the Schema Registry given a name/ID.
+1. **Reading the schema** from a local resource in the producer application such as a file, variable, property, or a Kubernetes construct like a ConfigMap or Secret.
+1. **Retrieving the schema** definition from the Schema Registry using a name or ID.
 
-When the producer wants to send an event to a Kafka topic, two things happen:
+When a producer wants to send an event to a Kafka topic, two actions occur:
 
-1. The producer makes sure the event to be sent complies to the schema. Otherwise, it errors out.
-2. Determine  whether the event they are about to produce or consume is compatible with previous versions or compatible with the version they are expecting.
+1. The producer checks that the event complies with the schema. If it does not, an error is raised.
+1. The producer verifies whether the event is compatible with previous versions or aligns with the expected version.
 
-For the first action, the producer already has what it needs: the schema definition and the event that must comply with it. This enables the producer to perform the compliance check. However, for the second action, where the producer must ensure that the schema definition of the event is compatible with the existing schema for the relevant topic (if one exists), the producer may need to consult the Schema Registry.
+For the first action, the producer has what it needs: the schema definition and the event that must comply with it, enabling the compliance check. For the second action, where the producer must ensure that the event's schema definition is compatible with any existing schema for the relevant topic (if one exists), it may need to consult the Schema Registry.
 
-Producers (and consumers) maintain a local cache of schema definitions (and their versions) along with their unique global IDs, all retrieved from the Schema Registry, for the topics they wish to produce or consume events from. If the producer has a schema definition in its local cache that matches the schema definition required for the event's serialization, it can simply send the event, as the definitions match and the event complies with the schema.
+Producers (and consumers) maintain a local cache of schema definitions and their versions, along with unique global IDs, all retrieved from the Schema Registry for the topics they wish to produce or consume events from. If the producer has a schema definition in its local cache that matches the required schema for the event's serialization, it can send the event without issue.
 
-However, if the producer does not have a matching schema definition in its local cache—whether due to different versions or simply lacking the definition—it will contact the Schema Registry.
+However, if the producer does not have a matching schema definition in its local cache—either due to version differences or a lack of definition—it will contact the Schema Registry.
 
+If a matching schema definition for the relevant topic exists in the Schema Registry, the producer can retrieve the global unique ID for that schema definition and locally cache both the schema and its ID for future events. This avoids the need to contact the Schema Registry again.
 
-If a schema definition for the relevant topic that matches the schema definition required for serialization already exists in the Schema Registry, the producer can simply retrieve the global unique ID for that schema definition. It will then locally cache both the schema definition and its ID for future events, thereby avoiding the need to contact the Schema Registry again.
+If no matching schema definition exists in the Schema Registry, the producer must register the schema definition it has for that topic. This ensures that the schema is available for any consumer wishing to consume events that comply with it.
 
-If a schema definition for the relevant topic that matches the schema required for serialization does not already exist in the Schema Registry, the producer must register the schema definition it has on hand for that topic. This ensures that the schema is available for any consumer wishing to consume events that comply with it.
+To achieve this, the producer must be configured for auto-registration of schemas and provided with the appropriate credentials, especially if the Schema Registry implements role-based access control (RBAC).
 
-To achieve this, the producer must be configured for auto-registration of schemas and provided with the appropriate credentials to register schema definitions, especially if the Schema Registry implements any form of role-based access control (RBAC).
+If the producer is not configured for auto-registration or lacks the necessary credentials, the send event action will fail until a compatible schema definition for the relevant topic is registered in the Schema Registry.
 
-If the producer is not configured to auto-register schema definitions or if its credentials do not permit registration, the send event action will fail. This will persist until a schema definition for the relevant topic, matching the schema required for serialization, is registered in the Schema Registry.
+If the producer is configured for auto-registration and has the required credentials, the Schema Registry will validate the compatibility of the current schema definition with any existing definitions for the relevant topic. This ensures that if the schema being registered is a newer version, it remains compatible, preventing any negative impact on consumers.
 
-If the producer is configured to auto-register schema definitions and has the necessary credentials, the Schema Registry validates the compatibility of the current schema definition required for serialization with any existing schema definitions for the relevant topic. This ensures that if the schema definition being registered is a newer version, it remains compatible, preventing any negative impact on consumers.
-
-Once the schema definition or the new version of an existing schema is successfully registered in the Schema Registry, the producer retrieves its global unique ID to keep its local cache up to date.
+Once the schema definition or a new version of an existing schema is successfully registered in the Schema Registry, the producer retrieves its global unique ID to keep its local cache up to date.
 
 
 !!! Warning
@@ -80,28 +79,31 @@ like Kafka, Postgresql, Infinispan and supports different deployment models.
 
 #### Registry Characteristics
 
-* Apicurio Registry is a datastore for sharing standard event schemas and API designs across API and event-driven architectures.
 * The registry supports adding, removing, and updating the following types of artifacts: OpenAPI, AsyncAPI, GraphQL, Apache Avro, Google protocol buffers, JSON Schema, Kafka Connect schema, WSDL, XML Schema (XSD).
-* Schema can be created via Web Console, core REST API or Maven plugin
+* Schema can be created via Web Console, core REST API or Maven plugin.
 * It includes configurable rules to control the validity and compatibility.
 * Client applications can dynamically push or pull the latest schema updates to or from Apicurio Registry at runtime.
+
 Apicurio is compatible with existing Confluent schema registry client applications.
+
 * It includes client serializers/deserializers (Serdes) to validate Kafka and other message types at runtime.
-* Operator-based installation of Apicurio Registry on OpenShift
+* Operator-based installation of Apicurio Registry on Kubernetes and OpenShift
 * Use the concept of artifact group to collect schema and APIs logically related.
 * Support search for artifacts by label, name, group, and description
 
 When using Kafka as persistence, special Kafka topic `<kafkastore.topic>` (default `_schemas`), with a single partition, is used as a highly available write ahead log. 
+
 All schemas, subject/version and ID metadata, and compatibility settings are appended as messages to this log. 
-A Schema Registry instance therefore both produces and consumes messages under the `_schemas` topic. 
-It produces messages to the log when, for example, new schemas are registered under a subject, or when updates to 
-compatibility settings are registered. Schema Registry consumes from the `_schemas` log in a background thread, and updates its local 
-caches on consumption of each new `_schemas` message to reflect the newly added schema or compatibility setting. 
-Updating local state from the Kafka log in this manner ensures durability, ordering, and easy recoverability.
+
+A Schema Registry instance both produces and consumes messages under the `_schemas` topic. 
+It produces messages to the log when, for instance, new schemas are registered under a subject, or when updates to 
+compatibility settings are made. The Schema Registry consumes from the `_schemas` log in a background thread, updating its local 
+caches with each new message to reflect the added schema or compatibility setting.
+
+This approach to updating local state from the Kafka log ensures durability, ordering, and easy recoverability.
 
 
-The way Apicur.io has to handle schema association to topics is by schema name. Given we have a topic called orders, 
-the schemas that will apply to it are avros-key (when using composite key) and orders-value (most likely based on CloudEvents and then custom payload).
+Apicur.io handles schema association to topics by schema name. For example, if we have a topic called orders, the schemas that apply to it would be avros-key (when using a composite key) and orders-value (which is likely based on CloudEvents and includes a custom payload).
 
 ## Apache Avro
 
@@ -109,14 +111,14 @@ Avro is an open source data serialization system that helps with data exchange b
 
 ### Why Apache Avro
 
-There are several websites that discuss the Apache Avro data serialization system benefits over other messaging data protocols. A simple google search will list dozens of them. Here, we will highlight just a few from a [Confluent blog post](https://www.confluent.io/blog/avro-kafka-data/):
+Here’s a concise overview of the benefits of Apache Avro based on the [Confluent blog post](https://www.confluent.io/blog/avro-kafka-data/):
 
-- It has a direct mapping to and from JSON
-- It has a very compact format. The bulk of JSON, repeating every field name with every single record, is what makes JSON inefficient for high-volume usage.
-- It is very fast.
-- It has great bindings for a wide variety of programming languages so you can generate Java objects that make working with event data easier, but it does not require code generation so tools can be written generically for any data stream.
-- It has a rich, extensible schema language defined in pure JSON
-- It has the best notion of compatibility for evolving your data over time.
+* **Direct Mapping to JSON:** Avro supports seamless conversion between its binary format and JSON, making it versatile for various applications.
+* **Compact Format:** Unlike JSON, which repeats field names for every record, Avro’s compact format minimizes data size, enhancing efficiency for high-volume usage.
+* **Speed:** Avro is designed for fast serialization and deserialization, improving performance in data processing.
+* **Language Bindings:** It offers extensive bindings for multiple programming languages, allowing developers to generate Java objects easily. Moreover, it enables generic tools for any data stream without needing code generation.
+* **Rich Schema Language:** Avro features a robust, extensible schema language defined in pure JSON, facilitating clear data definitions.
+* **Compatibility:** Avro provides an effective mechanism for managing schema evolution, ensuring that data formats can adapt over time without breaking existing consumers.
 
 ## Data Schemas
 
@@ -124,14 +126,14 @@ Avro relies on schemas. When Avro data is produced or read, the Avro schema for 
 
 ### How does a data schema look like?
 
-Let's see how a data schema to define a person's profile in a bank could look like:
+Let's see how a data schema to define a person's profile:
 
 ```json
 {
   "namespace": "banking.schemas.demo",
   "name": "profile",
   "type": "record",
-  "doc": "Data schema to represent a profile for a banking entity",
+  "doc": "Data schema to represent a person profile for a banking domain",
   "fields ": [
     {
       "name": "name",
@@ -156,7 +158,8 @@ Let's see how a data schema to define a person's profile in a bank could look li
         "name": "genderEnum",
         "symbols": [
           "male",
-          "female"
+          "female",
+          "Other"
         ]
       }
     }
@@ -199,7 +202,7 @@ In the picture below we see two messages, one complies with the above Apache Avr
 
 ![data examples](./images/data_examples.png)
 
-You might start realising by now the benefits of having the data flowing into your Apache Kafka event backbone validated against a schema. See next section for more.
+You may begin to recognize the advantages of validating data flowing into your Apache Kafka event backbone against a schema. This validation not only ensures data quality but also enhances consistency and interoperability across different systems.
 
 For more information on the Apache Avro Data Schema specification see <https://avro.apache.org/docs/current/spec.html>
 
@@ -209,17 +212,6 @@ For more information on the Apache Avro Data Schema specification see <https://a
 - **Robustness**: They protect downstream data consumers from malformed  data, as only valid data will be permitted in the topic. They let the producers or consumers of data streams know the right fields are need in an event and what type each field is (contract for microservices).
 - **Compatibility**: model and handle change in data format.
 
-## Avro, Kafka and Schema Registry
-
-In this section we try to put all the pieces together for the common flow of sending and receiving messages through an event backbone 
-such as kafka having those messages serialized using the Apache Avro data serialization system and complying with their respective messages 
-that are stored and managed by a schema registry.
-
-Avro relies on schemas. When Avro data is produced or read, the Avro schema for such piece of data is always present. An Avro schema defines 
-the structure of the Avro data format. Schema Registry defines a scope in which schemas can evolve, and that scope is the subject. 
-The name of the subject depends on the configured subject name strategy, which by default is set to derive subject name from topic name.
-
-In this case, the messages are serialized using Avro and sent to a kafka topic. Each message is a key-value pair. Either the message key or the message value, or both, can be serialized as Avro. Integration with Schema Registry means that Kafka messages do not need to be written with the entire Avro schema. Instead, Kafka messages are written with the **schema id**. The producers writing the messages and the consumers reading the messages must be using the same Schema Registry to get the same mapping between a schema and schema id.
 
 ## More reading
 

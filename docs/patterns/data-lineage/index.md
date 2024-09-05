@@ -118,7 +118,7 @@ Metadata about the event can be added as part of the `field` definition, and sho
 
 The classical integration with schema registry is presented in the figure below:
 
-![](../../techno/avro-schemas/images/schema-registry.png)
+![](../../techno/avro-schemas/diagrams/schema-registry.drawio.png)
 
 Schema registry can be deployed in different data centers and serves multi Kafka clusters. For DR, you need to use a 'primary' server and one secondary in different data center. Both will receive schema update via DevOps pipeline. One of the main open source Schema Registry is [Apicurio](https://www.apicur.io/), which is integrated with Event Streams and in most of our implementation. Apicurio can persist schema definition inside Kafka Topic and so schema replication can also being synchronize via Mirror Maker 2 replication. If Postgresql is used for persistence then postgresql can be used for replicating schemas.
 

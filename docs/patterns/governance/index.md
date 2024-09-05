@@ -36,7 +36,7 @@ In the context of event-driven architecture (EDA), the 'fit for purpose' assessm
 
 ## Architecture patterns
 
-We have already described in [this section](../../eda/#components-of-the-architecture) as set of event-driven architecture patterns that can be leveraged while establishing EDA practices which includes how to integrate with data in topic for doing feature engineering. 
+We have already described in [this chapter](../../concepts/eda.md#components-of-the-architecture) as set of event-driven architecture patterns that can be leveraged while establishing EDA practices which includes how to integrate with data in topic for doing feature engineering. 
 
 Legacy integration and coexistence between legacy applications or mainframe transactional application and microservices is presented in [this section](../../concepts/legacy-itg.md).
 
@@ -74,7 +74,7 @@ Data governance is a well established practices in most companies. Solutions nee
 In the context of event-driven architecture, one focus will be to ensure re-use of event topics, 
 control the schema definition, have a consistent and governed ways to manage topic as service, 
 domain and event data model definition, access control, encryption and traceability. 
-As this subject is very important, we have started to address it in a [separate 'data lineage' note](../../methodology/data-lineage/).
+As this subject is very important, we have started to address it in a [separate 'data lineage' note](../../patterns/data-lineage/index.md).
 
 ## Deployment Strategy
 

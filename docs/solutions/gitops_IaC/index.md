@@ -44,7 +44,7 @@ Schema definitions are managed by a **Schema Registry**.
 
 ### Event-streaming applications
 
-Event-streaming applications support stateful processing using [Kafka Stream](../../techno/kstreams/) APIs or [Apache Flink](https://jbcodeforce.github.io/flink-studies/).
+Event-streaming applications support stateful processing using [Kafka Stream](../../techno/kstreams/index.md) APIs or [Apache Flink](https://jbcodeforce.github.io/flink-studies/).
 
 ### Kafka Cluster
 
