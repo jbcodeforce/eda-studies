@@ -29,6 +29,7 @@ nav:
     - Governance: patterns/governance/index.md     # updated 07/2024 - still need work
   - Demonstrations:
     - Getting Started: demos/getting-started.md
+    - Security: solutions/security/index.md
     - GitOps - IaC: solutions/gitops_IaC/index.md
     - Real-time Inventory: https://jbcodeforce.github.io/eda-rt-inventory/
   - Technologies:
@@ -60,6 +61,7 @@ theme:
   features:
       - content.code.annotate
       - content.tooltips
+      - content.code.copy
       - search.highlight
       - navigation.instant
       - navigation.instant.progress
@@ -98,7 +100,10 @@ markdown_extensions:
       permalink: true
       toc_depth: 3
   - pymdownx.tabbed
-  - pymdownx.highlight
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.details

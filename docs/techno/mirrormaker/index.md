@@ -2,26 +2,26 @@
 
 !!! warning "Under construction"
 
-This section introduces [**Mirror Maker 2.0**](https://kafka.apache.org/documentation/#georeplication-overview), the replication feature of Kafka 2.4, and how it can be used, along with best practices, for data replication between two Kafka clusters. 
-Mirror Maker 2.0 was defined as part of the Kafka Improvement Process - [KIP 382](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0) and can be used
-for disaster recovery (active / passive) or for more complex topology with multiple Kafka Clusters to support "always-on" architecture.
+This section introduces [**Mirror Maker 2.0**](https://kafka.apache.org/documentation/#georeplication-overview), a replication feature of Kafka 2.4, detailing its usage and best practices for data replication between two Kafka clusters. 
+Mirror Maker 2.0 was defined as part of the Kafka Improvement Process - [KIP 382](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0) - and can be used for disaster recovery (active / passive) or for more complex topologies involving multiple Kafka Clusters to support an "always-on" architecture.
 
 ## Overview
 
-* Mirror Maker is built on top of Kafka Connect and it is used to replicate topics and consumer groups metadata by preserving partitioning.
-* OpenShift clusters are defined in both region and spread among the three data centers. For a better view of the golden topology for OpenShift [see this diagram](https://github.com/ibm-cloud-architecture/eda-tech-academy/blob/main/docs/demo/images/es-golden-topo.png)  with master, worker nodes deployment.
-* At least two Kafka clusters are defined, one as `source` in the active region and one `target` for disaster recovery or passive region.
-* Source cluster has producer and consumer applications deployed in the same OpenShift Cluster or deployed on VMs and accessing the Kafka brokers via network load balancer.
-* Producer, consumer or streaming applications deployed within OpenShift use the `bootstrap URL` to kafka broker via internal service definition. Something like `es-prod-kafka-bootstrap.ibm-eventstreams.svc`.
-With such configuration their setting will be the same on the target cluster.
-* The target cluster has the mirror maker cluster which is based on the Kafka connect framework.
+* Mirror Maker is built on top of Kafka Connect and and is designed to replicate topics and consumer group metadata while preserving partitioning.
+* At least two Kafka clusters are established: one designated as the source in the active region and another as the target for disaster recovery or passive use.
+* The source cluster hosts producer and consumer applications, which can be deployed either within the same Kubernetes cluster or on VMs, accessing Kafka brokers.
+* Producer, consumer, or streaming applications deployed in Kubernetes connect to the Kafka broker using the `bootstrap URL`, defined through an internal service. For example, it may look like `es-prod-kafka-bootstrap.ibm-eventstreams.svc.` This configuration ensures that the settings remain consistent across the target cluster.
+* Kubernetes / OpenShift clusters are defined across three data centers, with a well-structured distribution. For a clearer understanding of the golden topology for OpenShift, refer to the following diagram, which illustrates the deployment of master and worker nodes.
+
+  ![](./images/k8s-golden-topo.png)
+
+* The target cluster hosts a MirrorMaker cluster, which operates based on the Kafka Connect framework.
 
 The following diagram illustrates those principles:
 
-![](./images/principles.png)
+![](./diagrams/principles.drawio.png)
 
-When zooming into what need to be replicated, we can see source topics from the blue cluster to target topics on the green cluster. 
-This configuration is for disaster recovery, with a active - passive model, where only the left side has active applications producing and consuming records from Kafka Topics.
+When zooming in on the replication details, we can observe the source topics from the blue cluster being replicated to the target topics on the green cluster. This configuration is designed for disaster recovery, utilizing an active-passive model. In this setup, only the left side has active applications that are producing and consuming records from the Kafka topics.s
 
  ![1](./images/mm2-dr.png)
 
