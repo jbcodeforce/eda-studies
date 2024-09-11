@@ -45,15 +45,41 @@ Remember that:
 * When using public endpoint, Clients need access to internet without proxy. 
 * When using Kafka Connector source and sink connectors, running on Confluent Cloud, those connectors need to be able to accessible the sources over the internet from Confluent Cloud.
 
-## Schema Registry
+## [Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html)
 
-* One registry per environment, created in the same region as the first kafka cluster is created, but can manage future clusters in other regions.
-* In multi-tenant deployments, one physical Schema Registry per cloud and geographic region, hosts many logical schema registries. Confluent Cloud uses API keys that are resource scoped for Schema Registry clusters to store schemas and route requests to the appropriate logical clusters.
-* This is different API key than the one to access the kafka cluster
+* One registry per environment, created in the same region as the first kafka cluster is created, but can manage future clusters in other regions. A schema registry is local to a kafka cluster as it persists state in topic.
+* The schema registry is stateless and keep state in Kafka. Multiple instance of the Schema registry can run in parallel, they will be a node supporting the write operation, and any node can serve a READ. All nodes know how to forward requests to the primary for WRITEs.
+* If one Schema Registry node goes down, another node is elected leader and the cluster auto-recovers.
+* In multi-tenant deployments, one physical Schema Registry cluster per cloud and geographic region, hosts many logical schema registries.
 * At the environment level, developers may view and search schemas, monitor usage, and set a compatibility mode for schemas. 
-* Still compatibility mode can be overrided anged at the topic/schema level. The default is backward compatibility: consumer can consume older message, as default values are added to new attributes.
-* *Foward* compatibility means that data produced with a new schema can be read by consumers using the last schema, or the schema before. [See details in compatibility note](https://docs.confluent.io/cloud/current/sr/fundamentals/schema-evolution.html#summary). With *Foward* compatibility mode, consumers aren’t guaranteed to be able to read old messages.
+
+![](./diagrams/registry.drawio.png){ align=center}
+
+* Possible to deploy into two regions with replicator and so one data center is the primary, with manual promotion for a secondary to become a primary. 
+
+* Spanning multiple datacenters (DCs) with your Confluent Schema Registry synchronizes data across sites, 
+
+![](./diagrams/registry-2dc.drawio.png)
+
+* The Schema Registry nodes in both datacenters link to the primary Kafka cluster in DC A, and the secondary datacenter (DC B) forwards Schema Registry writes to the primary (DC A). Schema Registry instances in DC B have `leader.eligibility` set to false, meaning that none can be elected leader during steady state operation with both datacenters online.
+* Replication replicates also topic for the schema persistence.
+* Producers write data to just the active cluster. 
+* Consumers can read from both regions.
+* Access Control List needs to be replicated too
+
+* Confluent Cloud uses API keys that are resource scoped for Schema Registry clusters to store schemas and route requests to the appropriate logical clusters.
+
+![](./diagrams/registry-saas.drawio.png)
+
+* This is a different API key than the one to access the kafka cluster
 * When apps are in VPC, the VPC needs to be able to communicate with  Confluent Cloud public end point on port 443
+
+
+### Schema management 
+
+* Still compatibility mode can be overrided at the topic/schema level. The default is backward compatibility: consumer can consume older messages, as default values are added to new attributes.
+* *Foward* compatibility means that data produced with a new schema can be read by consumers using the last schema, or the schema before. [See details in compatibility note](https://docs.confluent.io/cloud/current/sr/fundamentals/schema-evolution.html#summary). With *Foward* compatibility mode, consumers aren’t guaranteed to be able to read old messages.
+
 * Stream governance feature helps addressing data governance
 * Schema can be created via CLI, REST API, Console or Maven plugin to be used during CI/CD
 * Schema is associated to topic, with mechanism to support backward compatibility

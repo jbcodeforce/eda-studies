@@ -46,7 +46,7 @@ Among the later components to deploy, we have included everything necessary to m
 
 ### Event-driven applications
 
-Event-driven applications support business logic, are microservice-based, and utilize reactive messaging, MQ, or Kafka APIs. These applications provide OpenAPIs for mobile and web applications, as well as AsyncAPI specifications when producing events to Kafka or messages to MQ. OpenAPI and AsyncAPI definitions are managed by the API manager and the event endpoint manager.
+Event-driven applications support business logic, are based on microservices, and utilize reactive messaging through message queues (MQ) or Kafka APIs. These applications offer OpenAPIs for mobile and web applications and provide AsyncAPI specifications for producing events to Kafka or messages to MQ. Both OpenAPI and AsyncAPI definitions are managed by the API manager and the event endpoint manager.
 
 ![](./diagrams/eda-dev-govern.drawio.png)
 
