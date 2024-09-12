@@ -71,16 +71,24 @@ Be aware that non-Java consumers may use a C library that also requires the sche
 
 ## Schema Serialization Approaches
 
+
 ### Avro
 
-[Apache Avro](https://avro.apache.org/docs/1.11.1/getting-started-java/) is used for serializing data and defining schemas. It was developed within the Hadoop project and is particularly popular in big data ecosystems. The core values are:
+[Apache Avro](https://avro.apache.org/docs/1.11.1/getting-started-java/) is an open source data serialization framework that helps with data exchange between systems, programming languages, and processing frameworks. Avro helps define a binary format for the data, as well as map it to the programming language of your choice.
 
-* **Schema evolution**: Avro has excellent support for schema evolution, allowing for easy updates to data structures without breaking compatibility. 
+It was developed within the Hadoop project and is particularly popular in big data ecosystems. The core values are:
+
+Here’s a concise overview of the benefits of Apache Avro based on the [Confluent blog post](https://www.confluent.io/blog/avro-kafka-data/):
+
+* **Direct Mapping to JSON:** Avro supports seamless conversion between its binary format and JSON, making it versatile for various applications.
+* **Compact Format:** Unlike JSON, which repeats field names for every record, Avro’s compact format minimizes data size, enhancing efficiency for high-volume usage. Schemas are readable, and as data is in binary format, it is well fitted for systems requiring efficient serialization.
 * **Dynamic typing:** Avro supports dynamic typing, which can be more flexible than Protobuf's static typing in some scenarios.
 * **Self-describing data:** Avro data files include the schema, making them self-describing and easier to work with in some contexts.
 * **Rich data structures:** Avro supports complex data types like unions, which can be useful in certain scenarios.
-* **Language support**: While not as widespread as Protobuf, Avro has good language support, especially in the Java ecosystem.
-* Schema is readable, but data is in binary format, it is well fitted for systems requiring efficient serialization.
+* **Speed:** Avro is designed for fast serialization and deserialization, improving performance in data processing.
+* **Language Bindings:** It offers extensive bindings for multiple programming languages, allowing developers to generate Java objects easily. Moreover, it enables generic tools for any data stream without needing code generation. While not as widespread as Protobuf, Avro has good language support, especially in the Java ecosystem.
+* **Rich Schema Language:** Avro features a robust, extensible schema language defined in pure JSON, facilitating clear data definitions.
+* **Schema evolution**: Avro provides an effective mechanism for managing schema evolution, ensuring that data formats can adapt over time without breaking compatibility.
 
 It has a maven integration to generate Java POJO from schema. 
 
@@ -121,7 +129,22 @@ Some challenges:
 
 Avro can be slower than Protobuf for serialization/deserialization
 
-## Schema Registry Technology
+## Schema Registry Technologies
+
+### Confluent Schema Registry
+
+The [Confluent Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html) is primarily designed for Kafka ecosystems but can be used with other systems. It supports Avro, JSON Schema, and Protobuf formats. It provides schema versioning and compatibility checks (backward, forward, full) and offers rich REST API for schema management and retrieval.
+
+* Best for organizations using Kafka for event-driven architectures and streaming data pipelines.
+* Suitable for managing complex schema evolution and compatibility scenarios.
+* It is more platform-agnostic and integrates seamlessly with Confluent Kafka and other Kafka clients. 
+* Provides compatibility with various data streaming and processing frameworks beyond Kafka, such as Spark and Flink.
+* Pricing can depend on whether you use the open-source version or the Confluent Cloud service.
+* Confluent Cloud offers a managed service with a subscription model based on usage.
+* Strong community support, especially for Kafka users.
+* Comprehensive documentation and robust community resources
+
+The Confluent Schema Registry attaches the schema identifier by storing it as part of the Kafka message key or value payload after a Magic Byte, which increases the payload size by 5 bytes. 
 
 ### Apicurio
 
@@ -137,8 +160,10 @@ Can be deployed in Kubernetes platform, and managed by operator. It supports HA 
 #### Registry Characteristics
 
 * The registry supports adding, removing, and updating the following types of artifacts: OpenAPI, AsyncAPI, GraphQL, Apache Avro, Google protocol buffers, JSON Schema, Kafka Connect schema, WSDL, XML Schema (XSD).
-* Schema can be created via Web Console, core REST API or Maven plugin.
+* Schema can be created via Web Console, a user friendly interface to manage client and core REST APIs usable for CI/CD pipelines and Maven plugin.
 * It includes configurable rules to control the validity and compatibility.
+* It can be integrated with various applications and services but is not tied to a specific ecosystem.
+* It is suitable for microservices architectures and cloud-native applications.
 * Client applications can dynamically push or pull the latest schema updates to or from Apicurio Registry at runtime.
 
 Apicurio is compatible with existing Confluent schema registry client applications.
@@ -158,24 +183,20 @@ compatibility settings are made. The Schema Registry consumes from the `_schemas
 caches with each new message to reflect the added schema or compatibility setting.
 
 This approach to updating local state from the Kafka log ensures durability, ordering, and easy recoverability.
-
-
+ 
 Apicur.io handles schema association to topics by schema name. For example, if we have a topic called orders, the schemas that apply to it would be avros-key (when using a composite key) and orders-value (which is likely based on CloudEvents and includes a custom payload).
 
-## Apache Avro
+### AWS Glue Schema Registry
 
-Avro is an open source data serialization system that helps with data exchange between systems, programming languages, and processing frameworks. Avro helps define a binary format for your data, as well as map it to the programming language of your choice.
+[AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html) is used in AWS service to manage and enforce schemas on your data streaming applications using convenient integrations with Apache Kafka, Amazon Managed Streaming for Apache Kafka, Amazon Kinesis Data Streams, Amazon Managed Service for Apache Flink, and AWS Lambda. It supports Avro, JSON Schema, and Protobuf formats, offers versioning and validation of schemas, and integrates with AWS Identity and Access Management (IAM) for security.
 
-### Why Apache Avro
+* for organizations using AWS for data lakes, ETL, and real-time data processing.
+* Useful for managing data schemas in serverless architecture
+* Need to assess performance and total cost of ownership
+* Pricing is based on the number of registered schemas and requests made.
+* Costs can vary depending on the AWS services used in conjunction.
 
-Here’s a concise overview of the benefits of Apache Avro based on the [Confluent blog post](https://www.confluent.io/blog/avro-kafka-data/):
-
-* **Direct Mapping to JSON:** Avro supports seamless conversion between its binary format and JSON, making it versatile for various applications.
-* **Compact Format:** Unlike JSON, which repeats field names for every record, Avro’s compact format minimizes data size, enhancing efficiency for high-volume usage.
-* **Speed:** Avro is designed for fast serialization and deserialization, improving performance in data processing.
-* **Language Bindings:** It offers extensive bindings for multiple programming languages, allowing developers to generate Java objects easily. Moreover, it enables generic tools for any data stream without needing code generation.
-* **Rich Schema Language:** Avro features a robust, extensible schema language defined in pure JSON, facilitating clear data definitions.
-* **Compatibility:** Avro provides an effective mechanism for managing schema evolution, ensuring that data formats can adapt over time without breaking existing consumers.
+If you are predominantly using AWS services, Glue Schema Registry may be the better fit. Conversely, if your infrastructure is heavily based on Kafka, Confluent Schema Registry would likely be more advantageous.
 
 ## Data Schemas
 
@@ -268,7 +289,6 @@ For more information on the Apache Avro Data Schema specification see <https://a
 - **Clarity and Semantics**: They document the usage of the event and the meaning of each field in the "doc" fields.
 - **Robustness**: They protect downstream data consumers from malformed  data, as only valid data will be permitted in the topic. They let the producers or consumers of data streams know the right fields are need in an event and what type each field is (contract for microservices).
 - **Compatibility**: model and handle change in data format.
-
 
 ## More reading
 

@@ -11,10 +11,10 @@ nav:
     - Legacy integration: concepts/legacy-itg.md  # reviewed 07/2024
     - Data pipeline: concepts/data-pipeline.md
   - Methodology:
-    - Event Storming: event-storming/index.md
-    - Domain driven design: ddd/index.md
-    - EDA Assessment : ddd/eda_assessment.md
-    - Vaccine Examples: event-storming/vaccine-dt-es-ddd.md
+    - Event Storming: methodology/event-storming/index.md
+    - Domain driven design: methodology/ddd/index.md
+    - EDA Assessment : methodology/ddd/eda_assessment.md
+    - Vaccine Examples: methodology/event-storming/vaccine-dt-es-ddd.md
   - Design patterns:
     - Common patterns: patterns/index.md
     - Messaging vs events: patterns/events-versus-messages/index.md
@@ -29,7 +29,7 @@ nav:
     - Data lineage: patterns/data-lineage/index.md
     - Governance: patterns/governance/index.md     # updated 07/2024 - still need work
   - Demonstrations:
-    - Getting Started: demos/getting-started.md
+    - Getting Started: methodology/getting-started.md
     - Security: solutions/security/index.md
     - GitOps - IaC: solutions/gitops_IaC/index.md
     - Real-time Inventory: https://jbcodeforce.github.io/eda-rt-inventory/
