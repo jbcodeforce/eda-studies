@@ -6,7 +6,7 @@ nav:
   - Home: index.md                        # reviewed 03/2024
   - EDA concepts: 
     - Reference architecture: concepts/eda.md     # reviewed 03/2024
-    - From SOA to EDA: concepts/soa-eda.md
+    - From SOA to EDA: concepts/soa-eda.md        # reviewed 07/2024
     - Messaging backbone: concepts/backbone.md
     - Legacy integration: concepts/legacy-itg.md  # reviewed 07/2024
     - Data pipeline: concepts/data-pipeline.md
@@ -38,7 +38,7 @@ nav:
     - Kafka FAQ: techno/kafka/faq.md   # reviewed 07/2024
     - Kafka Producer: techno/kafka/producer.md # reviewed 08/2024
     - Kafka Consumer: techno/kafka/consumer.md
-    - Avro Schema: techno/avro-schemas/index.md
+    - Schema Mgt: techno/avro-schemas/index.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
     - Confluent: techno/confluent/index.md

@@ -1,5 +1,9 @@
 # From SOA to EDA
 
+???- Info "Chapter updated 07/2024"
+    **This page content reviewed 07/2024**
+    Created 09/2023
+
 I will take a imaginary business case of car ride on autonomous vehicles. 
 
 For this discussion, the simplest requirements include, booking a ride to go from one location to another location, manage a fleet of autonomous cars, get payment from the customer once the trip is done, get estimation for the ride duration and price to present a proposition to the end-users.   
@@ -44,3 +48,4 @@ In the autonomous car ride example, choreography may be used, as it seems that s
 * Another argument is related to availability: if one of the service is not responding quickly, then all the components in the calling chain are impacted. And in case of outages, if one component fails, error will propagate back to caller chain. There are patterns to handle such issues, like circuit breaker, throttling, or bulkhead. Now this is true, asynchronous processing helps to support failure and slower services.
 
 
+[>>> Next : Message backbone](backbone.md)

@@ -1,5 +1,10 @@
 # Event-driven architecture
 
+
+???- Info "Chapter updated 07/2024"
+    **This page content reviewed 07/2024**
+    Created 2018
+
 ## Components of the architecture
 
 To provide a comprehensive understanding of event-driven architecture (EDA) and its high-level building blocks, it is crucial to consider the following components without any technology bias. The diagram below illustrates these components:
@@ -180,3 +185,6 @@ can be done with different technologies like [Kafka Streams](../techno/kstreams/
 capabilities are needed to offer excellent response time, high throughput and low latency. 
 
 It is a simpler alternative to the Lambda Architecture – as all data is treated as if it were a stream. Both architectures entail the storage of historical data to enable large-scale analytics.
+
+
+[>>> Next : From SOA to EDA](soa-eda.md)

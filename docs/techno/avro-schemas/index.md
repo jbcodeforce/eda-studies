@@ -2,6 +2,7 @@
 
 ???+ Info "Updates"
     Created 01/2019  Last update 9/05/2024
+    Work in progress
 
 This chapter describes what and why Avro and Schema registry are important elements of any event-driven solutions.
 
@@ -68,14 +69,70 @@ The global unique ID can be located either in the event headers or within the ev
 
 Be aware that non-Java consumers may use a C library that also requires the schema definition for the deserializer, as opposed to allowing the deserializer to retrieve the schema definition from the Schema Registry, as explained above. The strategy should involve loading the schema from the Schema Registry via an API. See [Kafka python reported issue](https://github.com/confluentinc/confluent-kafka-python/issues/834)
 
-## Schema Registry
+## Schema Serialization Approaches
+
+### Avro
+
+[Apache Avro](https://avro.apache.org/docs/1.11.1/getting-started-java/) is used for serializing data and defining schemas. It was developed within the Hadoop project and is particularly popular in big data ecosystems. The core values are:
+
+* **Schema evolution**: Avro has excellent support for schema evolution, allowing for easy updates to data structures without breaking compatibility. 
+* **Dynamic typing:** Avro supports dynamic typing, which can be more flexible than Protobuf's static typing in some scenarios.
+* **Self-describing data:** Avro data files include the schema, making them self-describing and easier to work with in some contexts.
+* **Rich data structures:** Avro supports complex data types like unions, which can be useful in certain scenarios.
+* **Language support**: While not as widespread as Protobuf, Avro has good language support, especially in the Java ecosystem.
+* Schema is readable, but data is in binary format, it is well fitted for systems requiring efficient serialization.
+
+It has a maven integration to generate Java POJO from schema. 
+
+### Json
+
+[JSON Schema](https://json-schema.org/learn/getting-started-step-by-step) is another important tool for defining the structure of JSON data. The main values are the same than avro: data validation, human readable documentation of the data structure, code generation from JSON Schema, interoperability as it is supported by various programming language.
+
+Developers already familiar with JSON find it easy to adopt. But is verbose, schemas can become quite lengthy for complex data structures.
+
+The major issues are: 
+
+* Validation can be slower compared to binary formats like Avro or Protobuf.
+* Schema evolution is not as seamless as with Avro.
+
+### Protobuf
+
+[Protobuf](https://protobuf.dev/getting-started/) (Protocol Buffers) is a language-agnostic interface definition language developed by Google. 
+
+Protobuf allows developers to define the structure of their data using a simple language-agnostic specification. This definition can then be used to generate code in various programming languages, enabling easy serialization and deserialization of structured data.
+
+The advantages:
+
+* **Efficiency**: Protobuf serializes data into a compact binary format, resulting in smaller message sizes compared to text-based formats like JSON or XML.
+* **Speed:** Binary serialization and deserialization are generally faster than text-based alternatives.
+* **Language-agnostic:** Protobuf supports code generation for multiple programming languages, facilitating interoperability between different systems.
+* **Backward and forward compatibility:** Protobuf's schema evolution rules make it easier to update message definitions without breaking existing systems.
+* **Strong typing:** The schema definition provides clear data types, reducing errors and improving code quality.
+* **Tooling support:** Many tools and frameworks support Protobuf, including gRPC for efficient RPC communication.
+
+Some challenges:
+
+* **Learning curve:** Developers need to learn Protobuf's syntax and tools, which can be an initial hurdle.
+* **Human readability:** The binary format is not human-readable, making debugging more challenging without proper tools.
+* **Limited built-in types:** Protobuf has a smaller set of built-in data types compared to some other schema definition languages.
+* **Complexity for simple use cases:** For very simple data structures or when human readability is crucial, JSON or XML might be more appropriate.
+* **Size overhead for small messages:** While efficient for larger datasets, Protobuf can introduce some overhead for very small messages.
+* **Less flexibility:** Compared to schema-less formats like JSON, Protobuf requires more upfront design and can be less flexible for rapidly changing data structures.
+
+Avro can be slower than Protobuf for serialization/deserialization
+
+## Schema Registry Technology
 
 ### Apicurio
 
 [Apicur.io](https://www.apicur.io) includes a [schema registry](https://www.apicur.io/registry/docs/apicurio-registry/2.6.x/index.html) to store schema definitions. It supports Avro, Json, protobuf schemas, and an API registry to manage OpenApi and AsynchAPI.
 
 Apicur.io is a Cloud-native Quarkus Java runtime with low memory footprint and fast deployment times. It supports [different persistences](hhttps://www.apicur.io/registry/docs/apicurio-registry/2.6.x/getting-started/assembly-installing-registry-docker.html)
-like Kafka, Postgresql, Infinispan and supports different deployment models.
+like Kafka, Postgresql, and supports different deployment models.
+
+![](./diagrams/apicurio-deploy.drawio.png)
+
+Can be deployed in Kubernetes platform, and managed by operator. It supports HA with leader-follower. It can persist states in local Kafka cluster, and can suppport remote Kafka clusters too.
 
 #### Registry Characteristics
 

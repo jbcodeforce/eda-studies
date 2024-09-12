@@ -1,4 +1,8 @@
-# Messaging Backbone
+# Message Backbone
+
+???- Info "Chapter updated 09/2024"
+    **This page content reviewed 09/2024**
+    Created 2020 - Updated 08/ 2024
 
 As introduced before the messaging as a service enterprise may want to deploy support the following components:
 
@@ -34,26 +38,34 @@ Queueing system are non-idempotents, but some are.
 
 ### Pub/sub with topics
 
-The main event backend on the market is Apache Kafka. Kafka's append-only log format, sequential I/O access, and zero copying support high throughput with low latency. Its partition-based data distribution allows it to scale horizontally to hundreds of thousands of partitions. Older queue systems are also supporting pub/sub, most of them based on the Java Messaging Service APIs and protocol.
+The leading event middleware in the market is Apache Kafka. Kafka's append-only log format, sequential I/O access, and zero-copy mechanisms enable high throughput with low latency. Its partition-based data distribution allows for horizontal scaling to hundreds of thousands of partitions.
 
-A typical kafka cluster has multiple brokers, with their own persistence on disk and Zookeeper ensemble to manage the cluster states.
+Older queue systems are now supporting publish/subscribe (pub/sub) patterns, most of which are based on Java Messaging Service (JMS) APIs and protocols.
+
+A typical Kafka cluster has multiple brokers, with their own persistence on disk and Zookeeper Ensemble to manage the cluster states (topology up to mid 2024:)
 
 ![](../techno/kafka/diagrams/kafka-hl-view.drawio.png)
 
-Topics are a key elements to support message persistence and access semantic. Most of the systems work with topic subscriptions, and some will published on the active subscriptions only, while Kafka help to have consumer being able to connect at any time and replay the event from the origin.
+Since mid 2024 and the general availability of the Kraft protocol and the controller nodes, Zookeeper is not mandatory and not recommended.
+
+![](../techno/kafka/diagrams/kafka-kraft-hl-view.drawio.png)
+
+Topics are key elements that support message persistence and access semantics. Most systems operate with topic subscriptions, where some publish messages only to active subscriptions. In contrast, Kafka allows consumers to connect at any time and replay events from the beginning.
+
+---
 
 ### Criteria to select a technology
 
-A Message as a Service platform will need to support queues and topics. For Topics one of the Kafka flavor needs to be selected. The list of Kafka packaging is long and Cloud providers offer managed services to by pass the management of the infrastructure and version to version upgrade.
+A Message as a Service (MaaS) platform must support both queues and topics. For topics, a specific Kafka packaging needs to be chosen. There are numerous packaging options available in the market, and cloud providers offer managed services that eliminate the need for infrastructure management and version upgrades.
 
 There are a set of criteria to consider for selecting a Kafka packaging:
 
-* Type of asynchronous expected interaction
+* Type of asynchronous expected interaction, queue or topic
 * Data volume
-* Easy to move data to 3nd tier storage
-* Latency
-* Storage
-* User interface to get visibility to topic, consumer groups and lags
+* Easy to move data to Tiered storage
+* Expected Latency
+* Storage needs and retention time
+* User interface to get visibility to topics, consumer groups and consumer lags
 * Support to declarative configuration
 * Monitoring with proprietary and shared platforms
 * Access control: enforce strong access controls and authentication mechanisms
@@ -65,19 +77,20 @@ There are a set of criteria to consider for selecting a Kafka packaging:
 
 ### Centralized Cluster vs multiple clusters
 
-Adopting a centralized Kafka cluster, for production environment, can bring numerous benefits, but it also requires careful consideration of various criteria. it is important to consider the segregation strategies for maximizing performance and optimizing cost while increasing Kafka adoption. The strategic dimensions to consider are:
+Adopting a centralized Kafka cluster in a production environment can offer numerous benefits, but it also necessitates careful considerations of various factors. It is essential to evaluate segregation strategies to maximize performance, optimize costs, and facilitate greater adoption of Kafka. The strategic dimensions to consider are:
 
+* Geo-localization requirements
 * Operational decoupling
 * Tenant isolation
 * Application optimization
-* Service availability, goelocation, and data criticality
+* Service availability, and data criticality
 * Cost and operating attention to each workload.
 
 #### Factor for centralized
 
  Here are some key factors to consider:
 
-* Number of applications and number of topic per application
+* Number of applications and small number of topic per application.
 * Application designed for real-time messaging and distributed data processing may better fit for leveraging common cluster. While ETL data pipeline can afford more downtime than a real-time messaging infrastructure for frontline applications.
 * Data volume and data criticality
 * Data isolation by applications and domains: a centralized Kafka cluster facilitates better data governance, data sharing, and data consistency across the organization. It enables a common data streaming strategy and reduces the risk of data silos. But domain specific data boundaries leads to adopt decentralized cluster.
@@ -125,9 +138,9 @@ Consider streaming system, like Kafka, AWS Kinesis Data Stream, as pub/sub and p
 
 ## Event router needs
 
-Consider event router, like Amazon EventBridge when we need to apply routing to targets using business logic when
+Some vendors are proposing event routing capability to top of message broker. This is marginal and addresses a very limited problem of routing to target subscribers. Consider event router when:
 
-* Routing events to target based on rules
-* Being able to apply filter and transformation
-* Many to many routing with EventBus
-* Point to point with enrichment with Pipes
+* There is very basic logic to apply to the message to route to a target consumer
+* Being able to apply filter and transformation on message in the message broker
+* Many to many routing
+* Point to point with enrichment
