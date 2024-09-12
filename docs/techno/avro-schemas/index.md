@@ -190,11 +190,13 @@ Apicur.io handles schema association to topics by schema name. For example, if w
 
 [AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html) is used in AWS service to manage and enforce schemas on your data streaming applications using convenient integrations with Apache Kafka, Amazon Managed Streaming for Apache Kafka, Amazon Kinesis Data Streams, Amazon Managed Service for Apache Flink, and AWS Lambda. It supports Avro, JSON Schema, and Protobuf formats, offers versioning and validation of schemas, and integrates with AWS Identity and Access Management (IAM) for security.
 
-* for organizations using AWS for data lakes, ETL, and real-time data processing.
+* For organizations using AWS for data lakes, ETL, and real-time data processing.
 * Useful for managing data schemas in serverless architecture
 * Need to assess performance and total cost of ownership
 * Pricing is based on the number of registered schemas and requests made.
 * Costs can vary depending on the AWS services used in conjunction.
+
+![](./diagrams/aws-glue.drawio.png)
 
 If you are predominantly using AWS services, Glue Schema Registry may be the better fit. Conversely, if your infrastructure is heavily based on Kafka, Confluent Schema Registry would likely be more advantageous.
 
