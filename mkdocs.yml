@@ -30,6 +30,7 @@ nav:
     - Governance: patterns/governance/index.md     # updated 07/2024 - still need work
   - Demonstrations:
     - Getting Started: methodology/getting-started.md
+    - Sandbox notes: techno/kafka/playground.md
     - Security: solutions/security/index.md
     - GitOps - IaC: solutions/gitops_IaC/index.md
     - Real-time Inventory: https://jbcodeforce.github.io/eda-rt-inventory/
@@ -42,6 +43,7 @@ nav:
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md
     - Confluent: techno/confluent/index.md
+    - RedPanda: https://jbcodeforce.github.io/redpanda-studies/
     - Mirror Maker 2: techno/mirrormaker/index.md
     - Flink: https://jbcodeforce.github.io/flink-studies
     - Active MQ: https://jbcodeforce.github.io/aws-messaging-study/activemq/

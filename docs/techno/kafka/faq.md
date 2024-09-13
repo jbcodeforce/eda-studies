@@ -126,10 +126,55 @@
 
 ## Security questions
 
+For deeper dive on security administration [see Confluent article](https://docs.confluent.io/platform/current/security/general-overview.html) and [Apache Kafka product documentation](http://kafka.apache.org/documentation/#security).
+
+
+
 ???- question "What Security support in Kafka?"
 	* Encrypt data in transit between producer and Kafka brokers
 	* Client authentication
 	* Client authorization
+
+???- question "Explain security protocol"
+	[security.protocol](http://kafka.apache.org/documentation/#adminclientconfigs_security.protocol) defines the protocol used to communicate with brokers. Verify how the listeners are configured in the Kafka cluster. The valid values are:
+
+	```
+	PLAINTEXT (using PLAINTEXT transport layer & no authentication - default value).
+	SSL (using SSL transport layer & certificate-based authentication)
+	SASL_PLAINTEXT (using PLAINTEXT transport layer & SASL-based authentication)
+	SASL_SSL (using SSL transport layer & SASL-based authentication)
+	```
+
+	In Strimzi the following yaml defines the different listeners type and port: `tls` boolean is for the traffic encryption, while `authentication.type` defines the matching security protocol.
+
+	```yaml
+	listeners:
+		- name: plain
+			port: 9092
+			type: internal
+			tls: false
+		- name: tls
+			port: 9093
+			type: internal
+			tls: true
+			authentication:
+			type: tls
+		- name: external
+			type: route
+			port: 9094
+			tls: true 
+			authentication:
+			type: scram-sha-512
+	```
+
+???- question "What are `ssl.truststore.location` and `ssl.truststore.password`?"
+	When doing TLS encryption, we need to provide the Kafka clients with the location of a trusted Certificate Authority-based certificate. This file is often provided by the Kafka administrator and is generally unique to the specific Kafka cluster deployment. The certificate is in JKS format for JVM languages and PEM/ P12 for nodejs or Python.
+
+	To extract a PEM-based certificate from a JKS-based truststore, we can use the following command: 
+
+	```
+	keytool -exportcert -keypass {truststore-password} -keystore {provided-kafka-truststore.jks} -rfc -file {desired-kafka-cert-output.pem}
+	```
 
 ???- question "What are the security configuration to consider?"
 	On Kubernetes, Kafka can be configured with external and internal URLs. With Strimzi internal URLs are using TLS or Plain authentication, then TLS for encryption. If no authentication property is specified then the listener does not authenticate clients which connect through that listener. The listener will accept all connections without authentication.
@@ -178,28 +223,30 @@
 	%prod.kafka.security.protocol=SSL
 	%prod.kafka.ssl.keystore.location=/deployments/certs/user/user.p12
 	%prod.kafka.ssl.keystore.type=PKCS12
-	quarkus.openshift.env.mapping.KAFKA_SSL_KEYSTORE_PASSWORD.from-secret=${KAFKA_USER:tls-user}
-	quarkus.openshift.env.mapping.KAFKA_SSL_KEYSTORE_PASSWORD.with-key=user.password
-	quarkus.openshift.mounts.user-cert.path=/deployments/certs/user
-	quarkus.openshift.secret-volumes.user-cert.secret-name=${KAFKA_USER:tls-user}
-	# To validate server side certificate we will mount it too with the following declaration
-	quarkus.openshift.env.mapping.KAFKA_SSL_TRUSTSTORE_PASSWORD.from-secret=${KAFKA_CA_CERT_NAME:kafka-cluster-ca-cert}
-	quarkus.openshift.env.mapping.KAFKA_SSL_TRUSTSTORE_PASSWORD.with-key=ca.password
-	quarkus.openshift.mounts.kafka-cert.path=/deployments/certs/server
-	quarkus.openshift.secret-volumes.kafka-cert.secret-name=${KAFKA_CA_CERT_NAME:kafka-cluster-ca-cert}
+
 	```
 
 	For the server side certificate, it will be in a truststore, which is mounted to  `/deployments/certs/server` and from a secret (this secret is created at the cluster level).
 
 	Also because we also use TLS for encryption we need:
 
-	```
+	```sh
 	%prod.kafka.ssl.protocol=TLSv1.2
 	```
 
 	Mutual TLS authentication is always used for the communication between Kafka brokers and ZooKeeper pods. For mutual, or two-way, authentication, both the server and the client present certificates.
 
+	* The [sasl.mechanism](http://kafka.apache.org/documentation/#adminclientconfigs_sasl.mechanism) property is for defining the authentication protocol used. Possible values are:
+
+	```
+	PLAIN (cleartext passwords, although they will be encrypted across the wire per security.protocol settings above)
+	SCRAM-SHA-512 (modern Salted Challenge Response Authentication Mechanism)
+	GSSAPI (Kerberos-supported authentication and the default if not specified otherwise)
+	```
+
+
 	* SCRAM: (Salted Challenge Response Authentication Mechanism) is an authentication protocol that can establish mutual authentication using passwords. Strimzi can configure Kafka to use SASL (Simple Authentication and Security Layer) SCRAM-SHA-512 to provide authentication on both unencrypted and encrypted client connections.
+
 		* The listener declaration:
 		
 		```yaml
@@ -237,6 +284,14 @@
 	%prod.quarkus.openshift.secret-volumes.kafka-cert.secret-name=${KAFKA_CA_CERT_NAME:kafka-cluster-ca-cert}
 	```
 
+???- question "What are the setting for `sasl.jaas.config`?
+
+	```
+	sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="{USERNAME}" password="{PASSWORD}";
+	sasl.jaas.config = org.apache.kafka.common.security.scram.ScramLoginModule required username="{USERNAME}" password="{PASSWORD}";
+	```
+
+
 ???- question "How internal and external broker listener work?"
 
 	See [this article](https://rmoff.net/2018/08/02/kafka-listeners-explained/) to understand the listener configuration. Here is a config to be used in docker container:
@@ -247,6 +302,70 @@
 	KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092,INTERNAL://kafka:29092
 	KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 	KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+	```
+
+	For **external connection** to Strimzi cluster use the following, where USERNAME is a scram-user
+
+	```sh
+	bootstrap.servers={kafka-cluster-name}-kafka-bootstrap-{namespace}.{kubernetes-cluster-fully-qualified-domain-name}:443
+	security.protocol=SASL_SSL
+	sasl.mechanism=SCRAM-SHA-512
+	sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="{USERNAME}" password="{PASSWORD}";
+	ssl.truststore.location={/provided/to/you/by/the/kafka/administrator}
+	ssl.truststore.password={__provided_to_you_by_the_kafka_administrator__}
+	```
+
+	To get the user password get the user secret (oc or kubectl CLIs):
+
+	```shell
+	oc get secret scram-user -o jsonpath='{.data.admin_password}' | base64 --decode && echo ""
+	```
+
+	To get the Bootstrap URL use: 
+
+	```
+	expost K_CLUSTER_NAME=mycluster
+	export BOOTSTRAP="$(oc get route ${K_CLUSTER_NAME}-kafka-bootstrap -o jsonpath='{.spec.host}'):443"
+	```
+
+
+
+	The `sasl.jaas.config` can come from an environment variable inside of a secret, but in fact it is already predefined in the scram user in Strimzi:
+
+	```sh
+	oc get secret my-user -o json | jq -r '.data["sasl.jaas.config"]' | base64 -d -
+	```
+
+	* For **internal communication**, with PLAIN the setting is:
+
+	```sh
+	bootstrap.servers={kafka-cluster-name}-kafka-bootstrap.{namespace}.svc.cluster.local:9093
+	security.protocol = SASL_PLAINTEXT (these clients do not require SSL-based encryption as they are local to the cluster)
+	sasl.mechanism = PLAIN
+	sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="{USERNAME}" password="{PASSWORD}";
+	```
+
+	* For internal authentication with mutual TLS the settings:
+
+	```
+	security.protocol=SSL 
+	```
+
+???- question "App running not in same namespace as Kafka"
+	Remember that if the application does not run in the same namespace as the kafka cluster then copy the secrets to the namespace with something like:
+
+	```sh
+	if [[ -z $(oc get secret ${TLS_USER} 2> /dev/null) ]]
+	then
+	# As the project is personal to the user, we can keep a generic name for the secret
+	oc get secret ${TLS_USER} -n ${KAFKA_NS} -o json | jq -r '.metadata.name="tls-user"' | jq -r '.metadata.namespace="'${YOUR_PROJECT_NAME}'"' | oc apply -f -
+	fi
+
+	if [[ -z $(oc get secret ${SCRAM_USER} 2> /dev/null) ]]
+	then
+		# As the project is personal to the user, we can keep a generic name for the secret
+		oc get secret ${SCRAM_USER} -n ${KAFKA_NS} -o json |  jq -r '.metadata.name="scram-user"' | jq -r '.metadata.namespace="'${YOUR_PROJECT_NAME}'"' | oc apply -f -
+	fi
 	```
 
 ???- question "How to protect data at rest?"
