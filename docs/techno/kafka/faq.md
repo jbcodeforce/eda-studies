@@ -284,7 +284,7 @@ For deeper dive on security administration [see Confluent article](https://docs.
 	%prod.quarkus.openshift.secret-volumes.kafka-cert.secret-name=${KAFKA_CA_CERT_NAME:kafka-cluster-ca-cert}
 	```
 
-???- question "What are the setting for `sasl.jaas.config`?
+???- question "What are the setting for `sasl.jaas.config`?"
 
 	```
 	sasl.jaas.config = org.apache.kafka.common.security.plain.PlainLoginModule required username="{USERNAME}" password="{PASSWORD}";
