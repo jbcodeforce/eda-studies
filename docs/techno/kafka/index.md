@@ -96,6 +96,63 @@ We are detailing consumer group implementation in [this note](./consumer.md#cons
 
 An api to develop streaming processing application. See [deeper dive, demos and labs in the kafka-studies repository](https://github.com/jbcodeforce/kafka-studies)
 
+## Cost dimensions
+
+Sizing a Kafka cluster can be complex, but it’s not always necessary to determine the exact specifications upfront. Adding nodes to the cluster is straightforward, and a single Kafka cluster can scale to hundreds of nodes. However, it’s important to conduct a budget assessment to evaluate the potential costs of transitioning to an event backbone like Kafka. Abaccus used in sizing may be tuned and adapted by your own performance tests.
+
+The ingestion rate and data size are the primary factors to consider, but they are not the only ones. Let’s begin by defining the key dimensions. Using the diagram below, architects should evaluate the number of potential event sources that will be ingested through source connectors. For each major inbound flow, we need to assess the number of messages per second and their average size. It may also be helpful to analyze average, 90th percentile (p90), and peak values. 
+
+![](./diagrams/sizing.drawio.png)
+
+Each message in Kafka is replicated, which means that the disk size on each broker must account for the ingestion rate, the replication factor, and the **retention time**. With three nodes and a replication factor of three, each node needs sufficient disk space to maintain a steady state for the ingestion rate. All traffic that arrives in each broker from producers and replication traffic from other brokers is eventually persisted to storage volumes attached to the broker.
+
+The most common resource bottlenecks for clusters, from an infrastructure perspective, are network throughput, storage throughput, and the network throughput between brokers and the storage backend, particularly for brokers utilizing network-attached storage. Consider increasing the volume throughput if possible or adding more volumes to the cluster.
+
+Next, the estimations should consider the number of streaming functions that will consume events from topics and generate new messages for other topics. These new messages will contribute to the inbound metrics. On average, the number of messages processed by these functions may approach the input message count. For example, if there are 1,000 messages per second on the left side of the diagram, each function may read and produce approximately 1,000 messages. Thus, multiplying the input rate by the number of functions provides a good estimate.
+
+However, it's important to note that some functions will compute aggregates over time windows, resulting in fewer output messages compared to the input messages. Additionally, modern event-driven microservices may also generate their own events that adds to the ingestion global throughput.
+
+Finally some topics will be consumed to send messages to sink, so leaving the universe of Kafka, with one important dimension being the **number of consumers** to get those messages to.
+
+The most common resource bottlenecks for clusters, from an infrastructure perspective, are network throughput, storage throughput, and the network throughput between brokers and the storage backend, particularly for brokers utilizing network-attached storage. Having more brokers is helping to support more throughput. The max throughput of a cluster is represented by the following function:
+
+$$
+\max(T_{cluster}) = \min( \max(T_{storage}) * brokers / replicas,
+                          \max(T_{SAN network}) * brokers / replicas, 
+                          \max(T_{network}) * brokers / (consumergroups + replicas - 1))
+$$
+
+The more consumer groups there are, the greater the outbound data traffic on the broker's network. When the number of consumers is larger than 1, the broker network traffic is always higher than the traffic into the broker. We can therefore ignore data traffic into brokers as a potential bottleneck. Increasing the number of consumer groups reading from a cluster decreases its sustained throughput limit
+
+The number of brokers should account for maintenance, scaling, potential broker loss, or even the failure of an entire availability zone. When consumers fall behind or need to reprocess historical data, the requested data may no longer reside in memory, necessitating that brokers fetch it from the storage volume. This results in non-sequential I/O reads. When using Storage Area Network volumes, it also generates additional network traffic to the volume. Utilizing larger brokers with more memory or enabling compression can help mitigate this effect.
+
+For sizing, it is assumed that producers load balance messages evently among brokers, there are enough partitions to support ingress throughput and consumers are reading from the last topic.
+
+For disk attachment to broker, there are two choices: AN or local disk. With SAN the throughput is linked to the storage network throughput. While for local disk is it based on IOPS. It is important to note that with attached disk, that changing the broker means loosing disk, and the broker needs to reload from replicas from other brokers. With mounted disk, the access to the stored append log is quicker. With SAN, the throughput characteristics of the different volume types range between 128 MB/sec and 4000 MB/sec. Some cloud providers are also controlling the network bandwidth by VM type.
+
+For production keeps the workload below 80% of the max sustained throughput. So when the SAN network is limited to 250 MB/s the throughput limit is: $$ 80\% * 250 = 200 MB/sec$$
+
+When a consumer falls behind or needs to recover from failure it reprocesses older messages. In that case, the pages holding the data may no longer reside in the page cache, and brokers need to fetch the data from the SAN volume. That causes additional network traffic to the volume and non-sequential I/O reads. This can substantially impact the throughput of the SAN volume.
+
+Amazon MSK recently has **provision storage** capacity to increase the throughput up to 1000 MB/sec. With self managed cluster on EC2, solution architects need to consider gp3. io2 or st1 volume types. But in this case, the VM network may become the bottleneck.
+
+Finally encryption is CPU intensive, the brokers need to encrypt and decrypt individual messages.
+
+### Cloud provider specifics
+
+Cloud deployment brings its own challenges and costs: as seen in previous section, type of machine impacts IOPS and network throughput, and the number of brokers helps supporting higher throughput limit. Amazon MSK enforces that brokers are evenly balanced across all configured Availability Zones. So adding broker is always by a factor of # of AZs. Having too many small brokers cost more during maintenance operations.
+
+Also having too big machine increases the blast radius in case of failure. 
+
+MSK clusters have a sustained throughput limit and can burst to a higher throughput for short periods. The cluster can then instantaneously absorb much higher throughput for some time.
+
+In the cloud, application placement will have an impact on throughput and also on the cost of the overall solution. In the figure below, the deployment uses a typical hybrid architecture, where applications are still running on-premises, while new cloud native apps are deployed on the cloud, container orchetration platform. 
+
+![](./diagrams/cross-zones-cost.drawio.png)
+
+Most of cloud providers do not charge inbound traffic, but charge outbound and cross- availability zones traffic. These are the red arrows in the figure. 
+
+So the number of brokers, the number of replicas, the number of consumers and local producers will impact the overall cost. Look at the cost per GB/sec for VPC to VPC, outbound to on-premises servers.
 
 ## Additional readings
 
