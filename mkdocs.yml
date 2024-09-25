@@ -41,7 +41,7 @@ nav:
     - Kafka Consumer: techno/kafka/consumer.md
     - Schema Mgt: techno/avro-schemas/index.md
     - Kafka Streams: techno/kstreams/index.md
-    - Kafka Connect: techno/kafka-connect/index.md
+    - Kafka Connect: techno/kafka-connect/index.md  # reviewed 09/2024
     - Confluent: techno/confluent/index.md
     - RedPanda: https://jbcodeforce.github.io/redpanda-studies/
     - Mirror Maker 2: techno/mirrormaker/index.md

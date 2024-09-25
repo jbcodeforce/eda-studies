@@ -1,7 +1,11 @@
 # Kafka Connect
 
-[Kafka connect](https://kafka.apache.org/documentation/#connect) is an open source framework 
-for easily integrate external systems with Kafka. It works with any Kafka products. It uses the concepts of source and sink connectors to ingest or deliver data to / from  Kafka topics.
+???- Info "Version Update"
+    Created 05/2019 - Updated 09/24/2024
+
+[Kafka connect](https://kafka.apache.org/documentation/#connect) is an open-source framework designed to facilitate the integration of external systems with Kafka. It is compatible with all Kafka products and employs the concepts of source and sink connectors to ingest data into or deliver data from Kafka topics.
+
+## Concepts and Architecture
 
 A source connector collects data from a system. A sink connector delivers data from Kafka topics into other systems.
 
@@ -10,62 +14,76 @@ Here is the basic concepts of Kafka Connect integration with Kafka Cluster and e
 ![](./diagrams/kafka-connect.drawio.png)
 
 
-The general concepts are detailed in the [Robin Moffatt's video](https://talks.rmoff.net/DQkDj3). Here is a quick summary:
+The general concepts are presented in [Robin Moffatt's video](https://talks.rmoff.net/DQkDj3), which we can summarize as:
 
-* **Connector** represents a logical job to move data from / to Kafka  to / from external systems. [Apache Camel offers open source Kafka connectors](https://camel.apache.org/camel-Kafka-connector/1.0.x/index.html), or we can [implement our own](https://Kafka.apache.org/documentation/#connect_development).
+* **Connector** represents a logical job to move data from / to Kafka  to / from external systems. [Apache Camel offers open source Kafka connectors](https://camel.apache.org/camel-Kafka-connector/1.0.x/index.html), or developers can [implement their own connector](https://Kafka.apache.org/documentation/#connect_development).
 * **Workers** are JVMs running the connectors. For production deployment workers run in cluster or "distributed mode", and leverage the Kafka consumer group management protocol to scale tasks horizontally.
 * **Tasks**: each worker coordinates a set of tasks to move the data. In distributed mode, task states are saved in Kafka topics. They can be started, stopped at any time to support resilience, and scalable data pipeline.
 * **REST API** to configure the connectors and monitors the tasks.
 
-It supports distributed or standalone deployment modes. Fully integrated with Kafka Cluster to keep its states, it automatically manage offset, and handle the complex process of offset commitment.
+It supports both distributed and standalone deployment modes. Fully integrated with the Kafka cluster to maintain its state, it automatically manages offsets and handles the complex process of offset commitment.
 
-The following figure illustrates a classical 'distributed' deployment of a Kafka Connect cluster. 
+The following figure illustrates a typical 'distributed' deployment of a Kafka Connect cluster:
 
 ![](./diagrams/kc-worker.drawio.png)
 
-Workers are the running processes (JVMs) to execute connectors and tasks. It uses the existing Kafka group management protocol to scale the worker easily. Each Connector is responsible for defining and updating a set of Tasks that actually move the data. Tasks are threads in a JVM. 
-When a connector is first submitted to the cluster, the workers rebalance the full set of connectors in the cluster with their tasks so that each worker has approximately the same amount of work. 
+Workers are the running processes (JVMs) responsible for executing connectors and tasks. They utilize the existing Kafka group management protocol to scale easily. Each connector defines and manages a set of tasks that handle the actual data movement. Tasks run as threads within a JVM.
 
-* Connector and tasks are not guaranteed to run on the same instance in the cluster, especially if we have multiple tasks and multiple instances in our Kafka Connect cluster.
-* The connector may be configured to add `Converters` (code used to translate data between Connect and the system sending or receiving the data), and `Transforms`: simple logic to alter each message produced by or sent to a connector.
+When a connector is initially submitted to the cluster, the workers rebalance the entire set of connectors and their tasks to ensure that each worker has approximately the same workload.
 
-For fault tolerance and offset management, Kafka Connect uses Kafka three topics to persist its states, which may be created when the connectors start are:
+Connectors and tasks are not guaranteed to run on the same instance in the cluster, especially when multiple tasks and instances are present in the Kafka Connect cluster.
 
-* **connect-configs**: This topic stores the connector and task configurations.
-* **connect-offsets**: This topic stores offsets for Kafka Connect.
-* **connect-status**: This topic stores status updates of connectors and tasks.
+The connector can be configured to include **Converters** (which translate data between Connect and the system sending or receiving the data) and **Transforms** (which apply simple logic to alter each message produced by or sent to a connector).
+
+### Key value propositions
+
+1. **Simplified Integration:** Kakfa Connect provides a straightforward, configuration based, way to connect external systems to Kafka, enabling easy data ingestion and delivery without needing custom code. There are a lot of existing connectors, and each main source or sink technology vendors have their own connectors. [Confluent connectors.](https://www.confluent.io/lp/confluent-connectors)
+1. **Scalability:** Kafka Connect supports both distributed and standalone deployment modes, allowing it to scale efficiently with the needs of the application.
+1. **Fault Tolerance:** It integrates seamlessly with Kafka’s fault-tolerant architecture, ensuring that data is reliably processed even in the event of failures.
+1. **Data Transformation:** With support for Converters and Transforms, Kafka Connect allows for data transformation and formatting on-the-fly, ensuring that data is in the correct format for both producers and consumers.
+1. **Community and Ecosystem:** Free your teams from writing generic integration code and managing connectors to focus on building real-time apps. Being part of the Kafka ecosystem, it benefits from a large community and a wide range of existing connectors for various systems, such as databases, cloud services, and other messaging platforms.
+1. **Ease of Use:** It simplifies the management of data flows, allowing users to focus on business logic rather than the intricacies of data integration.
+1. **Real-Time Processing:** Kafka Connect enables real-time data streaming, making it suitable for applications that require immediate insights and actions based on incoming data.
+
+### Characteristics
+
+* Kafka Connect connectors can efficiently copy large volumes of data from a source to Kafka by operating at the datasource level using native protocols. For instance, when the source is a database, it utilizes the JDBC API.
+* It supports both streaming and batching of data.
+* It can scale from a standalone, single connector setup to running tasks in parallel on a distributed cluster.
+* Kafka Connect defines three models: the data model, worker model, and connector model. The worker model enables Kafka Connect to scale the application effectively.
+* A Kafka Connect cluster can support multiple applications and can be organized as a service.
+* A REST API is available for submitting and managing connectors.
+                                                                                                 
+
+### Fault tolerance
+
+For fault tolerance and offset management, Kafka Connect utilizes three Kafka topics to persist its state, which are created when the connectors start:
+
+* **connect-configs**: This topic stores the configurations for connectors and tasks.
+* **connect-offsets**: This topic retains offsets for Kafka Connect.
+* **connect-status**: This topic contains status updates for connectors and tasks.
+
+When a worker fails: 
+
+![](./diagrams/kc-fault1.drawio.png){ width="800" }
+
+Tasks allocated in the failed worker are reallocated to existing workers, and the task's states (read offsets, source record mapping to offset) are reloaded from the different state topics.
 
 
-## Characteristics
+![](./diagrams/kc-fault2.drawio.png){ width="800" }
 
-* Kafka Connect connector, copy a vast quantity of data from source to Kafka: work at the datasource level using native protocol: when the source is a database, it uses JDBC API for example.
-* Support streaming and batching.
-* Scale from standalone, mono connector to start small, to run tasks in parallel on distributed cluster.
-* Kafka Connect defines three models: data model, worker model and connector model. Worker model allows Kafka Connect to scale the application.
-* Kafka Connect cluster can serve multiple applications and so may be organized as a service.
-* A REST api exists to submit and manage connectors.
 
-## Connector cluster configuration
+### Connector cluster configuration
 
 The following configurations are important to review:
 
 * `group.id`: one per connect cluster. It is used by source connectors only.
 * `heartbeat.interval.ms`: The expected time between heartbeats to the group coordinator when using Kafka’s group management facilities.
 
-## Fault tolerance
-
-When a worker fails: 
-
-![](./diagrams/kc-fault1.drawio.png){ width="800" }
-
-Tasks allocated in the failed worker are reallocated to existing workers, and the task's state, read offsets, source record mapping to offset are reloaded from the different topics.
-
-
-![](./diagrams/kc-fault2.drawio.png){ width="800" }
 
 ## Installation
 
-The  Kafka connect framework fits well into a kubernetes deployment. As of now, we have different options for that deployment: the [Strimzi Kafka connect operator](https://strimzi.io/docs/latest/using.html#kafka-connect-str), install in a VM like an EC2 instances, or use serverless using AWS MSK Kafka Connector.
+The  Kafka connect framework fits well into a Kubernetes deployment model. Currently, there are different options for that deployment: the [Strimzi Kafka connect operator](https://strimzi.io/docs/latest/using.html#kafka-connect-str), directly install binary on VM, or use a managed service from Confluent or one of the cloud providers.
 
 ### Local demonstration
 
@@ -73,9 +91,7 @@ This lab present the simplest way to demontrate Kafka Connect using File Source 
 
 ### Strimzi
 
-[KafkaConnector resources](https://strimzi.io/docs/operators/latest/configuring.html#assembly-kafka-connect-str) allow us to create and manage connector instances for Kafka Connect in a Kubernetes-native way.
-To manage connectors, we can use the Kafka Connect REST API, or use KafkaConnector custom kubernetes resources.
-In case of GitOps methodology we will define connector cluster and connector instance as yamls.
+[KafkaConnector resources](https://strimzi.io/docs/operators/latest/configuring.html#assembly-kafka-connect-str) allow developers to create and manage connector instances for Kafka Connect in a Kubernetes-native way. To manage connectors, developers can use the Kafka Connect REST API, or use KafkaConnector custom Kubernetes resources. Using the GitOps methodology, devlopers will define connector cluster and connector instance as yamls.
 Connector configuration is passed to Kafka Connect as part of an HTTP request and stored within Kafka itself.
 
 ### IBM MQ connector
