@@ -37,7 +37,7 @@ The connector can be configured to include **Converters** (which translate data 
 
 ### Key value propositions
 
-1. **Simplified Integration:** Kakfa Connect provides a straightforward, configuration based, way to connect external systems to Kafka, enabling easy data ingestion and delivery without needing custom code. There are a lot of existing connectors, and each main source or sink technology vendors have their own connectors. [Confluent connectors.](https://www.confluent.io/lp/confluent-connectors)
+1. **Simplified Integration:** Kafka Connect provides a straightforward, configuration based, way to connect external systems to Kafka, enabling easy data ingestion and delivery without needing custom code. There are a lot of existing connectors, and each main source or sink technology vendors have their own connectors. [Confluent connectors.](https://www.confluent.io/lp/confluent-connectors)
 1. **Scalability:** Kafka Connect supports both distributed and standalone deployment modes, allowing it to scale efficiently with the needs of the application.
 1. **Fault Tolerance:** It integrates seamlessly with Kafka’s fault-tolerant architecture, ensuring that data is reliably processed even in the event of failures.
 1. **Data Transformation:** With support for Converters and Transforms, Kafka Connect allows for data transformation and formatting on-the-fly, ensuring that data is in the correct format for both producers and consumers.
@@ -73,21 +73,34 @@ Tasks allocated in the failed worker are reallocated to existing workers, and th
 ![](./diagrams/kc-fault2.drawio.png){ width="800" }
 
 
+
 ### Connector cluster configuration
+
+Connectors are defined using properties files, [configuration](https://kafka.apache.org/documentation.html#connectconfigs) and Java code, package as jars and dropped into plugins folder.
 
 The following configurations are important to review:
 
 * `group.id`: one per connect cluster. It is used by source connectors only.
 * `heartbeat.interval.ms`: The expected time between heartbeats to the group coordinator when using Kafka’s group management facilities.
+* `config.storage.topic`: Topic where connector configurations are stored
+* `offset.storage.topic`: Topic where source connector offsets are stored
+* `status.storage.topic`: Topic where connector and task status are stored
+* ` key.converster` and `value.converter`: converter classes (e.g. Avro, Json) used to convert between Kafka Connect format and the serialized form that is written to Kafka.
+* `exactly.once.source.support`: For source connectors to use transactions to write source records and their source offsets, and by proactively fencing out old task generations before bringing up new ones.
 
+## Playground
 
-## Installation
+### Installation
 
 The  Kafka connect framework fits well into a Kubernetes deployment model. Currently, there are different options for that deployment: the [Strimzi Kafka connect operator](https://strimzi.io/docs/latest/using.html#kafka-connect-str), directly install binary on VM, or use a managed service from Confluent or one of the cloud providers.
 
-### Local demonstration
+### Local demonstrations
 
-This lab present the simplest way to demontrate Kafka Connect using File Source and File Sink on a local laptop. The approach is based on docker compose, 1 Kafka broker, 1 topic, and a container running the file connectors in [standalone mode](https://github.com/jbcodeforce/kafka-studies/tree/master/labs/kconnect/filetofile) or in distributed mode with [this sample](https://github.com/jbcodeforce/kafka-studies/tree/master/labs/kconnect/distributed-filetofile).
+#### File Connectors
+
+The Kakfa Connect labs in [kafka-studies]((https://github.com/jbcodeforce/eda-quickstarts/tree/main/kafka-connect) present the simplest way to demontrate Kafka Connect using File Source and File Sink on a local computer. The approach is based on docker compose with 1 Kafka broker, 1 topic, and a container running the source and sink file connectors in [standalone mode](https://github.com/jbcodeforce/eda-quickstarts/tree/main/kafka-connect/filetofile). File lines are copied to target file after simple message transformation.
+
+The distributed mode with [this sample](https://github.com/jbcodeforce/eda-quickstarts/tree/main/kafka-connect/distributed-filetofile).
 
 ### Strimzi
 
