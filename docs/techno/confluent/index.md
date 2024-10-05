@@ -43,7 +43,7 @@ The control plane runs on AWS in k8s. Clusters are running on k8s too via Conflu
 
 Isolation is done via private network, and namespaces.
 
-### Kakfa cluster
+### Kafka cluster
 
 * One environment contains clusters, kafka connect cluster, Flink apps, ksqlDB, Schema registry.
 * Confluent Cloud clusters are available in 3 types: Basic, Standard, and Dedicated.
@@ -112,12 +112,15 @@ confluent kafka topic describe test-topic
 confluent kafka topic produce test-topic --parse-key
 confluent kafka topic consume --from-beginning test-topic --group <grp-name>
 # use a key
+confluent api-key list
 confluent api-key use <API_Key>
 # Generate a client config
 confluent kafka client-config create <LANGUAGE> --api-key <API_KEY> --api-secret <API_SECRET>
 ```
 
 CLI configuration is saved in ~/.confluent/config.json
+
+[Different demos to use local kafka or Confluent Cloud cluster](https://github.com/jbcodeforce/eda-quickstarts)
 
 ## [Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html)
 

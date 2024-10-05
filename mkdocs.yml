@@ -31,7 +31,6 @@ nav:
   - Demonstrations:
     - Getting Started: methodology/getting-started.md
     - Sandbox notes: techno/kafka/playground.md
-    - Security: solutions/security/index.md
     - GitOps - IaC: solutions/gitops_IaC/index.md
     - Real-time Inventory: https://jbcodeforce.github.io/eda-rt-inventory/
   - Technologies:
@@ -39,6 +38,7 @@ nav:
     - Kafka FAQ: techno/kafka/faq.md   # reviewed 07/2024
     - Kafka Producer: techno/kafka/producer.md # reviewed 08/2024
     - Kafka Consumer: techno/kafka/consumer.md
+    - Kafka Security: techno/kafka/security/index.md
     - Schema Mgt: techno/avro-schemas/index.md
     - Kafka Streams: techno/kstreams/index.md
     - Kafka Connect: techno/kafka-connect/index.md  # reviewed 09/2024

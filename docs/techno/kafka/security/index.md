@@ -1,7 +1,8 @@
 
 # Kafka Security Overview
 
-Created 04/13/2022 - Updated 09/2024
+???- Info "Versioning"
+    Created 04/13/2022 - Updated 09/2024
 
 Review **[this video for a refresh on SSL and TLS certificates](https://www.youtube.com/watch?v=T4Df5_cojAs)** and keep in mind what the speaker quotes:
 
@@ -30,7 +31,7 @@ The following figure presents a decision tree and the actions to consider for co
 In Kafka, the following yaml snippet from an Strimzi instance definition defines the following Kafka listeners"
 
 * One internal non secured kafka listener on port `9092` called `plain`
-* One internal secured (TLS encrypted) Kafka listener on port `9093` called `tls`, which also enforces authentication throughout TLS, and 
+* One internal secured (TLS encrypted) Kafka listener on port `9093` called `tls`, which also enforces authentication throughout TLS,
 * One external secured (TLS encrypted) Kafka listener on port `9094` called `external`, which also enforces authentication throughout SCRAM credentials, that is exposed through a route.
 
 ```yaml title="Cluster definition in Strimzi"
@@ -63,24 +64,26 @@ The most important and essential property to connect to Kafka brokers, is the `b
 
 At the very minimum, they will need to set the [security.protocol](http://kafka.apache.org/documentation/#adminclientconfigs_security.protocol) property that will tell whether the application isconnecting to a secured Kafka listener or not. As a result, the values for `security.protocol` are:
 
-  * `PLAINTEXT` - using PLAINTEXT transport layer & no authentication - default value.
-  * `SSL` - using SSL transport layer & certificate-based authentication or no authentication.
-  * `SASL_PLAINTEXT` - using PLAINTEXT transport layer & SASL-based authentication.
-  * `SASL_SSL` - using SSL transport layer & SASL-based authentication.
+* `PLAINTEXT` - using PLAINTEXT transport layer & no authentication - default value.
+* `SSL` - using SSL transport layer & certificate-based authentication or no authentication.
+* `SASL_PLAINTEXT` - using PLAINTEXT transport layer & SASL-based authentication.
+* `SASL_SSL` - using SSL transport layer & SASL-based authentication.
 
 Based on the above, the security protocol developers will use to connect to the different Kafka listeners that Kafka deploys are:
 
-   - `PLAINTEXT` when connecting to the non secured internal `plain` Kafka listener on port `9092`
-   - `SSL` when connecting to the secured (TLS encrypted) internal `tls` Kafka listener on port `9093` that also enforces authentication through TLS certificates
-   - `SASL_SSL` when connecting to the secured (TLS encrypted) external `external` Kafka listener on port `9094` that also enforces authentication through SCRAM credentials.
+- `PLAINTEXT` when connecting to the non secured internal `plain` Kafka listener on port `9092`
+- `SSL` when connecting to the secured (TLS encrypted) internal `tls` Kafka listener on port `9093` that also enforces authentication through TLS certificates
+- `SASL_SSL` when connecting to the secured (TLS encrypted) external `external` Kafka listener on port `9094` that also enforces authentication through SCRAM credentials.
 
 ### Non-secured listener
 
 You would only need to specify that there is no security in place for your application to connect to a non-secured kafka listener:
 
-```properties
+```properties title="Configuration properties"
 security.protocol=PLAINTEXT
 ```
+
+*Do not set `sasl.mechanisms` when security.protocol=PLAINTEXT*
 
 ### Secured listener
 
@@ -133,7 +136,7 @@ Dl9DpLZo0fVoJF73k2z2mBk8gCjGqZk289octuOCr+MwXcGN6JTR2Iux05TBI6uf
 Once you have the Certificate Authority of your Kafka cluster, you will provide its location and password in your properties file through the `ssl.truststore.location` and `ssl.truststore.password` properties.
 
 
-```properties
+```properties title="Secured configuration"
 security.protocol=SSL or SASL_SSL
 ssl.protocol=TLSv1.2
 
@@ -142,7 +145,7 @@ ssl.truststore.location=truststore.p12
 ssl.truststore.type=PKCS12
 ```
 
-where `security.protocol` will vary between `SSL` or `SASL_SSL` based on the authentication as you will see next.
+where `security.protocol` will vary between `SSL` or `SASL_SSL` based on the authentication as you will see in the next section.
 
 ### Authentication
 
@@ -229,22 +232,22 @@ Now that you know how to get the authentication credentials or certificates for 
 
 - If your Kafka listener authentication method is SCRAM:
 
-  ```properties
-  security.protocol=SASL_SSL
+```properties title="Scram authentication with SSL encryption"
+security.protocol=SASL_SSL
 
-  sasl.mechanism=SCRAM-SHA-512
-  sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username\="<USERNAME>" password\="<PASSWORD>";
-  ```
+sasl.mechanism=SCRAM-SHA-512
+sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username\="<USERNAME>" password\="<PASSWORD>";
+```
 
 - If your Kafka listener authentication method is TLS:
 
-  ```properties
-  security.protocol=SSL
+```properties title="TLS authentication and SSL encryption"
+security.protocol=SSL
 
-  ssl.keystore.location=<location_to_your_user.p12>
-  ssl.keystore.password=<user.p12-password>
-  ssl.keystore.type=PKCS12
-  ```
+ssl.keystore.location=<location_to_your_user.p12>
+ssl.keystore.password=<user.p12-password>
+ssl.keystore.type=PKCS12
+```
 
 ## Recapitulation
 
