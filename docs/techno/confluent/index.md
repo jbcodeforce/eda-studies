@@ -96,9 +96,9 @@ There are different ways to access Confluent Cloud: via users or service account
 There are different quick start tutorials as:
 
 * [Confluent Fundamentals](https://developer.confluent.io/courses/#fundamentals)
-* [Hands-on on Confluent Cloud (CCloud)](https://developer.confluent.io/courses/apache-kafka/get-started-hands-on/).  [URL fo CCloud]()
+* [Hands-on on Confluent Cloud (CCloud)](https://developer.confluent.io/courses/apache-kafka/get-started-hands-on/).  [URL fo CCloud- https://confluent.cloud/](https://confluent.cloud/)
 
-* Some [CLI commands] summary:
+* Here are import [CLI commands](https://docs.confluent.io/confluent-cli/current/overview.html):
 
 ```sh
 confluent login --save
@@ -120,7 +120,19 @@ confluent kafka client-config create <LANGUAGE> --api-key <API_KEY> --api-secret
 
 CLI configuration is saved in ~/.confluent/config.json
 
-[Different demos to use local kafka or Confluent Cloud cluster](https://github.com/jbcodeforce/eda-quickstarts)
+### API Keys
+
+We need:
+
+* Confluent Cloud login user and password
+* Cluster API Key: `confluent api-key create --resource <cluster_id>`
+* Special Key for Flink: select a service account key for long running jobs while for interactive sessions, use user account key. For the REST API use base64 to encode the key. Keys are scoped per environment.
+
+### Demos and quick starts
+
+* [Quickstart with Console](https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html)
+* [Java Table API Quick Start](https://docs.confluent.io/cloud/current/flink/get-started/quick-start-java-table-api.html)
+* [Different demos to use local kafka or Confluent Cloud cluster](https://github.com/jbcodeforce/eda-quickstarts) and [Flink studies](https://github.com/jbcodeforce/flink-studies)
 
 ## [Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html)
 
@@ -152,8 +164,38 @@ CLI configuration is saved in ~/.confluent/config.json
 * This is a different API key than the one to access the kafka cluster
 * When apps are in VPC, the VPC needs to be able to communicate with  Confluent Cloud public end point on port 443
 
+### Schema file
 
-See [Hands-on schema registry 101.](https://developer.confluent.io/courses/apache-kafka/schema-registry-hands-on/)
+The development steps can be summarized as
+
+1. Define the record schemas in the selected target serialization, avro or protobuf and define files within `src/main/avro` or `src/main/proto`.
+1. Use maven or graddle plugins: to create java classes from the schema definitions
+
+#### [Protobuf](https://protobuf.dev/)
+
+A schema needs to define the version of the syntax of the protobuf spec.
+`package` is mapped to a java package name and define a namespace. Protobuf define a schema for a record as a message
+
+```protobuf
+package org.acme.payement.events;
+option java_outer_classname = "PaymentEvent"
+
+message PaymentEvent {
+    string payment_id = 1;
+    double amount = 2;
+    string customer_id = 3; 
+}
+```
+
+#### Avro 
+
+Use json syntax to define schema. 
+
+
+### Hands-on
+
+* See [Hands-on schema registry 101.](https://developer.confluent.io/courses/apache-kafka/schema-registry-hands-on/)
+* 
 
 ### Schema management 
 
