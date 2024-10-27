@@ -4,7 +4,7 @@
     Created 01/2019  Last update 9/05/2024
     Work in progress
 
-This chapter describes what and why Avro and Schema registry are important elements of any event-driven solutions.
+This chapter describes why Avro and Schema registry are important elements of any event-driven solutions.
 
 ## Why this is important
 
@@ -51,7 +51,7 @@ Once the schema definition or a new version of an existing schema is successfull
 
 
 !!! Warning
-    We strongly recommend that producers be restricted from registering schema definitions in the Schema Registry to ensure better governance and management. It is advisable that schema definition registration be handled by a designated individual with the appropriate role, such as an administrator, API manager, asynchronous API manager, development manager, or operator.
+    We strongly recommend that producers be restricted from automatically register schema definitions in the Schema Registry, the reason is to ensure better governance and management. It is advisable that schema definition registration be handled by a designated individual with the appropriate role, such as an administrator, API manager, asynchronous API manager, development manager, or operator.
 
 
 Once the producer has a schema definition in its local cache, along with its global unique ID, that matches the schema required for the serialization of the event, it produces the event to the Kafka topic using the appropriate `AvroKafkaSerializer` class. The global unique ID of the schema definition is serialized alongside the event, eliminating the need for the event to carry its schema definition, as was the case in older messaging or eventing technologies and systems.
@@ -71,7 +71,6 @@ Be aware that non-Java consumers may use a C library that also requires the sche
 
 ## Schema Serialization Approaches
 
-
 ### Avro
 
 [Apache Avro](https://avro.apache.org/docs/1.11.1/getting-started-java/) is an open source data serialization framework that helps with data exchange between systems, programming languages, and processing frameworks. Avro helps define a binary format for the data, as well as map it to the programming language of your choice.
@@ -90,7 +89,7 @@ Here’s a concise overview of the benefits of Apache Avro based on the [Conflue
 * **Rich Schema Language:** Avro features a robust, extensible schema language defined in pure JSON, facilitating clear data definitions.
 * **Schema evolution**: Avro provides an effective mechanism for managing schema evolution, ensuring that data formats can adapt over time without breaking compatibility.
 
-It has a maven integration to generate Java POJO from schema. 
+It has a maven integration to generate Java POJO from schema. There are also libraries for doing Avro with Python code, use Pydantic to Avro and Avro schema to Pydantic classes.
 
 ### Json
 
@@ -145,6 +144,8 @@ The [Confluent Schema Registry](https://docs.confluent.io/platform/current/schem
 * Comprehensive documentation and robust community resources
 
 The Confluent Schema Registry attaches the schema identifier by storing it as part of the Kafka message key or value payload after a Magic Byte, which increases the payload size by 5 bytes. 
+
+It works as part of Confluent Platform or Confluent Cloud managed service. 
 
 ### Apicurio
 

@@ -1,4 +1,6 @@
-# Confluent Cloud
+# Confluent as Kafka provider
+
+## Confluent Cloud
 
 ???- info "Updates"
     Created 07/2024 - Update 10/2024
@@ -21,7 +23,7 @@ The services supported are:
 * Logs and metrics
 
 
-## Core Concepts
+### Core Concepts
 
 When creating a cluster, developers are connected to the Confluent control plane and can select a cloud provider, then one of the possible regions (not all cloud provider regions are available).
 
@@ -35,7 +37,7 @@ The main three concepts are:
 
 Below is a set of important information, facts, links on the Confluent offering.
 
-### Control Plane
+#### Control Plane
 
 The control plane runs on AWS in k8s. Clusters are running on k8s too via Confluent Kubernetes Operator. A dedicated monitoring cluster runs and Kafka is used to for async messaging between those components. The satellite clusters may run independently even is there is a problem on the control plane.
 
@@ -43,7 +45,7 @@ The control plane runs on AWS in k8s. Clusters are running on k8s too via Conflu
 
 Isolation is done via private network, and namespaces.
 
-### Kafka cluster
+#### Kafka cluster
 
 * One environment contains clusters, kafka connect cluster, Flink apps, ksqlDB, Schema registry.
 * Confluent Cloud clusters are available in 3 types: Basic, Standard, and Dedicated.
@@ -71,12 +73,12 @@ Isolation is done via private network, and namespaces.
         ![](./diagrams/topo-d.drawio.png)
 
 
-#### CKU
+##### CKU
 
 Measure the capacity and limits of Confluent Kafka cluster. A 1 CKU is a 4 brokers clusters. 2 CKUs are needed or HA at 6 brokers.
 
 
-### Networking
+#### Networking
 
 * Shared clusters have only public endpoints. Dedicated may use VPC, and VPC peering or AWS transit gateway, or private links 
 * Public endpoints are protected via API keys, but connections are TLS v1.2. The connection are going to a NLB for TCP ingress.
@@ -89,7 +91,7 @@ Measure the capacity and limits of Confluent Kafka cluster. A 1 CKU is a 4 broke
 * When using public endpoint, Clients need access to internet without proxy. When the cluster has only private endpoints, then we need to setup a proxy (HAproxy, nginx..) to be able to at least see topics. The proxy runs in a Jumphost within our own VPC. The alternate solution is to use dynamic proxy.
 * When using Kafka Connector source and sink connectors, running on Confluent Cloud, those connectors need to be able to accessible the sources over the internet from Confluent Cloud.
 
-## Getting Started
+### Getting Started
 
 There are different ways to access Confluent Cloud: via users or service accounts. SC accesses Confluent Cloud services only, but can get role assignment. Each types have API keys.
 
@@ -120,7 +122,7 @@ confluent kafka client-config create <LANGUAGE> --api-key <API_KEY> --api-secret
 
 CLI configuration is saved in ~/.confluent/config.json
 
-### API Keys
+#### API Keys
 
 We need:
 
@@ -128,13 +130,13 @@ We need:
 * Cluster API Key: `confluent api-key create --resource <cluster_id>`
 * Special Key for Flink: select a service account key for long running jobs while for interactive sessions, use user account key. For the REST API use base64 to encode the key. Keys are scoped per environment.
 
-### Demos and quick starts
+#### Demos and quick starts
 
 * [Quickstart with Console](https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html)
 * [Java Table API Quick Start](https://docs.confluent.io/cloud/current/flink/get-started/quick-start-java-table-api.html)
 * [Different demos to use local kafka or Confluent Cloud cluster](https://github.com/jbcodeforce/eda-quickstarts) and [Flink studies](https://github.com/jbcodeforce/flink-studies)
 
-## [Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html)
+### [Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html)
 
 * One registry per environment, created in the same region as the first kafka cluster is created, but can manage future clusters in other regions. A schema registry is local to one kafka cluster as it persists state in topics.
 * Two "governance packages": **Essentials** (not in all region) and **Advanced**. Schema registries are accessible via public and [private]() endpoints, and uses separate Access Keys from the Kafka cluster ones.
@@ -166,9 +168,9 @@ We need:
 
 ### Schema file
 
-The development steps can be summarized as
+The development steps can be summarized as:
 
-1. Define the record schemas in the selected target serialization, avro or protobuf and define files within `src/main/avro` or `src/main/proto`.
+1. Define the record schemas in the selected target serialization, avro, json or protobuf and define files within `src/main/avro`, `src/main/json` or `src/main/proto`.
 1. Use maven or graddle plugins: to create java classes from the schema definitions
 
 #### [Protobuf](https://protobuf.dev/)
@@ -189,10 +191,10 @@ message PaymentEvent {
 
 #### Avro 
 
-Use json syntax to define schema. 
+Use [avro syntax]() to define schema. 
 
 
-### Hands-on
+#### Hands-on
 
 * See [Hands-on schema registry 101.](https://developer.confluent.io/courses/apache-kafka/schema-registry-hands-on/)
 * 
@@ -208,16 +210,33 @@ Use json syntax to define schema.
 * Avro was developed with schema evolution in mind, and its specification clearly states the rules for backward compatibility, not the case for Json or Protobuf.
 * Transitive compatibility means checking a new schema against all previously registered schemas.
 
-## Kafka Connector
+### Kafka Connector
 
 Managed connectors supports only, as of now, a subset of the connectors available on Connector hub. Still it is possiblle to upload our own plugins.
 
 Connectors can access public or private (via VPC peering or transit gateways) sources and sinks.
 
-## Security
+### Security
 
 * There are different API keys to access cluster, cloud, resources, schema registry and logs and metrics.
 
-## Infrastructure As Code
+### Infrastructure As Code
 
 [Terraform Confluent Provider](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs) to configure any CCloud resources.
+
+---
+
+## Cloud Platform
+
+This the on-premises deployment, which for development can run with docker compose or using the Confluent For Kubernetes (CFK).
+
+### CFK
+
+See [confluent-kubernetes-examples git repo.](https://github.com/confluentinc/confluent-kubernetes-examples) which can be summarized as
+
+```
+# define helm repo for confluent helm releases
+helm repo add confluentinc https://packages.confluent.io/helm
+k create ns confluent
+helm upgrade --install operator confluentinc/confluent-for-kubernetes -n confluent --set kRaftEnabled=true
+```
