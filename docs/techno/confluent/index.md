@@ -3,7 +3,8 @@
 ## Confluent Cloud
 
 ???- info "Updates"
-    Created 07/2024 - Update 10/2024
+    * Created 07/2024
+    * Update 10/2024
 
 
 Managed service offering for the Confluent platform on one of the AWS, Azure or GCP cloud. It runs on its own private network that can be integrated with client virtual private network and on-premises network. 
@@ -50,13 +51,13 @@ Isolation is done via private network, and namespaces.
 * One environment contains clusters, kafka connect cluster, Flink apps, ksqlDB, Schema registry.
 * Confluent Cloud clusters are available in 3 types: Basic, Standard, and Dedicated.
 
-    * Standard can be sinlge or multi zones 99.99% SLA, and offers RBAC and OAuth
-    * Dedicated: 1GB/s Ingress and Egress, with private netowrking, and self cloud managed keys. Define you CIDR according to your VPC connection (Peering, transit gateway)
+    * Standard can be single or multi zones 99.99% SLA, and offers RBAC and OAuth
+    * Dedicated: 1GB/s Ingress and Egress, with private networking, and self cloud managed keys. Define you CIDR according to your VPC connection (Peering, transit gateway)
 
 * Kafka API keys are required to interact with Kafka clusters in Confluent Cloud. Each Kafka API key is valid for a specific Kafka cluster. To access one API key/secret pair for each Kafka cluster. Key can be setup with global access to produce and consume from the cluster.
 * The potential deployment topology pattern for hybrid cloud:
 
-    * One time migration from on-premises Kafka cluster to a Confluent Cloud cluster - In fact in can also being steady state for data propagation to the cloud and may be datalake.
+    * One time migration from on-premises Kafka cluster to a Confluent Cloud cluster - In fact in can also being steady state for data propagation to the cloud and may be data lake.
 
         ![](./diagrams/topo-a.drawio.png)
     
@@ -64,7 +65,7 @@ Isolation is done via private network, and namespaces.
 
         ![](./diagrams/topo-b.drawio.png)
 
-    * The 3nd topology addresses the need to deploy at a global scale, with local market with data sovereignty constraint. Cloud clusters are used to agregate the data for global use, or for read access.
+    * The 3nd topology addresses the need to deploy at a global scale, with local market with data sovereignty constraint. Cloud clusters are used to aggregate the data for global use, or for read access.
 
         ![](./diagrams/topo-c.drawio.png)
 
@@ -83,12 +84,12 @@ Measure the capacity and limits of Confluent Kafka cluster. A 1 CKU is a 4 broke
 * Shared clusters have only public endpoints. Dedicated may use VPC, and VPC peering or AWS transit gateway, or private links 
 * Public endpoints are protected via API keys, but connections are TLS v1.2. The connection are going to a NLB for TCP ingress.
 * Public endpoints are protected with a proxy layer, NLB and other security guards to avoid  DoS, DDoS, syn flooding, and other network-level attacks.
-* Kafka uses TCP protocol, and get cluster metadata during the bootstrap connection. The broker endpoints is used to send or get data from the brokers. TLS. mTLS, SASL-SSL can be used to secure the connectin and authentication. Confluent Cloud uses SASL-SSL.
-* The traffic between client and broker could not go over a load balancer. The load balancing is done via the list of DNS names and ports of the brokers. To get this list, cliet connect to the advertise listener. 
+* Kafka uses TCP protocol, and get cluster metadata during the bootstrap connection. The broker endpoints is used to send or get data from the brokers. TLS. mTLS, SASL-SSL can be used to secure the connecting and authentication. Confluent Cloud uses SASL-SSL.
+* The traffic between client and broker could not go over a load balancer. The load balancing is done via the list of DNS names and ports of the brokers. To get this list, client connect to the advertise listener. 
 * Client apps can connect with TLS v1.2 over public endpoints.
 
 * Client apps running on-premises may connect with Transit Gateway or Private Link. Private Link has no constraint on CIDR ranges, and offers a one-way connectivity from customer's VPC to Confluent Cloud. A private link can support access to multiple Confluent Kafka clusters.
-* When using public endpoint, Clients need access to internet without proxy. When the cluster has only private endpoints, then we need to setup a proxy (HAproxy, nginx..) to be able to at least see topics. The proxy runs in a Jumphost within our own VPC. The alternate solution is to use dynamic proxy.
+* When using public endpoint, Clients need access to internet without proxy. When the cluster has only private endpoints, then we need to setup a proxy (HAproxy, nginx..) to be able to at least see topics. The proxy runs in a Jump host within our own VPC. The alternate solution is to use dynamic proxy.
 * When using Kafka Connector source and sink connectors, running on Confluent Cloud, those connectors need to be able to accessible the sources over the internet from Confluent Cloud.
 
 ### Getting Started
@@ -99,7 +100,6 @@ There are different quick start tutorials as:
 
 * [Confluent Fundamentals](https://developer.confluent.io/courses/#fundamentals)
 * [Hands-on on Confluent Cloud (CCloud)](https://developer.confluent.io/courses/apache-kafka/get-started-hands-on/).  [URL fo CCloud- https://confluent.cloud/](https://confluent.cloud/)
-
 * Here are import [CLI commands](https://docs.confluent.io/confluent-cli/current/overview.html):
 
 ```sh
@@ -157,14 +157,14 @@ We need:
 * Replication replicates also topic for the schema persistence.
 * Producers write data to just the active cluster. 
 * Consumers can read from both regions.
-* Access Control List needs to be replicated too
+* Access Control List needs to be replicated too.
 
 * Confluent Cloud uses API keys that are resource scoped for Schema Registry clusters to store schemas and route requests to the appropriate logical clusters.
 
 ![](./diagrams/registry-saas.drawio.png)
 
-* This is a different API key than the one to access the kafka cluster
-* When apps are in VPC, the VPC needs to be able to communicate with  Confluent Cloud public end point on port 443
+* This is a different API key than the one to access the kafka cluster.
+* When apps are in VPC, the VPC needs to be able to communicate with  Confluent Cloud public end point on port 443.
 
 ### Schema file
 
@@ -179,7 +179,7 @@ A schema needs to define the version of the syntax of the protobuf spec.
 `package` is mapped to a java package name and define a namespace. Protobuf define a schema for a record as a message
 
 ```protobuf
-package org.acme.payement.events;
+package org.acme.payment.events;
 option java_outer_classname = "PaymentEvent"
 
 message PaymentEvent {
@@ -201,8 +201,8 @@ Use [avro syntax]() to define schema.
 
 ### Schema management 
 
-* Still compatibility mode can be overrided at the topic/schema level. The default is backward compatibility: consumer can consume older messages, as default values are added to new attributes.
-* *Foward* compatibility means that data produced with a new schema can be read by consumers using the last schema, or the schema before. [See details in compatibility note](https://docs.confluent.io/cloud/current/sr/fundamentals/schema-evolution.html#summary). With *Foward* compatibility mode, consumers aren’t guaranteed to be able to read old messages.
+* Still compatibility mode can be overridden at the topic/schema level. The default is backward compatibility: consumer can consume older messages, as default values are added to new attributes.
+* *Forward* compatibility means that data produced with a new schema can be read by consumers using the last schema, or the schema before. [See details in compatibility note](https://docs.confluent.io/cloud/current/sr/fundamentals/schema-evolution.html#summary). With *Forward* compatibility mode, consumers aren’t guaranteed to be able to read old messages.
 
 * Stream governance feature helps addressing data governance
 * Schema can be created via CLI, REST API, Console or Maven plugin to be used during CI/CD
@@ -212,7 +212,7 @@ Use [avro syntax]() to define schema.
 
 ### Kafka Connector
 
-Managed connectors supports only, as of now, a subset of the connectors available on Connector hub. Still it is possiblle to upload our own plugins.
+Managed connectors supports only, as of now, a subset of the connectors available on Connector hub. Still it is possible to upload our own plugins.
 
 Connectors can access public or private (via VPC peering or transit gateways) sources and sinks.
 
@@ -226,15 +226,19 @@ Connectors can access public or private (via VPC peering or transit gateways) so
 
 ---
 
-## Cloud Platform
+## confluent Platform
 
 This the on-premises deployment, which for development can run with docker compose or using the Confluent For Kubernetes (CFK).
+
+### Docker Local
+
+See [this excellent cp-all-in-one repository](https://github.com/confluentinc/cp-all-in-one) with different patterns and configurations to run Confluent platform locally or hybrid with Confluent Cloud and local components such as Schema Registry, Flink, ksqlServer...
 
 ### CFK
 
 See [confluent-kubernetes-examples git repo.](https://github.com/confluentinc/confluent-kubernetes-examples) which can be summarized as
 
-```
+```sh
 # define helm repo for confluent helm releases
 helm repo add confluentinc https://packages.confluent.io/helm
 k create ns confluent
