@@ -73,8 +73,17 @@ Isolation is done via private network, and namespaces.
 
         ![](./diagrams/topo-d.drawio.png)
 
+#### Cluster Types
 
-##### CKU
+Dimensions to consider for selecting cluster type are: 1/ the scaling needs, 2/ Networking 3/ sizing for ingress, egress, 4/ security
+
+* Basic: small, get started - no sizing needed
+* Standard: production ready for most apps
+* Enterprise: Enhanced security with private networking 
+* Freight: Bring your own cluster in VPC, Write to S3, so higher latency.
+* Dedicated: programming scaling, priced by CKU
+
+#### CKU
 
 Measure the capacity and limits of Confluent Kafka cluster. A 1 CKU is a 4 brokers clusters. 2 CKUs are needed or HA at 6 brokers.
 
@@ -216,6 +225,8 @@ Managed connectors supports only, as of now, a subset of the connectors availabl
 
 Connectors can access public or private (via VPC peering or transit gateways) sources and sinks.
 
+Confluent Cloud support hosted Connect.
+
 ### Security
 
 * There are different API keys to access cluster, cloud, resources, schema registry and logs and metrics.
@@ -223,6 +234,12 @@ Connectors can access public or private (via VPC peering or transit gateways) so
 ### Infrastructure As Code
 
 [Terraform Confluent Provider](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs) to configure any CCloud resources.
+
+### Governance
+
+
+Two packages: essentials and advanced for enterprise uses cases that groups client-side field level encryption, and doing data quality rules.
+
 
 ---
 
@@ -244,3 +261,4 @@ helm repo add confluentinc https://packages.confluent.io/helm
 k create ns confluent
 helm upgrade --install operator confluentinc/confluent-for-kubernetes -n confluent --set kRaftEnabled=true
 ```
+
